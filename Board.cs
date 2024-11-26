@@ -6,7 +6,7 @@ namespace chess
 {
     public class Board
     {
-        const string START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+        public const string START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
         public int[,] pieces { get; private set; } = new int[8, 8];
         public bool whiteToMove { get; set; }

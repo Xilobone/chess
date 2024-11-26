@@ -43,48 +43,21 @@ namespace chess
                     break;
             }
 
+            ChessPlayer chessPlayer = new ChessPlayer(whitePlayer, blackPlayer);
+
             //gets the starting position from a fen string
-            Board board;
             Console.Write("Enter the fen position to start (or leave blank for the regular starting position):");
             string? fen = Console.ReadLine();
 
             if (string.IsNullOrEmpty(fen))
             {
-                board = Board.startPosition();
+                chessPlayer.Play();
             }
             else
             {
-                board = Board.fromFen(fen);
+                chessPlayer.Play(fen);
             }
-
-            long startTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            //runs the game
-            while (!board.isInMate())
-            {
-                board.display();
-                //Console.ReadLine();
-
-                Move move;
-                if (board.whiteToMove)
-                {
-                    move = whitePlayer.makeMove(board);
-                }
-                else
-                {
-                    move = blackPlayer.makeMove(board);
-                }
-
-                //Console.WriteLine(board);
-                //Console.WriteLine(move);
-                board.makeMove(move);
-            }
-
-            board.display();
-            long time = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startTime;
-            Console.WriteLine("total elapsed time:" + time + "ms");
         }
-
-        
 
         //gets the number of players to play with
         private int getNumberOfPlayers()
