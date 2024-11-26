@@ -1,6 +1,3 @@
-using System.Diagnostics;
-using System.Numerics;
-
 namespace chess
 {
     public class MoveGenerator
@@ -37,6 +34,19 @@ namespace chess
         { Move.CASTLE_BLACK_QUEENSIDE, new Position(2,7) }
     };
 
+        public static List<Move> generateAllMoves(Board board) {
+            List<Move> moves = new List<Move>();
+
+            for (int x = 0; x < 8; x++)
+            {
+                for (int y = 0; y < 8; y++)
+                {
+                    moves.AddRange(generateMoves(board, new Position(x, y)));
+                }
+            }
+
+            return moves;
+        }
         public static List<Move> generateMoves(Board board, Position position)
         {
             return generateMoves(board, position, false);
@@ -213,25 +223,25 @@ namespace chess
             int piece = board.getPiece(pos);
             if (piece == Piece.WHITE_KING)
             {
-                if (board.castlingOptions[Move.CASTLE_WHITE_KINGSIDE] && board.getPiece(new Position(1, 0)) == Piece.EMPTY && board.getPiece(new Position(2, 0)) == Piece.EMPTY && board.getPiece(new Position(3, 0)) == Piece.EMPTY)
-                {
-                    appendMove(moves, board, pos, KING_CASTLE_POSITIONS[Move.CASTLE_WHITE_KINGSIDE], allowCheck, Move.FLAG_CASTLING);
-                }
-                if (board.castlingOptions[Move.CASTLE_WHITE_QUEENSIDE] && board.getPiece(new Position(5, 0)) == Piece.EMPTY && board.getPiece(new Position(6, 0)) == Piece.EMPTY)
+                if (board.castlingOptions[Move.CASTLE_WHITE_QUEENSIDE] && board.getPiece(new Position(1, 0)) == Piece.EMPTY && board.getPiece(new Position(2, 0)) == Piece.EMPTY && board.getPiece(new Position(3, 0)) == Piece.EMPTY)
                 {
                     appendMove(moves, board, pos, KING_CASTLE_POSITIONS[Move.CASTLE_WHITE_QUEENSIDE], allowCheck, Move.FLAG_CASTLING);
+                }
+                if (board.castlingOptions[Move.CASTLE_WHITE_KINGSIDE] && board.getPiece(new Position(5, 0)) == Piece.EMPTY && board.getPiece(new Position(6, 0)) == Piece.EMPTY)
+                {
+                    appendMove(moves, board, pos, KING_CASTLE_POSITIONS[Move.CASTLE_WHITE_KINGSIDE], allowCheck, Move.FLAG_CASTLING);
                 }
             }
 
             if (piece == Piece.BLACK_KING)
             {
-                if (board.castlingOptions[Move.CASTLE_BLACK_KINGSIDE] && board.getPiece(new Position(1, 7)) == Piece.EMPTY && board.getPiece(new Position(2, 7)) == Piece.EMPTY && board.getPiece(new Position(3, 7)) == Piece.EMPTY)
-                {
-                    appendMove(moves, board, pos, KING_CASTLE_POSITIONS[Move.CASTLE_BLACK_KINGSIDE], allowCheck, Move.FLAG_CASTLING);
-                }
-                if (board.castlingOptions[Move.CASTLE_BLACK_QUEENSIDE] && board.getPiece(new Position(5, 7)) == Piece.EMPTY && board.getPiece(new Position(6, 7)) == Piece.EMPTY)
+                if (board.castlingOptions[Move.CASTLE_BLACK_QUEENSIDE] && board.getPiece(new Position(1, 7)) == Piece.EMPTY && board.getPiece(new Position(2, 7)) == Piece.EMPTY && board.getPiece(new Position(3, 7)) == Piece.EMPTY)
                 {
                     appendMove(moves, board, pos, KING_CASTLE_POSITIONS[Move.CASTLE_BLACK_QUEENSIDE], allowCheck, Move.FLAG_CASTLING);
+                }
+                if (board.castlingOptions[Move.CASTLE_BLACK_KINGSIDE] && board.getPiece(new Position(5, 7)) == Piece.EMPTY && board.getPiece(new Position(6, 7)) == Piece.EMPTY)
+                {
+                    appendMove(moves, board, pos, KING_CASTLE_POSITIONS[Move.CASTLE_BLACK_KINGSIDE], allowCheck, Move.FLAG_CASTLING);
                 }
             }
 
@@ -317,12 +327,12 @@ namespace chess
             {
                 foreach (int prom_flag in Move.FLAG_PROMOTIONS)
                 {
-                    moves.Append(new Move(pos, newPos, prom_flag));
+                    moves.Add(new Move(pos, newPos, prom_flag));
                 }
                 return;
             }
 
-            moves.Append(new Move(pos, newPos, flag));
+            moves.Add(new Move(pos, newPos, flag));
         }
     }
 }

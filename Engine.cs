@@ -1,4 +1,6 @@
-namespace chess
+using chess;
+
+namespace engine
 {
     public class Engine : IPlayer
     {
@@ -52,11 +54,12 @@ namespace chess
 
         private SearchResult maxi(Board board, float alpha, float beta, int depth)
         {
+            long startTime;
             if (depth == 0 || board.isInMate())
             {
                 evaluatedBoards++;
 
-                long startTime = getCurrentTime();
+                startTime = getCurrentTime();
                 float eval = Evaluator.evaluate(board);
                 evaluationTime += getCurrentTime() - startTime;
 
@@ -66,49 +69,35 @@ namespace chess
             float max = float.MinValue;
             Move? bestMove = null;
 
-            for (int x = 0; x < 8; x++)
+            startTime = getCurrentTime();
+            List<Move> moves = MoveGenerator.generateAllMoves(board);
+            generationTime += getCurrentTime() - startTime;
+
+            foreach (Move move in moves)
             {
-                for (int y = 0; y < 8; y++)
+                Board resultingBoard = board.getCopy();
+                resultingBoard.makeMove(move);
+
+                SearchResult result = mini(resultingBoard, alpha, beta, depth - 1);
+
+                if (result.evaluation > max)
                 {
-                    Position pos = new Position(x, y);
-                    int piece = board.getPiece(pos);
-
-                    if (!Piece.isItsTurn(piece, board.whiteToMove))
+                    max = alpha;
+                    if (result.evaluation > alpha)
                     {
-                        continue;
-                    }
-
-                    long startTime = getCurrentTime();
-                    List<Move> moves = MoveGenerator.generateMoves(board, pos);
-                    //Console.WriteLine("Length of moves list:" + moves.Count);
-                    generationTime += getCurrentTime() - startTime;
-
-                    foreach (Move move in moves)
-                    {
-                        Board resultingBoard = board.getCopy();
-                        resultingBoard.makeMove(move);
-
-                        SearchResult result = mini(resultingBoard, alpha, beta, depth - 1);
-
-                        if (result.evaluation > max)
-                        {
-                            max = alpha;
-                            if (result.evaluation > alpha)
-                            {
-                                alpha = result.evaluation;
-                                bestMove = move;
-                            }
-                        }
-
-                        if (result.evaluation >= beta)
-                        {
-                            prunedBranches += moves.Count() - moves.IndexOf(move) - 1;
-                            //Console.WriteLine("Beta pruning, move:", bestMove);
-                            return new SearchResult(result.evaluation, bestMove);
-                        }
+                        alpha = result.evaluation;
+                        bestMove = move;
                     }
                 }
+
+                if (result.evaluation >= beta)
+                {
+                    prunedBranches += moves.Count() - moves.IndexOf(move) - 1;
+                    //Console.WriteLine("Beta pruning, move:", bestMove);
+                    return new SearchResult(result.evaluation, bestMove);
+                }
             }
+
 
             //Console.WriteLine("returning at end of maxi, move:" + bestMove);
             return new SearchResult(max, bestMove);
@@ -116,11 +105,13 @@ namespace chess
 
         private SearchResult mini(Board board, float alpha, float beta, int depth)
         {
+            long startTime;
+
             if (depth == 0 || board.isInMate())
             {
                 evaluatedBoards++;
 
-                long startTime = getCurrentTime();
+                startTime = getCurrentTime();
                 float eval = Evaluator.evaluate(board);
                 evaluationTime += getCurrentTime() - startTime;
 
@@ -130,45 +121,31 @@ namespace chess
             float min = float.MaxValue;
             Move? bestMove = null;
 
-            for (int x = 0; x < 8; x++)
+            startTime = getCurrentTime();
+            List<Move> moves = MoveGenerator.generateAllMoves(board);
+            generationTime += getCurrentTime() - startTime;
+
+            foreach (Move move in moves)
             {
-                for (int y = 0; y < 8; y++)
+                Board resultingBoard = board.getCopy();
+                resultingBoard.makeMove(move);
+
+                SearchResult result = maxi(resultingBoard, alpha, beta, depth - 1);
+
+                if (result.evaluation < min)
                 {
-                    Position pos = new Position(x, y);
-                    int piece = board.getPiece(pos);
-
-                    if (!Piece.isItsTurn(piece, board.whiteToMove))
+                    min = result.evaluation;
+                    if (result.evaluation < beta)
                     {
-                        continue;
+                        beta = result.evaluation;
+                        bestMove = move;
                     }
+                }
 
-                    long startTime = getCurrentTime();
-                    List<Move> moves = MoveGenerator.generateMoves(board, pos);
-                    generationTime += getCurrentTime() - startTime;
-
-                    foreach (Move move in moves)
-                    {
-                        Board resultingBoard = board.getCopy();
-                        resultingBoard.makeMove(move);
-
-                        SearchResult result = maxi(resultingBoard, alpha, beta, depth - 1);
-
-                        if (result.evaluation < min)
-                        {
-                            min = result.evaluation;
-                            if (result.evaluation < beta)
-                            {
-                                beta = result.evaluation;
-                                bestMove = move;
-                            }
-                        }
-
-                        if (result.evaluation <= alpha)
-                        {
-                            prunedBranches += moves.Count() - moves.IndexOf(move) - 1;
-                            return new SearchResult(result.evaluation, bestMove);
-                        }
-                    }
+                if (result.evaluation <= alpha)
+                {
+                    prunedBranches += moves.Count() - moves.IndexOf(move) - 1;
+                    return new SearchResult(result.evaluation, bestMove);
                 }
             }
 

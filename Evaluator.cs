@@ -1,4 +1,6 @@
-namespace chess
+using chess;
+
+namespace engine
 {
     public class Evaluator
     {

@@ -4,19 +4,6 @@ namespace chess
     {
         public Move makeMove(Board board)
         {
-            List<Move> allMoves = new List<Move>();
-            for (int x = 0; x < 8; x++)
-            {
-                for (int y = 0; y < 8; y++)
-                {
-                    Position pos = new Position(x, y);
-
-                    allMoves.AddRange(MoveGenerator.generateMoves(board, pos));
-                }
-            }
-
-            Console.WriteLine("total valid moves:" + allMoves);
-
             Console.Write("Please make a move:");
             string? inp = Console.ReadLine();
 
@@ -49,13 +36,14 @@ namespace chess
             Console.Write("What do you want to promote to (type q,r,b or n):");
             string? promotion = Console.ReadLine();
 
-            while (!Move.PROMOTION_VALUES.Keys.Contains(promotion))
+
+            while (!Move.PROMOTION_VALUES.Keys.Contains(promotion!))
             {
                 Console.Write("The entered value was not correct, please try again:");
                 promotion = Console.ReadLine();
             }
 
-            return Move.PROMOTION_VALUES[promotion];
+            return Move.PROMOTION_VALUES[promotion!];
         }
     }
 }

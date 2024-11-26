@@ -1,3 +1,7 @@
+//TODO: disallow castling when or trough check
+//TODO: implement stalemate
+using engine;
+
 namespace chess
 {
     public class Chess
@@ -20,13 +24,13 @@ namespace chess
 
                     if (color == "b")
                     {
-                        whitePlayer = new Player();
-                        blackPlayer = new Engine(false);
+                        whitePlayer = new Engine(true);
+                        blackPlayer = new Player();
                     }
                     else
                     {
-                        whitePlayer = new Engine(true);
-                        blackPlayer = new Player();
+                        whitePlayer = new Player();
+                        blackPlayer = new Engine(false);
                     }
                     break;
                 case 2:
@@ -53,10 +57,12 @@ namespace chess
                 board = Board.fromFen(fen);
             }
 
+            long startTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             //runs the game
             while (!board.isInMate())
             {
                 board.display();
+                //Console.ReadLine();
 
                 Move move;
                 if (board.whiteToMove)
@@ -74,7 +80,11 @@ namespace chess
             }
 
             board.display();
+            long time = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startTime;
+            Console.WriteLine("total elapsed time:" + time + "ms");
         }
+
+        
 
         //gets the number of players to play with
         private int getNumberOfPlayers()

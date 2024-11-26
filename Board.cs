@@ -241,7 +241,7 @@ namespace chess
                         continue;
                     }
 
-                    List<Move> moves = MoveGenerator.generateMoves(this, pos, true);
+                    List<Move> moves = MoveGenerator.generateMoves(this, pos, false);
 
                     if (moves.Count > 0)
                     {
@@ -278,7 +278,7 @@ namespace chess
             Console.WriteLine();
 
             Console.WriteLine(toFen());
-            Console.WriteLine("Evaluation: " + Evaluator.evaluate(this));
+            //Console.WriteLine("Evaluation: " + Evaluator.evaluate(this));
 
             if (isInCheck()) Console.WriteLine("Check!");
             if (isInMate())
