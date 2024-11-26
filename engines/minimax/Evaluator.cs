@@ -1,8 +1,8 @@
 using chess;
 
-namespace engine
+namespace minimax_engine
 {
-    public class Evaluator
+    public class Evaluator : IEvaluator
     {
         private static Dictionary<int, int> PIECE_VALUES = new Dictionary<int, int>
     {
@@ -18,8 +18,8 @@ namespace engine
         { Piece.BLACK_QUEEN, -9 },
     };
 
-        private static Position[] CENTER_SQUARES = new Position[] { new Position(3, 3), new Position(3, 4), new Position(4, 3), new Position(4, 4) };
-        public static float evaluate(Board board)
+        private static Position[] CENTER_SQUARES = { new Position(3, 3), new Position(3, 4), new Position(4, 3), new Position(4, 4) };
+        public float evaluate(Board board)
         {
             float eval = 0;
 

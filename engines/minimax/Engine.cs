@@ -1,19 +1,23 @@
 using chess;
 
-namespace engine
+namespace minimax_engine
 {
-    public class Engine : IPlayer
+    public class Engine : IEngine
     {
 
         private const int MAX_DEPTH = 2;
-
-        private bool isWhite;
         private int depth;
         private int evaluatedBoards;
         private long computationTime;
         private long evaluationTime;
         private long generationTime;
         private int prunedBranches;
+
+        private Evaluator evaluator;
+
+        public bool isWhite { get; set; }
+
+        public Engine() : this(true, MAX_DEPTH) { }
 
         public Engine(bool isWhite) : this(isWhite, MAX_DEPTH) { }
 
@@ -27,6 +31,13 @@ namespace engine
             evaluationTime = 0;
             generationTime = 0;
             prunedBranches = 0;
+
+            evaluator = new Evaluator();
+        }
+
+        public Move makeMove(Board board, float maxTime)
+        {
+            return makeMove(board);
         }
         public Move makeMove(Board board)
         {
@@ -60,7 +71,7 @@ namespace engine
                 evaluatedBoards++;
 
                 startTime = getCurrentTime();
-                float eval = Evaluator.evaluate(board);
+                float eval = evaluator.evaluate(board);
                 evaluationTime += getCurrentTime() - startTime;
 
                 return new SearchResult(eval, null);
@@ -112,7 +123,7 @@ namespace engine
                 evaluatedBoards++;
 
                 startTime = getCurrentTime();
-                float eval = Evaluator.evaluate(board);
+                float eval = evaluator.evaluate(board);
                 evaluationTime += getCurrentTime() - startTime;
 
                 return new SearchResult(eval, null);

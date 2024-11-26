@@ -1,7 +1,15 @@
-namespace chess
+using chess;
+
+namespace player
 {
-    public class Player : IPlayer
+    public class Player : IEngine
     {
+        public bool isWhite { get; set; }
+
+        public Move makeMove(Board board, float maxTime)
+        {
+            return makeMove(board);
+        }
         public Move makeMove(Board board)
         {
             Console.Write("Please make a move:");
