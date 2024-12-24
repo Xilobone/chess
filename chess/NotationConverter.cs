@@ -150,6 +150,11 @@ namespace converter
             throw new Exception($"notation invalid! ({move})");
         }
 
+        /// <summary>
+        /// Converts a coordinate (eg. b2) to a position object
+        /// </summary>
+        /// <param name="coordinates">The coordinate to convert</param>
+        /// <returns>The converted position</returns>
         public static Position toPosition(string coordinates)
         {
             int x = coordinates[0] - 'a';
@@ -157,5 +162,15 @@ namespace converter
 
             return new Position(x, y);
         }
+
+        /// <summary>
+        /// Converts a position to a coordinate (eg. b2)
+        /// </summary>
+        /// <param name="position">The position to convert</param>
+        /// <returns>The converted position</returns>
+        public static string toCoordinates(Position position)
+        {
+            return (char)(position.x + 'a') + (position.y + 1).ToString();
+        }  
     }
 }

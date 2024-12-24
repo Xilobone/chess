@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Dynamic;
 using System.Runtime.CompilerServices;
+using converter;
 
 namespace chess
 {
@@ -365,7 +366,7 @@ namespace chess
             }
             else
             {
-                fen += Move.toCoordinates(enpassantPos);
+                fen += NotationConverter.toCoordinates(enpassantPos);
             }
 
             //add move counters
@@ -425,7 +426,7 @@ namespace chess
             }
 
             //en passant
-            board.enpassantPos = fen[3] == "-" ? null : Move.fromCoordinates(fen[3]);
+            board.enpassantPos = fen[3] == "-" ? null : NotationConverter.toPosition(fen[3]);
 
             board.halfMoves = int.Parse(fen[4]);
             board.fullMoves = int.Parse(fen[5]);

@@ -1,5 +1,6 @@
 
 using System.Text.RegularExpressions;
+using converter;
 
 namespace chess
 {
@@ -63,8 +64,8 @@ namespace chess
         {
             string[] move = move_str.Split(' ');
 
-            Position fr = fromCoordinates(move[0]);
-            Position to = fromCoordinates(move[1]);
+            Position fr = NotationConverter.toPosition(move[0]);
+            Position to = NotationConverter.toPosition(move[1]);
 
             return new Move(fr, to);
         }
@@ -89,19 +90,6 @@ namespace chess
         public override string ToString()
         {
             return $"(From:{fr}, To:{to})";
-        }
-
-        public static string toCoordinates(Position position)
-        {
-            return (char)(position.x + 'a') + (position.y + 1).ToString();
-        }
-
-        public static Position fromCoordinates(string coordinates)
-        {
-            int x = coordinates[0] - 'a';
-            int y = int.Parse(coordinates[1].ToString()) - 1;
-
-            return new Position(x, y);
-        }     
+        } 
     }
 }
