@@ -86,6 +86,11 @@ namespace chess
             return fr.GetHashCode() + to.GetHashCode();
         }
 
+        public override string ToString()
+        {
+            return $"(From:{fr}, To:{to})";
+        }
+
         public static string toCoordinates(Position position)
         {
             return (char)(position.x + 'a') + (position.y + 1).ToString();
@@ -97,6 +102,6 @@ namespace chess
             int y = int.Parse(coordinates[1].ToString()) - 1;
 
             return new Position(x, y);
-        }
+        }     
     }
 }

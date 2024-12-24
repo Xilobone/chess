@@ -47,7 +47,7 @@ namespace chess
                 enpassantPos = move.fr + new Position(0, 1);
                 //check if move creates an en passant option for white
             }
-            else if (piece == Piece.BLACK_PAWN && move.fr.y == 6 && move.to.x == 4)
+            else if (piece == Piece.BLACK_PAWN && move.fr.y == 6 && move.to.y == 4)
             {
                 enpassantPos = move.fr + new Position(0, -1);
             }

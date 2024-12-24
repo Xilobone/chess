@@ -1,3 +1,5 @@
+using System.Diagnostics.Contracts;
+
 namespace chess
 {
     public class Position
@@ -58,6 +60,11 @@ namespace chess
         public override int GetHashCode()
         {
             return 2 * x + 3 * y;
+        }
+
+        public override string ToString()
+        {
+            return Move.toCoordinates(this);
         }
     }
 }

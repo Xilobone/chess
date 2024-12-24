@@ -1,6 +1,7 @@
 using chess;
+using parser;
 
-namespace chess_program
+namespace engine_comparer
 {
     public class EngineComparer
     {
@@ -25,11 +26,11 @@ namespace chess_program
             white.engine.isWhite = true;
             black.engine.isWhite = false;
 
-            ChessPlayerSettings settings = new ChessPlayerSettings(10, 0, 0);
+            ChessPlayerSettings settings = new ChessPlayerSettings(100, 0, 0);
             ChessPlayer player = new ChessPlayer(white, black, settings);
 
             Console.WriteLine(white.engine.isWhite);
-            player.Play();
+            player.Play("r1b2rk1/1pppnpp1/pb4qp/4P3/1PBpN3/P2P1N2/2P2PPP/R2QR1K1 b - - 2 13");
         }
 
         private Player selectPlayer(bool isWhite) 
@@ -49,7 +50,9 @@ namespace chess_program
         }
         public static void Main(string[] args)
         {
-            new EngineComparer();
+            //snew EngineComparer();
+            GamesParser parser = new GamesParser("./lib/chess_games.pgn");
+            parser.parse(10);
         }
     }
 }
