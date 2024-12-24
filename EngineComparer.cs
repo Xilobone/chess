@@ -29,8 +29,11 @@ namespace engine_comparer
             ChessPlayerSettings settings = new ChessPlayerSettings(100, 0, 0);
             ChessPlayer player = new ChessPlayer(white, black, settings);
 
-            Console.WriteLine(white.engine.isWhite);
-            player.Play("r1b2rk1/1pppnpp1/pb4qp/4P3/1PBpN3/P2P1N2/2P2PPP/R2QR1K1 b - - 2 13");
+            Console.Write("Enter the starting fen (or leave empty for the standard position):");
+            string? fen = Console.ReadLine();
+
+            if (string.IsNullOrEmpty(fen)) player.Play();
+            else player.Play(fen);
         }
 
         private Player selectPlayer(bool isWhite) 
@@ -50,9 +53,9 @@ namespace engine_comparer
         }
         public static void Main(string[] args)
         {
-            //snew EngineComparer();
-            GamesParser parser = new GamesParser("./lib/chess_games.pgn");
-            parser.parse(10);
+            new EngineComparer();
+            //GamesParser parser = new GamesParser("./lib/chess_games.pgn");
+            //parser.parse(10);
         }
     }
 }

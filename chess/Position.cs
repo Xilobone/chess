@@ -1,4 +1,5 @@
 using System.Diagnostics.Contracts;
+using converter;
 
 namespace chess
 {
@@ -64,7 +65,7 @@ namespace chess
 
         public override string ToString()
         {
-            return Move.toCoordinates(this);
+            return NotationConverter.toCoordinates(this);
         }
     }
 }
