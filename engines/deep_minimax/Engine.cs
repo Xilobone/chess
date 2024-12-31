@@ -86,8 +86,7 @@ namespace deep_minimax_engine
 
             foreach (Move move in moves)
             {
-                Board resultingBoard = board.getCopy();
-                resultingBoard.makeMove(move);
+                Board resultingBoard = board.makeMove(move);
 
                 SearchResult result = mini(resultingBoard, alpha, beta, depth - 1);
 
@@ -138,8 +137,7 @@ namespace deep_minimax_engine
 
             foreach (Move move in moves)
             {
-                Board resultingBoard = board.getCopy();
-                resultingBoard.makeMove(move);
+                Board resultingBoard = board.makeMove(move);
 
                 SearchResult result = maxi(resultingBoard, alpha, beta, depth - 1);
 

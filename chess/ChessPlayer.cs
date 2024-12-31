@@ -48,7 +48,7 @@ namespace chess
                     case (false, false): move = black.engine.makeMove(board); break;
                 }
 
-                board.makeMove(move);
+                board = board.makeMove(move);
                 runningTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startTime;
             }
 

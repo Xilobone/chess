@@ -51,21 +51,19 @@ namespace parser
             for(int i = 1; i < moves.Length; i++)
             {
                 string[] move = moves[i].Split(" ");
-                Board copy = board.getCopy();
-                boards.Add(copy);
+                boards.Add(board);
 
                 Move whiteMove = NotationConverter.toMove(move[0], board);
                 //Console.WriteLine("White: " + move[0] + ", " + whiteMove);
-                board.makeMove(whiteMove);
+                board = board.makeMove(whiteMove);
                 // board.display();
                 if (move.Length == 3)
                 {
-                    Board copy2 = board.getCopy();
-                    boards.Add(copy2);
+                    boards.Add(board);
                 
                     Move blackMove = NotationConverter.toMove(move[1], board);
                     //Console.WriteLine("Black: " + move[1] + ", " + blackMove);
-                    board.makeMove(blackMove);
+                    board = board.makeMove(blackMove);
                     // board.display();
                 }
             }

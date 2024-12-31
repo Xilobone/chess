@@ -310,8 +310,8 @@ namespace chess
             int piece = board.getPiece(pos);
 
             //do not add move if it results in being in check
-            Board resultingBoard = board.getCopy();
-            resultingBoard.makeMove(new Move(pos, newPos));
+            Board resultingBoard = board.makeMove(new Move(pos, newPos));
+            //resultingBoard.makeMove(new Move(pos, newPos));
             resultingBoard.whiteToMove = !resultingBoard.whiteToMove;
 
             if (!allowCheck)
