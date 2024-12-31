@@ -8,12 +8,12 @@ namespace parser
         private string filePath;
         private IEvaluator[] evaluators;
         private Random random;
-        public GamesParser(string filePath, IEvaluator[] evaluators)
+        public GamesParser(string filePath, IEvaluator[] evaluators, int seed)
         {
             this.filePath = filePath;
             this.evaluators = evaluators;
 
-            this.random = new Random();
+            this.random = new Random(seed);
         }
 
         /// <summary>
@@ -36,23 +36,29 @@ namespace parser
                 if (string.IsNullOrEmpty(line)) continue;
                 if (line[0] == '[') continue;
 
-                
+
                 List<Board> b = getAllPositions(line, range);
-                foreach(Board board in b)
+                foreach (Board board in b)
                 {
                     boards.Add(board);
                 }
 
-                Console.WriteLine($"done {i}/{lines.Length} lines ({(double)(i * 100) / lines.Length}%), boards size:{boards.Count}");
+                double percentage = Math.Min((double)(boards.Count * 100) / listSize, 100);
+                Console.WriteLine($"Parsing pgn file ({percentage}%)");
 
-                if (boards.Count >= listSize) break;
+                if (boards.Count >= listSize)
+                {
+                    Console.WriteLine($"done parsing, used {(double)(i * 100) / lines.Length}% of available data");
+                    Console.WriteLine("--------------------");
+                    break;
+                }
             }
 
             //select random boards
             List<Board> allBoards = boards.ToList();
             List<Board> selectedBoards = new List<Board>();
 
-            while(selectedBoards.Count < amount)
+            while (selectedBoards.Count < amount)
             {
                 int index = random.Next(allBoards.Count);
                 Board board = allBoards[index];
