@@ -11,12 +11,17 @@ namespace parser
             this.filePath = filePath; 
         }
 
-        public List<Board> parse(int amount)
+        /// <summary>
+        /// Gets a list of unique boards from the file
+        /// </summary>
+        /// <param name="listSize">The amount of boards to include in the search</param>
+        /// <param name="amount">The amount of boards to save</param>
+        /// <returns></returns>
+        public List<Board> parse(int listSize, int amount)
         {
             List<Board> boards = new List<Board>();
 
             string[] lines = File.ReadAllLines(filePath);
-            //Console.WriteLine(lines.Length);
             for(int i = 0; i < lines.Length; i++)
             {
                 string line = lines[i];
@@ -27,6 +32,8 @@ namespace parser
 
                 boards.AddRange(getAllPositions(line));
                 Console.WriteLine($"done {i}/{lines.Length} lines ({(double) (i * 100) / lines.Length}%), boards size:{boards.Count}");
+
+                if (boards.Count >= listSize) break;
             }
 
             return boards;

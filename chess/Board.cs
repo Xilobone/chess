@@ -1,8 +1,6 @@
-using System.Diagnostics;
-using System.Dynamic;
-using System.Runtime.CompilerServices;
 using converter;
 
+//TODO: make board immutable
 namespace chess
 {
     public class Board
