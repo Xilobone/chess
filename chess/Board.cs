@@ -463,8 +463,73 @@ namespace chess
             copy.fullMoves = fullMoves;
 
             return copy;
+        }
 
+        public override bool Equals(object? obj)
+        {
+            if (obj == null) return false;
 
+            if (ReferenceEquals(this, obj)) return true;
+
+            if (obj is not Board) return false;
+
+            Board other = (Board)obj;
+
+            //check if pieces are the same
+            for(int x = 0; x < 8; x++)
+            {
+                for(int y = 0; y < 8; y++)
+                {
+                    if (pieces[x, y] != other.pieces[x, y]) return false;
+                }
+            }
+
+            //check white to move
+            if (whiteToMove != other.whiteToMove) return false;
+
+            //check en passant
+            if (enpassantPos is null && other.enpassantPos is not null) return false;
+
+            if (enpassantPos is not null && other.enpassantPos is not null)
+            {
+                if (enpassantPos.Equals(other.enpassantPos)) return false;
+            }
+
+            //check castling options
+            for (int i = 0; i < castlingOptions.Length; i++)
+            {
+                if (castlingOptions[i] != other.castlingOptions[i]) return false;
+            }
+
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            int hash = 0;
+
+            for(int x = 0; x < 8; x++)
+            {
+                for(int y = 0; y < 8; y++)
+                {
+                    hash += (17 * pieces[x, y]) + (19 * x) + (23 * y);
+                }
+            }
+
+            if (whiteToMove) hash += 29;
+
+            if (enpassantPos is not null)
+            {
+                hash += 31 * enpassantPos.x;
+                hash += 37 * enpassantPos.y;
+            }
+
+            for (int i = 0; i < castlingOptions.Length; i++)
+            {
+                if (castlingOptions[i]) hash += 987;
+            }
+
+            return hash;
         }
     }
 }

@@ -4,10 +4,11 @@ namespace deep_minimax_engine
 {
     public class Engine : IEngine
     {
-
         private const int MAX_DEPTH = 3;
 
         public bool isWhite { get; set; }
+        public bool displayStats { get; set; }
+
         private int depth;
         private int evaluatedBoards;
         private long computationTime;
@@ -56,8 +57,11 @@ namespace deep_minimax_engine
 
             computationTime = getCurrentTime() - startTime;
 
-            displayOverview();
-            clearCounters();
+            if (displayStats)
+            {
+                displayOverview();
+                clearCounters();
+            }
 
             //Console.WriteLine(result.move);
             return result.move!;
@@ -103,13 +107,10 @@ namespace deep_minimax_engine
                 if (result.evaluation >= beta)
                 {
                     prunedBranches += moves.Count() - moves.IndexOf(move) - 1;
-                    //Console.WriteLine("Beta pruning, move:", bestMove);
                     return new SearchResult(result.evaluation, bestMove);
                 }
             }
 
-
-            //Console.WriteLine("returning at end of maxi, move:" + bestMove);
             return new SearchResult(max, bestMove);
         }
 

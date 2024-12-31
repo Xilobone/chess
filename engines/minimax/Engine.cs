@@ -16,6 +16,7 @@ namespace minimax_engine
         private Evaluator evaluator;
 
         public bool isWhite { get; set; }
+        public bool displayStats { get; set; }
 
         public Engine() : this(true, MAX_DEPTH) { }
 
@@ -56,10 +57,12 @@ namespace minimax_engine
 
             computationTime = getCurrentTime() - startTime;
 
-            displayOverview();
-            clearCounters();
+            if (displayStats)
+            {
+                displayOverview();
+                clearCounters();
+            }
 
-            //Console.WriteLine(result.move);
             return result.move!;
         }
 
