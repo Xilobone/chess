@@ -53,9 +53,9 @@ namespace engine_comparer
         }
         public static void Main(string[] args)
         {
-            //new EngineComparer();
-            GamesParser parser = new GamesParser("./lib/chess_games.pgn");
-            parser.parse(10000,10);
+            new EngineComparer();
+            //GamesParser parser = new GamesParser("./lib/chess_games.pgn");
+            //parser.parse(10000,10);
         }
     }
 }

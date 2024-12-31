@@ -1,6 +1,5 @@
 using converter;
 
-//TODO: make board immutable
 namespace chess
 {
     public class Board
@@ -14,17 +13,18 @@ namespace chess
         public int halfMoves { get; private set; }
         public int fullMoves { get; private set; }
 
-        public void makeMove(Move move)
+        public Board makeMove(Move move)
         {
+            Board result = getCopy();
             int piece = getPiece(move.fr);
 
             if (piece == Piece.WHITE_PAWN || piece == Piece.BLACK_PAWN || getPiece(move.to) != Piece.EMPTY)
             {
-                halfMoves = 0;
+                result.halfMoves = 0;
             }
             else
             {
-                halfMoves++;
+                result.halfMoves++;
             }
 
             //move was en passant
@@ -32,51 +32,53 @@ namespace chess
             {
                 if (move.to.y == 2)
                 {
-                    pieces[move.to.x, move.to.y + 1] = Piece.EMPTY;
+                    result.pieces[move.to.x, move.to.y + 1] = Piece.EMPTY;
                 }
                 if (move.to.y == 5)
                 {
-                    pieces[move.to.x, move.to.y - 1] = Piece.EMPTY;
+                    result.pieces[move.to.x, move.to.y - 1] = Piece.EMPTY;
                 }
             }
 
             //check if move creates an en passant option for black
             if (piece == Piece.WHITE_PAWN && move.fr.y == 1 && move.to.y == 3)
             {
-                enpassantPos = move.fr + new Position(0, 1);
+                result.enpassantPos = move.fr + new Position(0, 1);
                 //check if move creates an en passant option for white
             }
             else if (piece == Piece.BLACK_PAWN && move.fr.y == 6 && move.to.y == 4)
             {
-                enpassantPos = move.fr + new Position(0, -1);
+                result.enpassantPos = move.fr + new Position(0, -1);
             }
             else
             {
-                enpassantPos = null;
+                result.enpassantPos = null;
             }
 
-            checkCastlingOptions(move);
+            result.checkCastlingOptions(move);
 
             if (move.flag == Move.FLAG_CASTLING)
             {
-                castle(move);
+                result.castle(move);
             }
 
             //move pieces around
-            pieces[move.to.x, move.to.y] = pieces[move.fr.x, move.fr.y];
-            pieces[move.fr.x, move.fr.y] = Piece.EMPTY;
+            result.pieces[move.to.x, move.to.y] = pieces[move.fr.x, move.fr.y];
+            result.pieces[move.fr.x, move.fr.y] = Piece.EMPTY;
 
             if (Move.FLAG_PROMOTIONS.Contains(move.flag))
             {
-                promote(move);
+                result.promote(move);
             }
 
-            whiteToMove = !whiteToMove;
+            result.whiteToMove = !whiteToMove;
 
             if (whiteToMove)
             {
-                fullMoves++;
+                result.fullMoves++;
             }
+
+            return result;
         }
 
         private void checkCastlingOptions(Move move)
