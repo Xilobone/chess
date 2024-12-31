@@ -6,23 +6,29 @@ namespace parser
     public class GamesParser
     {
         private string filePath;
-        public GamesParser(string filePath)
+        private IEvaluator[] evaluators;
+        private Random random;
+        public GamesParser(string filePath, IEvaluator[] evaluators)
         {
-            this.filePath = filePath; 
+            this.filePath = filePath;
+            this.evaluators = evaluators;
+
+            this.random = new Random();
         }
 
         /// <summary>
-        /// Gets a list of unique boards from the file
+        /// Gets a list of unique boards from the file which are roughly equal
         /// </summary>
         /// <param name="listSize">The amount of boards to include in the search</param>
         /// <param name="amount">The amount of boards to save</param>
+        /// <param name="range">The evaluation difference from 0 that is allowed</param>
         /// <returns></returns>
-        public List<Board> parse(int listSize, int amount)
+        public List<Board> parse(int listSize, int amount, float range)
         {
-            List<Board> boards = new List<Board>();
+            HashSet<Board> boards = new HashSet<Board>();
 
             string[] lines = File.ReadAllLines(filePath);
-            for(int i = 0; i < lines.Length; i++)
+            for (int i = 0; i < lines.Length; i++)
             {
                 string line = lines[i];
 
@@ -30,16 +36,35 @@ namespace parser
                 if (string.IsNullOrEmpty(line)) continue;
                 if (line[0] == '[') continue;
 
-                boards.AddRange(getAllPositions(line));
-                Console.WriteLine($"done {i}/{lines.Length} lines ({(double) (i * 100) / lines.Length}%), boards size:{boards.Count}");
+                
+                List<Board> b = getAllPositions(line, range);
+                foreach(Board board in b)
+                {
+                    boards.Add(board);
+                }
+
+                Console.WriteLine($"done {i}/{lines.Length} lines ({(double)(i * 100) / lines.Length}%), boards size:{boards.Count}");
 
                 if (boards.Count >= listSize) break;
             }
 
-            return boards;
+            //select random boards
+            List<Board> allBoards = boards.ToList();
+            List<Board> selectedBoards = new List<Board>();
+
+            while(selectedBoards.Count < amount)
+            {
+                int index = random.Next(allBoards.Count);
+                Board board = allBoards[index];
+
+                selectedBoards.Add(board);
+                allBoards.Remove(board);
+            }
+
+            return selectedBoards;
         }
 
-        private List<Board> getAllPositions(string line)
+        private List<Board> getAllPositions(string line, float range)
         {
             List<Board> boards = new List<Board>();
             Board board = Board.startPosition();
@@ -48,27 +73,39 @@ namespace parser
             string[] moves = line.Split(". ");
 
             //skip over first string, as it only contains "1"
-            for(int i = 1; i < moves.Length; i++)
+            for (int i = 1; i < moves.Length; i++)
             {
                 string[] move = moves[i].Split(" ");
-                boards.Add(board);
+
+                float eval = getAverageEval(board);
+                if (Math.Abs(eval) <= range && !boards.Contains(board)) boards.Add(board);
+
 
                 Move whiteMove = NotationConverter.toMove(move[0], board);
-                //Console.WriteLine("White: " + move[0] + ", " + whiteMove);
                 board = board.makeMove(whiteMove);
-                // board.display();
                 if (move.Length == 3)
                 {
-                    boards.Add(board);
-                
+                    eval = getAverageEval(board);
+                    if (Math.Abs(eval) <= range && !boards.Contains(board)) boards.Add(board);
+
                     Move blackMove = NotationConverter.toMove(move[1], board);
-                    //Console.WriteLine("Black: " + move[1] + ", " + blackMove);
                     board = board.makeMove(blackMove);
-                    // board.display();
                 }
             }
 
             return boards;
+        }
+
+        private float getAverageEval(Board board)
+        {
+            float eval = 0;
+
+            foreach (IEvaluator evaluator in evaluators)
+            {
+                eval += evaluator.evaluate(board);
+            }
+
+            return eval / evaluators.Length;
         }
     }
 }
