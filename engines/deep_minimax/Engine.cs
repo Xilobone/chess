@@ -18,6 +18,8 @@ namespace deep_minimax_engine
 
         private Evaluator evaluator;
 
+        private float remainingTime;
+
         public Engine() : this(true, MAX_DEPTH) { }
 
         public Engine(bool isWhite) : this(isWhite, MAX_DEPTH) { }
@@ -36,12 +38,13 @@ namespace deep_minimax_engine
             evaluator = new Evaluator();
         }
 
-        public Move makeMove(Board board, float maxTime)
-        {
-            return makeMove(board);
-        }
         public Move makeMove(Board board)
         {
+            return makeMove(board, float.MaxValue);
+        }
+        public Move makeMove(Board board, float maxTime)
+        {
+            remainingTime = maxTime;
             long startTime = getCurrentTime();
 
             SearchResult result;
@@ -70,7 +73,7 @@ namespace deep_minimax_engine
         private SearchResult maxi(Board board, float alpha, float beta, int depth)
         {
             long startTime;
-            if (depth == 0 || board.isInMate())
+            if (depth == 0 || board.isInMate() || remainingTime <= 0)
             {
                 evaluatedBoards++;
 
@@ -78,6 +81,7 @@ namespace deep_minimax_engine
                 float eval = evaluator.evaluate(board);
                 evaluationTime += getCurrentTime() - startTime;
 
+                remainingTime -= getCurrentTime() - startTime;
                 return new SearchResult(eval, null);
             }
 
@@ -88,9 +92,13 @@ namespace deep_minimax_engine
             List<Move> moves = MoveGenerator.generateAllMoves(board);
             generationTime += getCurrentTime() - startTime;
 
+            remainingTime -= getCurrentTime() - startTime;
+
             foreach (Move move in moves)
             {
+                startTime = getCurrentTime();
                 Board resultingBoard = board.makeMove(move);
+                remainingTime -= getCurrentTime() - startTime;
 
                 SearchResult result = mini(resultingBoard, alpha, beta, depth - 1);
 
@@ -118,7 +126,7 @@ namespace deep_minimax_engine
         {
             long startTime;
 
-            if (depth == 0 || board.isInMate())
+            if (depth == 0 || board.isInMate() || remainingTime <= 0)
             {
                 evaluatedBoards++;
 
@@ -126,6 +134,7 @@ namespace deep_minimax_engine
                 float eval = evaluator.evaluate(board);
                 evaluationTime += getCurrentTime() - startTime;
 
+                remainingTime -= getCurrentTime() - startTime;
                 return new SearchResult(eval, null);
             }
 
@@ -136,9 +145,13 @@ namespace deep_minimax_engine
             List<Move> moves = MoveGenerator.generateAllMoves(board);
             generationTime += getCurrentTime() - startTime;
 
+            remainingTime -= getCurrentTime() - startTime;
+
             foreach (Move move in moves)
             {
+                startTime = getCurrentTime();
                 Board resultingBoard = board.makeMove(move);
+                remainingTime -= getCurrentTime() - startTime;
 
                 SearchResult result = maxi(resultingBoard, alpha, beta, depth - 1);
 

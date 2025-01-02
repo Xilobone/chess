@@ -13,6 +13,7 @@ namespace minimax_engine
         private long generationTime;
         private int prunedBranches;
 
+        private float remainingTime;
         private Evaluator evaluator;
 
         public bool isWhite { get; set; }
@@ -36,18 +37,18 @@ namespace minimax_engine
             evaluator = new Evaluator();
         }
 
-        public Move makeMove(Board board, float maxTime)
-        {
-            return makeMove(board);
-        }
         public Move makeMove(Board board)
         {
+            return makeMove(board, float.MaxValue);
+        }
+        public Move makeMove(Board board, float maxTime)
+        {
+            remainingTime = maxTime;
             long startTime = getCurrentTime();
 
             SearchResult result;
             if (isWhite)
             {
-                //Console.WriteLine("running maxi");
                 result = maxi(board, float.MinValue, float.MaxValue, depth);
             }
             else
@@ -69,7 +70,7 @@ namespace minimax_engine
         private SearchResult maxi(Board board, float alpha, float beta, int depth)
         {
             long startTime;
-            if (depth == 0 || board.isInMate())
+            if (depth == 0 || board.isInMate() || remainingTime <= 0)
             {
                 evaluatedBoards++;
 
@@ -77,6 +78,7 @@ namespace minimax_engine
                 float eval = evaluator.evaluate(board);
                 evaluationTime += getCurrentTime() - startTime;
 
+                remainingTime -= getCurrentTime() - startTime;
                 return new SearchResult(eval, null);
             }
 
@@ -87,9 +89,14 @@ namespace minimax_engine
             List<Move> moves = MoveGenerator.generateAllMoves(board);
             generationTime += getCurrentTime() - startTime;
 
+            remainingTime -= getCurrentTime() - startTime;
+
+
             foreach (Move move in moves)
             {
+                startTime = getCurrentTime();
                 Board resultingBoard = board.makeMove(move);
+                remainingTime -= getCurrentTime() - startTime;
 
                 SearchResult result = mini(resultingBoard, alpha, beta, depth - 1);
 
@@ -106,7 +113,6 @@ namespace minimax_engine
                 if (result.evaluation >= beta)
                 {
                     prunedBranches += moves.Count() - moves.IndexOf(move) - 1;
-                    //Console.WriteLine("Beta pruning, move:", bestMove);
                     return new SearchResult(result.evaluation, bestMove);
                 }
             }
@@ -120,7 +126,7 @@ namespace minimax_engine
         {
             long startTime;
 
-            if (depth == 0 || board.isInMate())
+            if (depth == 0 || board.isInMate() || remainingTime <= 0)
             {
                 evaluatedBoards++;
 
@@ -128,6 +134,7 @@ namespace minimax_engine
                 float eval = evaluator.evaluate(board);
                 evaluationTime += getCurrentTime() - startTime;
 
+                remainingTime -= getCurrentTime() - startTime;
                 return new SearchResult(eval, null);
             }
 
@@ -138,9 +145,13 @@ namespace minimax_engine
             List<Move> moves = MoveGenerator.generateAllMoves(board);
             generationTime += getCurrentTime() - startTime;
 
+            remainingTime -= getCurrentTime() - startTime;
+
             foreach (Move move in moves)
             {
+                startTime = getCurrentTime();
                 Board resultingBoard = board.makeMove(move);
+                remainingTime -= getCurrentTime() - startTime;
 
                 SearchResult result = maxi(resultingBoard, alpha, beta, depth - 1);
 
