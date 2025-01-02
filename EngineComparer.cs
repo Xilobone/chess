@@ -12,7 +12,7 @@ namespace engine_comparer
             Player white = PlayerList.selectPlayer(true);
             Player black = PlayerList.selectPlayer(false);
 
-            ChessPlayerSettings settings = new ChessPlayerSettings(10, 0, 1000, false);
+            ChessPlayerSettings settings = ChessPlayerSettings.AskUserForSettings();
             //get list of boards to play
             IEvaluator[] evaluators = new IEvaluator[] { new deep_minimax_engine.Evaluator() };
             GamesParser parser = new GamesParser("./lib/chess_games.pgn", evaluators, 1);

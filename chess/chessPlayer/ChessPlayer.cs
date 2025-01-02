@@ -4,7 +4,6 @@ namespace chessPlayer
 {
     public class ChessPlayer
     {
-        private static ChessPlayerSettings DEFAULT_SETTINGS = new ChessPlayerSettings(false, 0, false, 0, false, 0, true);
         private Player white;
         private Player black;
 
@@ -16,7 +15,7 @@ namespace chessPlayer
         private int turnsAtStart;
         private bool whiteStarted;
 
-        public ChessPlayer(Player white, Player black) : this(white, black, DEFAULT_SETTINGS) { }
+        public ChessPlayer(Player white, Player black) : this(white, black, ChessPlayerSettings.DEFAULT_SETTINGS) { }
 
         public ChessPlayer(Player white, Player black, ChessPlayerSettings settings)
         {
@@ -106,7 +105,8 @@ namespace chessPlayer
             Player white = PlayerList.selectPlayer(true);
             Player black = PlayerList.selectPlayer(false);
 
-            ChessPlayerSettings settings = new ChessPlayerSettings(100, 0, 0);
+            // ChessPlayerSettings settings = new ChessPlayerSettings(100, 0, 1000);
+            ChessPlayerSettings settings = ChessPlayerSettings.AskUserForSettings();
             ChessPlayer player = new ChessPlayer(white, black, settings);
 
             Console.Write("Enter the starting fen (or leave empty for the standard position):");

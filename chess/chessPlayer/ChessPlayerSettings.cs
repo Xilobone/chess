@@ -1,7 +1,12 @@
+using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
+
 namespace chessPlayer
 {
     public class ChessPlayerSettings
     {
+        public static ChessPlayerSettings DEFAULT_SETTINGS = new ChessPlayerSettings(false, 0, false, 0, false, 0, true);
+
         public bool limitedTurns;
         public int maxTurns;
 
@@ -39,7 +44,7 @@ namespace chessPlayer
             this.maxTime = maxTime;
 
             this.limitedTurnTime = maxTurnTime > 0;
-            this.maxTurnTime = maxTime;
+            this.maxTurnTime = maxTurnTime;
 
             this.displayBoards = true;
         }
@@ -61,11 +66,21 @@ namespace chessPlayer
             this.maxTime = maxTime;
 
             this.limitedTurnTime = maxTurnTime > 0;
-            this.maxTurnTime = maxTime;
+            this.maxTurnTime = maxTurnTime;
 
             this.displayBoards = displayBoards;
         }
 
+        /// <summary>
+        /// Creates a new chess player settings objects with the specified values,
+        /// </summary>
+        /// <param name="limitedTurns">true if the game has a limited number of turns</param>
+        /// <param name="maxTurns">The maximum number of turns</param>
+        /// <param name="limitedTime">True if the game has a limited total allowed time per player</param>
+        /// <param name="maxTime">The total allowed time per player</param>
+        /// <param name="limitedTurnTime">True if the game has a limited time per turn</param>
+        /// <param name="maxTurnTime">The max time per turn</param>
+        /// <param name="displayBoards">True if the board should be displayed after each turn</param>
         public ChessPlayerSettings(bool limitedTurns, int maxTurns, bool limitedTime, float maxTime, bool limitedTurnTime, float maxTurnTime, bool displayBoards)
         {
             this.limitedTurns = limitedTurns;
@@ -75,6 +90,88 @@ namespace chessPlayer
             this.limitedTurnTime = limitedTurnTime;
             this.maxTurnTime = maxTurnTime;
             this.displayBoards = displayBoards;
+        }
+
+        private void DisplaySettings()
+        {
+            Console.WriteLine("Current chess player settings:");
+            Console.WriteLine("-----------------------");
+
+            if (limitedTurns) Console.WriteLine($"Max number of turns: {maxTurns}");
+            else Console.WriteLine("No max number of turns");
+            
+            if (limitedTime) Console.WriteLine($"Allowed total time per player: {maxTime}ms");
+            else Console.WriteLine("No max allowed total time per player");
+
+            if (limitedTurnTime) Console.WriteLine($"Allowed time per move: {maxTurnTime}");
+            else Console.WriteLine("No max allowed time per turn");
+
+            Console.WriteLine($"Board is {(displayBoards ? "" : "not ")}displayed after each turn");
+
+            Console.WriteLine("-----------------------");
+        }
+
+        /// <summary>
+        /// Asks the user of the program to enter the settings values
+        /// </summary>
+        /// <returns>The generated settings</returns>
+        public static ChessPlayerSettings AskUserForSettings()
+        {
+            DEFAULT_SETTINGS.DisplaySettings();
+
+            string? input = "";
+
+            while(!Regex.IsMatch(input, "^[yn]$"))
+            {
+                Console.Write("Do you want to change these settings? [y/n]:");
+
+                input = Console.ReadLine();
+                if (input == null) input = "";
+            }
+
+            if (input.Equals("n")) return DEFAULT_SETTINGS;
+
+            int maxTurns = AskUserForSetting("max turns");
+            int maxTime = AskUserForSetting("max time (in ms)");
+            int maxTurnTime = AskUserForSetting("max time per turn (in ms)");
+            bool displayBoards = AskUserForSettingBool("displaying the board after each turn");
+
+            ChessPlayerSettings settings = new ChessPlayerSettings(maxTurns, maxTime, maxTurnTime, displayBoards);
+
+            settings.DisplaySettings();
+
+            return settings;
+        }
+
+        private static int AskUserForSetting(string setting)
+        {
+            string? input = "";
+
+            while(!Regex.IsMatch(input, "^-?[0-9]+$"))
+            {
+                Console.Write($"Enter the {setting}, a negative value will disable this setting:");
+
+                input = Console.ReadLine();
+                if (input == null) input = "";
+            }
+
+            return int.Parse(input);
+        }
+
+        private static bool AskUserForSettingBool(string setting)
+        {
+            string? input = "";
+
+            while(!Regex.IsMatch(input, "^[yn]$"))
+            {
+                Console.Write($"Do you want to enable {setting}? [y/n]:");
+
+                input = Console.ReadLine();
+                if (input == null) input = "";
+
+            }
+
+            return input.Equals("y");
         }
     }
 }
