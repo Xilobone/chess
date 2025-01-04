@@ -109,9 +109,6 @@ namespace converter
             //convert to lowercase if it is blacks turn to move
             string pieceStr = board.whiteToMove ? pieceChar.ToString() : pieceChar.ToString().ToLower();
 
-            //if pieceString not a valid piece it must be a pawn capture
-            //if (!Piece.VALUES.ContainsKey(pieceStr)) return toMovePawnCapture(move, board);
-
             int piece = Piece.VALUES[pieceStr];
 
             Position to = toPosition(move.Substring(move.Length - 2, 2));

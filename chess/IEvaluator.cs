@@ -1,4 +1,3 @@
-
 namespace chess
 {
     public interface IEvaluator

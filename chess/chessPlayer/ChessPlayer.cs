@@ -63,6 +63,7 @@ namespace chessPlayer
                     case (false, false): move = black.engine.makeMove(board); break;
                 }
 
+                if (settings.displayBoards) Console.WriteLine($"move: {move}");
                 board = board.makeMove(move);
                 runningTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startTime;
             }
@@ -70,7 +71,7 @@ namespace chessPlayer
             if (settings.displayBoards) board.display();
 
             long time = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startTime;
-            if (settings.displayBoards) Console.WriteLine("total elapsed time:" + time + "ms");
+            if (settings.displayBoards) Console.WriteLine($"total elapsed time: {time}ms");
 
             return GameResult.GetResult(board, white, black);
         }
@@ -105,7 +106,6 @@ namespace chessPlayer
             Player white = PlayerList.selectPlayer(true);
             Player black = PlayerList.selectPlayer(false);
 
-            // ChessPlayerSettings settings = new ChessPlayerSettings(100, 0, 1000);
             ChessPlayerSettings settings = ChessPlayerSettings.AskUserForSettings();
             ChessPlayer player = new ChessPlayer(white, black, settings);
 
