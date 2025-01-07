@@ -2,12 +2,9 @@ using chess;
 
 namespace deep_minimax_engine
 {
-    public class Engine : IEngine
+    public class Engine : chess.Engine
     {
         private const int MAX_DEPTH = 3;
-
-        public bool isWhite { get; set; }
-        public bool displayStats { get; set; }
 
         private int depth;
         private int evaluatedBoards;
@@ -38,11 +35,11 @@ namespace deep_minimax_engine
             evaluator = new Evaluator();
         }
 
-        public Move makeMove(Board board)
+        public override Move makeMove(Board board)
         {
             return makeMove(board, float.MaxValue);
         }
-        public Move makeMove(Board board, float maxTime)
+        public override Move makeMove(Board board, float maxTime)
         {
             remainingTime = maxTime;
             long startTime = getCurrentTime();

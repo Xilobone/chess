@@ -8,7 +8,7 @@ namespace counters
     /// remembers previously stored values
     /// </summary>
     /// <typeparam name="T">The number type of the counter</typeparam>
-    public class Counter<T> where T : struct, INumber<T>
+    public class Counter<T> : ICounter where T : struct, INumber<T>
     {
         private string name;
         private string unit;
@@ -71,6 +71,15 @@ namespace counters
         }
 
         /// <summary>
+        /// Sets the value of the counter to be a specified value
+        /// </summary>
+        /// <param name="value">The value to set the counter to</param>
+        public void Set(T value)
+        {
+            this.value = value;
+        }
+
+        /// <summary>
         /// Resets the value of the counter and adds it to its history
         /// </summary>
         public void Reset()
@@ -122,12 +131,35 @@ namespace counters
 
             T avg = sum / count;
 
+            T stdDevSum = T.Zero;
+
+            foreach(T v in history)
+            {
+                stdDevSum += (v - avg) * (v - avg);
+            }
+
+            T stdDev = T.Zero;
+            if (count > T.One) stdDev = Sqrt(stdDevSum / (count - T.One));
+
             Console.WriteLine($"{name}:");
             Console.WriteLine($"    - count: {count}");
             Console.WriteLine($"    - avg: {avg}{unit}");
+            Console.WriteLine($"    - stdDev: {stdDev}{unit}");
             Console.WriteLine($"    - min: {min}{unit}");
             Console.WriteLine($"    - max: {max}{unit}");
 
+        }
+
+        /// <summary>
+        /// Calculates the square root of a value
+        /// </summary>
+        /// <param name="value">The value to calculate the square root of</param>
+        /// <returns>The square root of the value</returns>
+        private static T Sqrt(T value)
+        {
+            double v = Convert.ToDouble(value);
+            double sqrt = Math.Sqrt(v);
+            return T.CreateChecked(sqrt);
         }
         
 

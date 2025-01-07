@@ -2,16 +2,14 @@ using chess;
 
 namespace player
 {
-    public class Player : IEngine
+    public class Player : Engine
     {
-        public bool isWhite { get; set; }
-        public bool displayStats { get; set; }
 
-        public Move makeMove(Board board, float maxTime)
+        public override Move makeMove(Board board, float maxTime)
         {
             return makeMove(board);
         }
-        public Move makeMove(Board board)
+        public override Move makeMove(Board board)
         {
             Console.Write("Please make a move:");
             string? inp = Console.ReadLine();

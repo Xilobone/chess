@@ -2,7 +2,7 @@ using chess;
 
 namespace minimax_engine
 {
-    public class Engine : IEngine
+    public class Engine : chess.Engine
     {
 
         private const int MAX_DEPTH = 2;
@@ -15,10 +15,7 @@ namespace minimax_engine
 
         private float remainingTime;
         private Evaluator evaluator;
-
-        public bool isWhite { get; set; }
-        public bool displayStats { get; set; }
-
+        
         public Engine() : this(true, MAX_DEPTH) { }
 
         public Engine(bool isWhite) : this(isWhite, MAX_DEPTH) { }
@@ -37,11 +34,11 @@ namespace minimax_engine
             evaluator = new Evaluator();
         }
 
-        public Move makeMove(Board board)
+        public override Move makeMove(Board board)
         {
             return makeMove(board, float.MaxValue);
         }
-        public Move makeMove(Board board, float maxTime)
+        public override Move makeMove(Board board, float maxTime)
         {
             remainingTime = maxTime;
             long startTime = getCurrentTime();

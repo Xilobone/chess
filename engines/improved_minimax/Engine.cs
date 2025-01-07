@@ -1,19 +1,18 @@
 using chess;
+using counters;
 
 namespace improved_minimax_engine
 {
-    public class Engine : IEngine
+    public class Engine : chess.Engine
     {
         private const int MAX_DEPTH = 3;
 
-        public bool isWhite { get; set; }
-        public bool displayStats { get; set; }
-
         private int depth;
-        private int evaluatedBoards;
-        private long computationTime;
-        private long evaluationTime;
-        private long generationTime;
+
+        public Counter<int> evaluatedBoards { get; private set; }
+        public Counter<long> computationTime { get; private set; }
+        public Counter<long> evaluationTime { get; private set; }
+        public Counter<long> generationTime { get; private set; }
         private int prunedBranches;
 
         private Evaluator evaluator;
@@ -29,20 +28,23 @@ namespace improved_minimax_engine
             this.isWhite = isWhite;
             this.depth = depth;
 
-            evaluatedBoards = 0;
-            computationTime = 0;
-            evaluationTime = 0;
-            generationTime = 0;
+            evaluatedBoards = new Counter<int>("Evaluated boards");
+            computationTime = new Counter<long>("Computation time", "ms");
+            evaluationTime = new Counter<long>("Evaluation time", "ms");
+            generationTime = new Counter<long>("Generation time", "ms");
+            counters.AddRange(evaluatedBoards, computationTime, evaluationTime, generationTime);
+
             prunedBranches = 0;
 
             evaluator = new Evaluator();
         }
 
-        public Move makeMove(Board board)
+        public override Move makeMove(Board board)
         {
             return makeMove(board, float.MaxValue);
         }
-        public Move makeMove(Board board, float maxTime)
+
+        public override Move makeMove(Board board, float maxTime)
         {
             remainingTime = maxTime;
             long startTime = getCurrentTime();
@@ -50,7 +52,6 @@ namespace improved_minimax_engine
             SearchResult result;
             if (isWhite)
             {
-                //Console.WriteLine("running maxi");
                 result = maxi(board, float.MinValue, float.MaxValue, depth);
             }
             else
@@ -58,15 +59,10 @@ namespace improved_minimax_engine
                 result = mini(board, float.MinValue, float.MaxValue, depth);
             }
 
-            computationTime = getCurrentTime() - startTime;
+            computationTime.Set(getCurrentTime() - startTime);
 
-            if (displayStats)
-            {
-                displayOverview();
-                clearCounters();
-            }
+            clearCounters();
 
-            //Console.WriteLine(result.move);
             return result.move!;
         }
 
@@ -75,11 +71,11 @@ namespace improved_minimax_engine
             long startTime;
             if (depth == 0 || board.isInMate() || remainingTime <= 0)
             {
-                evaluatedBoards++;
+                evaluatedBoards.Increment();
 
                 startTime = getCurrentTime();
                 float eval = evaluator.evaluate(board);
-                evaluationTime += getCurrentTime() - startTime;
+                evaluationTime.Increment(getCurrentTime() - startTime);
 
                 remainingTime -= getCurrentTime() - startTime;
                 return new SearchResult(eval, null);
@@ -90,7 +86,7 @@ namespace improved_minimax_engine
 
             startTime = getCurrentTime();
             List<Move> moves = MoveGenerator.generateAllMoves(board);
-            generationTime += getCurrentTime() - startTime;
+            generationTime.Increment(getCurrentTime() - startTime);
 
             remainingTime -= getCurrentTime() - startTime;
 
@@ -128,11 +124,11 @@ namespace improved_minimax_engine
 
             if (depth == 0 || board.isInMate() || remainingTime <= 0)
             {
-                evaluatedBoards++;
+                evaluatedBoards.Increment();
 
                 startTime = getCurrentTime();
                 float eval = evaluator.evaluate(board);
-                evaluationTime += getCurrentTime() - startTime;
+                evaluationTime.Increment(getCurrentTime() - startTime);
 
                 remainingTime -= getCurrentTime() - startTime;
                 return new SearchResult(eval, null);
@@ -143,7 +139,7 @@ namespace improved_minimax_engine
 
             startTime = getCurrentTime();
             List<Move> moves = MoveGenerator.generateAllMoves(board);
-            generationTime += getCurrentTime() - startTime;
+            generationTime.Increment(getCurrentTime() - startTime);
 
             remainingTime -= getCurrentTime() - startTime;
 
@@ -175,20 +171,12 @@ namespace improved_minimax_engine
             return new SearchResult(min, bestMove);
         }
 
-        private void displayOverview()
-        {
-            Console.WriteLine("-- Computation time: " + computationTime + "ms");
-            Console.WriteLine("-- Time spent generating moves: " + generationTime + "ms");
-            Console.WriteLine("-- Time spent evaluating: " + evaluationTime + "ms");
-            Console.WriteLine("-- Boards evaluated: " + evaluatedBoards + " ( " + prunedBranches + " branches pruned )");
-        }
-
         private void clearCounters()
         {
-            computationTime = 0;
-            evaluationTime = 0;
-            generationTime = 0;
-            evaluatedBoards = 0;
+            computationTime.Reset();
+            evaluationTime.Reset();
+            generationTime.Reset();
+            evaluatedBoards.Reset();
             prunedBranches = 0;
         }
 

@@ -1,12 +1,15 @@
+using System.Text.RegularExpressions;
 using chess;
+using counters;
 
 namespace chessTesting 
 {
     public class EngineTester
-    {
+    {   
         public static void testSinglePosition()
         {
             Player player = PlayerList.selectPlayer(true);
+            int repetitions = getRepetitions();
 
             Console.Write("Enter the starting fen (or leave empty for the standard position):");
             string? fen = Console.ReadLine();
@@ -19,8 +22,36 @@ namespace chessTesting
             player.engine.displayStats = true;
 
             board.display();
-            Move move = player.engine.makeMove(board);
-            board.makeMove(move).display();
+
+            for(int i = 0; i < repetitions; i++)
+            {
+                Move move = player.engine.makeMove(board);
+                //board.makeMove(move).display();
+            }
+
+            foreach(ICounter counter in player.engine.counters)
+            {
+                counter.DisplayOverview();
+            }
+        }
+
+        private static int getRepetitions()
+        {
+            Console.Write("How often do you want to run the engine?:");
+
+            string? input = Console.ReadLine();
+
+            if (string.IsNullOrEmpty(input))
+            {
+                return getRepetitions();
+            }
+
+            if (!Regex.IsMatch(input, "^[0-9]+$"))
+            {
+                return getRepetitions();
+            }
+
+            return int.Parse(input);
         }
     }
 }
