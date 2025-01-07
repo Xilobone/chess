@@ -13,9 +13,13 @@ namespace chess
         public int halfMoves { get; private set; }
         public int fullMoves { get; private set; }
 
+        private List<Board> previousBoards = new List<Board>();
+
         public Board makeMove(Move move)
         {
             Board result = getCopy();
+            result.previousBoards.Add(this);
+            
             int piece = getPiece(move.fr);
 
             if (piece == Piece.WHITE_PAWN || piece == Piece.BLACK_PAWN || getPiece(move.to) != Piece.EMPTY)
@@ -255,6 +259,24 @@ namespace chess
         }
 
         /// <summary>
+        /// Checks if a board is a draw by repetition
+        /// </summary>
+        /// <returns>true if the board is a draw, false otherwise</returns>
+        public bool isInDraw()
+        {
+            int sameBoards = 0;
+
+            foreach(Board board in previousBoards)
+            {
+                if (this.Equals(board)) sameBoards++;
+            }
+
+            //a draw occurs if it is the third time this position occurs,
+            //the current board is not included in previousBoards but counts as 1
+            return sameBoards >= 2;
+        }
+
+        /// <summary>
         /// Shows a display of the board in the console
         /// </summary>
         public void display()
@@ -279,12 +301,17 @@ namespace chess
             Console.WriteLine();
 
             Console.WriteLine(toFen());
-            //Console.WriteLine("Evaluation: " + Evaluator.evaluate(this));
-
+            Console.WriteLine($"previous boards:{previousBoards.Count}");
             if (isInCheck()) Console.WriteLine("Check!");
             if (isInMate())
             {
                 Console.WriteLine("Mate!");
+                return;
+            }
+
+            if (isInDraw())
+            {
+                Console.WriteLine("Draw!");
                 return;
             }
 
@@ -462,6 +489,7 @@ namespace chess
             copy.halfMoves = halfMoves;
             copy.fullMoves = fullMoves;
 
+            copy.previousBoards = new List<Board>(previousBoards);
             return copy;
         }
 

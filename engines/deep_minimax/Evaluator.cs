@@ -23,6 +23,8 @@ namespace deep_minimax_engine
         {
             float eval = 0;
 
+            if (board.isInDraw()) return eval;
+
             eval += 2 * getPieceValue(board);
             eval += 0.2f * getPawnChain(board);
             eval += 0.5f * getCenterControl(board);
@@ -130,26 +132,16 @@ namespace deep_minimax_engine
 
         private static float getCheck(Board board)
         {
-            if (board.isInCheck())
-            {
-                return 1;
-            }
-            else
-            {
-                return 0;
-            }
+            if (!board.isInCheck()) return 0;
+
+            return board.whiteToMove ? -1 : 1;
         }
 
         private static float getMate(Board board)
         {
-            if (board.isInMate())
-            {
-                return 1;
-            }
-            else
-            {
-                return 0;
-            }
+            if (!board.isInMate()) return 0;
+
+            return board.whiteToMove ? -1 : 1;
         }
     }
 }

@@ -68,7 +68,12 @@ namespace chessPlayer
                 runningTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startTime;
             }
 
-            if (settings.displayBoards) board.display();
+            if (settings.displayBoards)
+            {
+                board.display();
+                Console.WriteLine("White's evaluation: " + white.evaluator.evaluate(board));
+                Console.WriteLine("Black's evaluation: " + black.evaluator.evaluate(board));
+            }
 
             long time = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startTime;
             if (settings.displayBoards) Console.WriteLine($"total elapsed time: {time}ms");
@@ -83,12 +88,12 @@ namespace chessPlayer
                 return false;
             }
 
-            if (board.isInMate())
+            if (board.isInMate() || board.isInDraw())
             {
                 return true;
             }
 
-            if (settings.limitedTurns && board.fullMoves - turnsAtStart > settings.maxTurns && whiteStarted == board.whiteToMove)
+            if (settings.limitedTurns && board.fullMoves - turnsAtStart >= settings.maxTurns && whiteStarted == board.whiteToMove)
             {
                 return true;
             }
