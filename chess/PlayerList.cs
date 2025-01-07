@@ -5,13 +5,16 @@ namespace chess
         public static Player[] whitePlayers = {
             new Player("player", new player.Player(), new player.Evaluator()),
             new Player("minimax", new minimax_engine.Engine(), new minimax_engine.Evaluator()),
-            new Player("deep minimax", new deep_minimax_engine.Engine(), new deep_minimax_engine.Evaluator())
+            new Player("deep minimax", new deep_minimax_engine.Engine(), new deep_minimax_engine.Evaluator()),
+            new Player("improved minimax", new improved_minimax_engine.Engine(), new improved_minimax_engine.Evaluator())
+        
         };
 
         public static Player[] blackPlayers = {
             new Player("player", new player.Player(), new player.Evaluator()),
             new Player("minimax", new minimax_engine.Engine(), new minimax_engine.Evaluator()),
-            new Player("deep minimax", new deep_minimax_engine.Engine(), new deep_minimax_engine.Evaluator())
+            new Player("deep minimax", new deep_minimax_engine.Engine(), new deep_minimax_engine.Evaluator()),
+            new Player("improved minimax", new improved_minimax_engine.Engine(), new improved_minimax_engine.Evaluator())
         };
 
         public static Player selectPlayer(bool isWhite) 
