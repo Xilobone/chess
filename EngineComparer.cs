@@ -2,7 +2,7 @@ using chess;
 using chessPlayer;
 using parser;
 
-namespace engine_comparer
+namespace chessTesting
 {
     public class EngineComparer
     {
