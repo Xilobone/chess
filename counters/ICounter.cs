@@ -4,5 +4,8 @@ namespace counters
     {
         public void DisplayValue();
         public void DisplayOverview();
+        public void DisplayOverview(bool showComparision);
+
+        public void write();
     }
 }

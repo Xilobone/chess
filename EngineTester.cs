@@ -25,13 +25,13 @@ namespace chessTesting
 
             for(int i = 0; i < repetitions; i++)
             {
-                Move move = player.engine.makeMove(board);
-                //board.makeMove(move).display();
+                player.engine.makeMove(board);
             }
 
+            //show counter with differences from baseline
             foreach(ICounter counter in player.engine.counters)
             {
-                counter.DisplayOverview();
+                counter.DisplayOverview(true);
             }
         }
 

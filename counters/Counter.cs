@@ -10,9 +10,17 @@ namespace counters
     /// <typeparam name="T">The number type of the counter</typeparam>
     public class Counter<T> : ICounter where T : struct, INumber<T>
     {
+        private const string BASE_FILE_PATH = "logs/counter/";
+
         private string name;
         private string unit;
         private T value;
+
+        private T count;
+        private T min;
+        private T max;
+        private T avg;
+        private T stdDev;
 
         private List<T> history;
 
@@ -35,7 +43,7 @@ namespace counters
 
             history = new List<T>();
         }
-        
+
         /// <summary>
         /// Increases the value of the counter by one
         /// </summary>
@@ -86,6 +94,32 @@ namespace counters
         {
             history.Add(value);
             value = default;
+
+            //calculate statistics
+            min = history[0];
+            max = history[0];
+            count = T.CreateChecked(history.Count);
+            T sum = T.Zero;
+
+            foreach (T v in history)
+            {
+                if (v < min) min = v;
+                if (v > max) max = v;
+
+                sum += v;
+            }
+
+            avg = sum / count;
+
+            T stdDevSum = T.Zero;
+
+            foreach (T v in history)
+            {
+                stdDevSum += (v - avg) * (v - avg);
+            }
+
+            stdDev = T.Zero;
+            if (count > T.One) stdDev = Sqrt(stdDevSum / (count - T.One));
         }
 
         /// <summary>
@@ -110,44 +144,84 @@ namespace counters
         /// </summary>
         public void DisplayOverview()
         {
+            DisplayOverview(false);
+        }
+
+        /// <summary>
+        /// Displays an overview of the values in the history
+        /// </summary>
+        /// <param name="showComparison">wether to show the comparison with the same named counter in the logs/counter directory</param>
+        public void DisplayOverview(bool showComparison)
+        {
             if (history.Count == 0)
             {
                 Console.WriteLine($"{name}: no values to display");
+            }
+
+            string overview = $"{name}:\n";
+
+            if (showComparison)
+            {
+                Counter<T> comparison = read<T>(name);
+
+                T countDiv = comparison.count != T.Zero ? T.CreateChecked(100) + (count - comparison.count) * T.CreateChecked(100) / comparison.count : T.Zero;
+                T avgDiv = comparison.avg != T.Zero ? T.CreateChecked(100) + (avg - comparison.avg) * T.CreateChecked(100) / comparison.avg : T.Zero;
+                T stdDevDiv = comparison.stdDev != T.Zero ? T.CreateChecked(100) + (stdDev - comparison.stdDev) * T.CreateChecked(100) / comparison.stdDev : T.Zero;
+                T minDiv = comparison.min != T.Zero ? T.CreateChecked(100) + (min - comparison.min) * T.CreateChecked(100) / comparison.min : T.Zero;
+                T maxDiv = comparison.max != T.Zero ? T.CreateChecked(100) + (max - comparison.max) * T.CreateChecked(100) / comparison.max : T.Zero;
+
+                overview += $"    - count: {count} ({countDiv}%)\n";
+                overview += $"    - avg: {avg}{unit} ({avgDiv}%)\n";
+                overview += $"    - stdDev: {stdDev}{unit} ({stdDevDiv}%)\n";
+                overview += $"    - min: {min}{unit} ({minDiv}%)\n";
+                overview += $"    - max: {max}{unit} ({maxDiv}%)";
+
+                Console.WriteLine(overview);
                 return;
             }
 
-            T min = history[0];
-            T max = history[0];
-            T count = T.CreateChecked(history.Count);
-            T sum = T.Zero;
+            overview += $"    - count: {count}\n";
+            overview += $"    - avg: {avg}{unit}\n";
+            overview += $"    - stdDev: {stdDev}{unit}\n";
+            overview += $"    - min: {min}{unit}\n";
+            overview += $"    - max: {max}{unit}";
 
-            foreach(T v in history)
+            Console.WriteLine(overview);
+
+        }
+
+        //writes the history of the counter to a .cntr file
+        public void write()
+        {
+            string path = $"{BASE_FILE_PATH}{name}.cntr";
+            foreach (T value in history)
             {
-                if (v < min) min = v;
-                if (v > max) max = v;
+                File.AppendAllText(path, value.ToString() + "\n");
+            }
+        }
 
-                sum += v;
+        /// <summary>
+        /// Reads a .cntr file and recreates the counter
+        /// </summary>
+        /// <typeparam name="S">The type of counter to create</typeparam>
+        /// <param name="name">The name of the file to read</param>
+        /// <returns>A counter with the same history as the file</returns>
+        public static Counter<S> read<S>(string name) where S : struct, INumber<S>
+        {
+            string path = $"{BASE_FILE_PATH}{name}.cntr";
+            string[] lines = File.ReadAllLines(path);
+
+            Counter<S> counter = new Counter<S>(name);
+
+            foreach (string line in lines)
+            {
+                S value = S.Parse(line, null);
+
+                counter.Set(value);
+                counter.Reset();
             }
 
-            T avg = sum / count;
-
-            T stdDevSum = T.Zero;
-
-            foreach(T v in history)
-            {
-                stdDevSum += (v - avg) * (v - avg);
-            }
-
-            T stdDev = T.Zero;
-            if (count > T.One) stdDev = Sqrt(stdDevSum / (count - T.One));
-
-            Console.WriteLine($"{name}:");
-            Console.WriteLine($"    - count: {count}");
-            Console.WriteLine($"    - avg: {avg}{unit}");
-            Console.WriteLine($"    - stdDev: {stdDev}{unit}");
-            Console.WriteLine($"    - min: {min}{unit}");
-            Console.WriteLine($"    - max: {max}{unit}");
-
+            return counter;
         }
 
         /// <summary>
@@ -161,7 +235,7 @@ namespace counters
             double sqrt = Math.Sqrt(v);
             return T.CreateChecked(sqrt);
         }
-        
+
 
 
     }
