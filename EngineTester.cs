@@ -23,10 +23,13 @@ namespace chessTesting
 
             board.display();
 
+            Move move = null;
             for(int i = 0; i < repetitions; i++)
             {
-                player.engine.makeMove(board);
+                move = player.engine.makeMove(board);
             }
+
+            Console.WriteLine($"Selected move: {move}");
 
             //show counter with differences from baseline
             foreach(ICounter counter in player.engine.counters)
