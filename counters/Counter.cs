@@ -164,17 +164,18 @@ namespace counters
             {
                 Counter<T> comparison = read<T>(name);
 
-                T countDiv = comparison.count != T.Zero ? T.CreateChecked(100) + (count - comparison.count) * T.CreateChecked(100) / comparison.count : T.Zero;
-                T avgDiv = comparison.avg != T.Zero ? T.CreateChecked(100) + (avg - comparison.avg) * T.CreateChecked(100) / comparison.avg : T.Zero;
-                T stdDevDiv = comparison.stdDev != T.Zero ? T.CreateChecked(100) + (stdDev - comparison.stdDev) * T.CreateChecked(100) / comparison.stdDev : T.Zero;
-                T minDiv = comparison.min != T.Zero ? T.CreateChecked(100) + (min - comparison.min) * T.CreateChecked(100) / comparison.min : T.Zero;
-                T maxDiv = comparison.max != T.Zero ? T.CreateChecked(100) + (max - comparison.max) * T.CreateChecked(100) / comparison.max : T.Zero;
+         
+                double countDiv = getFractionDifference(count, comparison.count);
+                double avgDiv = getFractionDifference(avg, comparison.avg);
+                double stdDevDiv = getFractionDifference(stdDev, comparison.stdDev);
+                double minDiv = getFractionDifference(min, comparison.min);
+                double maxDiv = getFractionDifference(max, comparison.max);
 
-                overview += $"    - count: {count} ({countDiv}%)\n";
-                overview += $"    - avg: {avg}{unit} ({avgDiv}%)\n";
-                overview += $"    - stdDev: {stdDev}{unit} ({stdDevDiv}%)\n";
-                overview += $"    - min: {min}{unit} ({minDiv}%)\n";
-                overview += $"    - max: {max}{unit} ({maxDiv}%)";
+                overview += $"    - count: {count} ({countDiv * 100}%)\n";
+                overview += $"    - avg: {avg}{unit} ({avgDiv * 100}%)\n";
+                overview += $"    - stdDev: {stdDev}{unit} ({stdDevDiv * 100}%)\n";
+                overview += $"    - min: {min}{unit} ({minDiv * 100}%)\n";
+                overview += $"    - max: {max}{unit} ({maxDiv * 100}%)";
 
                 Console.WriteLine(overview);
                 return;
@@ -234,6 +235,12 @@ namespace counters
             double v = Convert.ToDouble(value);
             double sqrt = Math.Sqrt(v);
             return T.CreateChecked(sqrt);
+        }
+
+        private static double getFractionDifference(T value1, T value2) {
+            if (value2 == T.Zero) return 0;
+
+            return (Convert.ToDouble(value1) - Convert.ToDouble(value2)) / Convert.ToDouble(value2);
         }
 
 
