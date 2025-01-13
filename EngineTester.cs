@@ -23,7 +23,7 @@ namespace chessTesting
 
             board.display();
 
-            Move move = null;
+            Move? move = null;
             for(int i = 0; i < repetitions; i++)
             {
                 move = player.engine.makeMove(board);
