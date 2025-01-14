@@ -5,7 +5,7 @@ namespace chessPlayer
 {
     public class ChessPlayerSettings
     {
-        public static ChessPlayerSettings DEFAULT_SETTINGS = new ChessPlayerSettings(false, 0, false, 0, false, 0, true);
+        public static ChessPlayerSettings DEFAULT_SETTINGS = new ChessPlayerSettings(false, 0, false, 0, false, 0, true, true);
 
         public bool limitedTurns;
         public int maxTurns;
@@ -17,6 +17,8 @@ namespace chessPlayer
         public float maxTurnTime;
 
         public bool displayBoards;
+
+        public bool requireInputAfterEachTurn;
         public ChessPlayerSettings()
         {
             this.limitedTurns = false;
@@ -26,6 +28,7 @@ namespace chessPlayer
             this.limitedTurnTime = false;
             this.maxTurnTime = 0;
             this.displayBoards = true;
+            requireInputAfterEachTurn = false;
         }
 
         /// <summary>
@@ -47,6 +50,7 @@ namespace chessPlayer
             this.maxTurnTime = maxTurnTime;
 
             this.displayBoards = true;
+            requireInputAfterEachTurn = false;
         }
 
         /// <summary>
@@ -57,7 +61,8 @@ namespace chessPlayer
         /// <param name="maxTime">The maximum time of the game (in ms)</param>
         /// <param name="maxTurnTime">The maximum time of a turn (in ms)</param>
         /// <param name="displayBoards">Whether to display the board after each move or not</param>
-        public ChessPlayerSettings(int maxTurns, float maxTime, float maxTurnTime, bool displayBoards)
+        /// <param name="requireInputAfterEachTurn">True if an input is required to continue to the next move</param>
+        public ChessPlayerSettings(int maxTurns, float maxTime, float maxTurnTime, bool displayBoards, bool requireInputAfterEachTurn)
         {
             this.limitedTurns = maxTurns > 0;
             this.maxTurns = maxTurns;
@@ -81,7 +86,8 @@ namespace chessPlayer
         /// <param name="limitedTurnTime">True if the game has a limited time per turn</param>
         /// <param name="maxTurnTime">The max time per turn</param>
         /// <param name="displayBoards">True if the board should be displayed after each turn</param>
-        public ChessPlayerSettings(bool limitedTurns, int maxTurns, bool limitedTime, float maxTime, bool limitedTurnTime, float maxTurnTime, bool displayBoards)
+        /// <param name="requireInputAfterEachTurn">True if an input is required to continue to the next move</param>
+        public ChessPlayerSettings(bool limitedTurns, int maxTurns, bool limitedTime, float maxTime, bool limitedTurnTime, float maxTurnTime, bool displayBoards, bool requireInputAfterEachTurn)
         {
             this.limitedTurns = limitedTurns;
             this.maxTurns = maxTurns;
@@ -90,6 +96,7 @@ namespace chessPlayer
             this.limitedTurnTime = limitedTurnTime;
             this.maxTurnTime = maxTurnTime;
             this.displayBoards = displayBoards;
+            this.requireInputAfterEachTurn = requireInputAfterEachTurn;
         }
 
         private void DisplaySettings()
@@ -107,6 +114,7 @@ namespace chessPlayer
             else Console.WriteLine("No max allowed time per turn");
 
             Console.WriteLine($"Board is {(displayBoards ? "" : "not ")}displayed after each turn");
+            Console.WriteLine($"Input is {(requireInputAfterEachTurn ? "" : "not ")}reqired after each turn");
 
             Console.WriteLine("-----------------------");
         }
@@ -135,8 +143,9 @@ namespace chessPlayer
             int maxTime = AskUserForSetting("max time (in ms)");
             int maxTurnTime = AskUserForSetting("max time per turn (in ms)");
             bool displayBoards = AskUserForSettingBool("displaying the board after each turn");
+            bool requireInputAfterEachTurn = AskUserForSettingBool("requiring input after each turn");
 
-            ChessPlayerSettings settings = new ChessPlayerSettings(maxTurns, maxTime, maxTurnTime, displayBoards);
+            ChessPlayerSettings settings = new ChessPlayerSettings(maxTurns, maxTime, maxTurnTime, displayBoards, requireInputAfterEachTurn);
 
             settings.DisplaySettings();
 

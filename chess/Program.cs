@@ -1,21 +1,30 @@
 using System.Text.RegularExpressions;
 using chessPlayer;
 using chessTesting;
+using gui;
 
 public class Program
 {
-    public static void Main(string[] args)
+    private ChessPlayer player;
+    public Program()
     {
+        player = new ChessPlayer();
         selectSetup();
     }
+    [STAThread]
+    public static void Main(string[] args)
+    {
+        new Program();
+    }
 
-    private static void selectSetup()
+    private void selectSetup()
     {
         Console.WriteLine("Select one of the following options:");
         Console.WriteLine("0:   Run chess player");
         Console.WriteLine("1:   Run engine comparer");
         Console.WriteLine("2:   Run engine for a single position");
-        Console.Write("Type 0, 1 or 2:");
+        Console.WriteLine("3:   Launch the gui");
+        Console.Write("Type 0, 1, 2 or 3:");
 
         string? input = Console.ReadLine();
 
@@ -25,7 +34,7 @@ public class Program
             return;
         }
 
-        if (!Regex.IsMatch(input, "^[0-2]$"))
+        if (!Regex.IsMatch(input, "^[0-3]$"))
         {
             selectSetup();
             return;
@@ -35,9 +44,10 @@ public class Program
 
         switch(type)
         {
-            case 0: ChessPlayer.PlayFromUserInput(); break;
+            case 0: player.PlayFromUserInput(); break;
             case 1: EngineComparer.CompareFromUserInput(); break;
             case 2: EngineTester.testSinglePosition(); break;
+            case 3: ChessGUI.Create(player); selectSetup(); break;
             default: break;
         }
     }

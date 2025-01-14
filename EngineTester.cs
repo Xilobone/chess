@@ -27,6 +27,7 @@ namespace chessTesting
             for(int i = 0; i < repetitions; i++)
             {
                 move = player.engine.makeMove(board);
+                MoveGenerator.checkCounter.Reset();
             }
 
             Console.WriteLine($"Selected move: {move}");
@@ -36,6 +37,9 @@ namespace chessTesting
             {
                 counter.DisplayOverview(true);
             }
+
+            MoveGenerator.checkCounter.write();
+            MoveGenerator.checkCounter.DisplayOverview();
         }
 
         private static int getRepetitions()

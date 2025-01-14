@@ -17,9 +17,13 @@ namespace chess
 
         private bool checkKnown;
         private bool inCheck;
-
         private bool mateKnown;
         private bool inMate;
+
+        //bitmaps should be read from the least significant bit to the most,
+        //they represent board positions from the top left to the bottom right
+        public long attackMapWhite;
+
         public Board makeMove(Move move)
         {
             Board result = getCopy();
@@ -481,6 +485,7 @@ namespace chess
             board.halfMoves = int.Parse(fen[4]);
             board.fullMoves = int.Parse(fen[5]);
 
+            board.attackMapWhite = BitBoard.ComputeInitial(board);
             return board;
         }
 
@@ -513,7 +518,7 @@ namespace chess
             copy.fullMoves = fullMoves;
 
             copy.previousBoards = new List<Board>(previousBoards);
-
+            copy.attackMapWhite = attackMapWhite;
             return copy;
         }
 
