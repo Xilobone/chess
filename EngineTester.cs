@@ -22,18 +22,24 @@ namespace chessTesting
             player.engine.displayStats = true;
 
             board.display();
+
             Move? move = null;
             for(int i = 0; i < repetitions; i++)
             {
                 move = player.engine.makeMove(board);
+                MoveGenerator.checkCounter.Reset();
             }
 
             Console.WriteLine($"Selected move: {move}");
+
             //show counter with differences from baseline
             foreach(ICounter counter in player.engine.counters)
             {
                 counter.DisplayOverview(true);
             }
+
+            MoveGenerator.checkCounter.write();
+            MoveGenerator.checkCounter.DisplayOverview();
         }
 
         private static int getRepetitions()

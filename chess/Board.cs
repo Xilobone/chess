@@ -15,11 +15,20 @@ namespace chess
 
         private List<Board> previousBoards = new List<Board>();
 
+        private bool checkKnown;
+        private bool inCheck;
+        private bool mateKnown;
+        private bool inMate;
+
+        //bitmaps should be read from the least significant bit to the most,
+        //they represent board positions from the top left to the bottom right
+        public long attackMapWhite;
+
         public Board makeMove(Move move)
         {
             Board result = getCopy();
             result.previousBoards.Add(this);
-            
+
             int piece = getPiece(move.fr);
 
             if (piece == Piece.WHITE_PAWN || piece == Piece.BLACK_PAWN || getPiece(move.to) != Piece.EMPTY)
@@ -181,6 +190,15 @@ namespace chess
 
         public bool isInCheck()
         {
+            if (checkKnown) return inCheck;
+
+            checkKnown = true;
+            inCheck = getInCheck();
+
+            return inCheck;
+        }
+        private bool getInCheck()
+        {
             // get the kings position
             Position? kingPos = null;
             for (int x = 0; x < 8; x++)
@@ -229,6 +247,15 @@ namespace chess
 
         public bool isInMate()
         {
+            if (mateKnown) return inMate;
+
+            mateKnown = true;
+            inMate = getInMate();
+
+            return inMate;
+        }
+        private bool getInMate()
+        {
             if (!isInCheck())
             {
                 return false;
@@ -266,7 +293,7 @@ namespace chess
         {
             int sameBoards = 0;
 
-            foreach(Board board in previousBoards)
+            foreach (Board board in previousBoards)
             {
                 if (this.Equals(board)) sameBoards++;
             }
@@ -458,6 +485,7 @@ namespace chess
             board.halfMoves = int.Parse(fen[4]);
             board.fullMoves = int.Parse(fen[5]);
 
+            board.attackMapWhite = BitBoard.ComputeInitial(board);
             return board;
         }
 
@@ -490,6 +518,7 @@ namespace chess
             copy.fullMoves = fullMoves;
 
             copy.previousBoards = new List<Board>(previousBoards);
+            copy.attackMapWhite = attackMapWhite;
             return copy;
         }
 
@@ -504,9 +533,9 @@ namespace chess
             Board other = (Board)obj;
 
             //check if pieces are the same
-            for(int x = 0; x < 8; x++)
+            for (int x = 0; x < 8; x++)
             {
-                for(int y = 0; y < 8; y++)
+                for (int y = 0; y < 8; y++)
                 {
                     if (pieces[x, y] != other.pieces[x, y]) return false;
                 }
@@ -536,9 +565,9 @@ namespace chess
         {
             int hash = 0;
 
-            for(int x = 0; x < 8; x++)
+            for (int x = 0; x < 8; x++)
             {
-                for(int y = 0; y < 8; y++)
+                for (int y = 0; y < 8; y++)
                 {
                     hash += (17 * pieces[x, y]) + (19 * x) + (23 * y);
                 }

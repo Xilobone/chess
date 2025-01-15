@@ -1,95 +1,55 @@
+using System.Drawing.Text;
+using System.Reflection.Metadata.Ecma335;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace chessPlayer
 {
     public class ChessPlayerSettings
     {
-        public static ChessPlayerSettings DEFAULT_SETTINGS = new ChessPlayerSettings(false, 0, false, 0, false, 0, true);
+        public static ChessPlayerSettings DEFAULT_SETTINGS { get => GetDefaultSettings(); private set => DEFAULT_SETTINGS = value; }
+        private static ChessPlayerSettings? _DEFAULT_SETTINGS;
 
-        public bool limitedTurns;
-        public int maxTurns;
+        public bool limitedTurns { get; set; }
+        public int maxTurns { get; set; }
 
-        public bool limitedTime;
-        public float maxTime;
+        public bool limitedTime { get; set; }
+        public float maxTime { get; set; }
+        public bool limitedTurnTime { get; set; }
+        public float maxTurnTime { get; set; }
 
-        public bool limitedTurnTime;
-        public float maxTurnTime;
+        public bool displayBoards { get; set; }
 
-        public bool displayBoards;
+        public bool requireInputAfterEachTurn { get; set; }
+
+        /// <summary>
+        /// Creates a new chess player settings object with the default values,
+        /// values can be changed afterwards
+        /// </summary>
         public ChessPlayerSettings()
         {
-            this.limitedTurns = false;
-            this.maxTurns = 0;
-            this.limitedTime = false;
-            this.maxTime = 0;
-            this.limitedTurnTime = false;
-            this.maxTurnTime = 0;
-            this.displayBoards = true;
+            limitedTurns = maxTurns > 0;
+            limitedTime = maxTime > 0;
+            limitedTurnTime = maxTurnTime > 0;
         }
 
-        /// <summary>
-        /// Creates a new chess player settings objects with the specified values,
-        /// if a value is non-positive it is assumed the relevant setting is false
-        /// </summary>
-        /// <param name="maxTurns">The maximum number of full turns</param>
-        /// <param name="maxTime">The maximum time of the game (in ms)</param>
-        /// <param name="maxTurnTime">The maximum time of a turn (in ms)</param>
-        public ChessPlayerSettings(int maxTurns, float maxTime, float maxTurnTime)
+        private static ChessPlayerSettings GetDefaultSettings()
         {
-            this.limitedTurns = maxTurns > 0;
-            this.maxTurns = maxTurns;
+            if (_DEFAULT_SETTINGS != null) return _DEFAULT_SETTINGS;
 
-            this.limitedTime = maxTime > 0;
-            this.maxTime = maxTime;
+            string[] str = File.ReadAllLines("lib/settings.json");
 
-            this.limitedTurnTime = maxTurnTime > 0;
-            this.maxTurnTime = maxTurnTime;
+            string json = "";
 
-            this.displayBoards = true;
-        }
+            foreach (string s in str)
+            {
+                json += s;
+            }
 
-        /// <summary>
-        /// Creates a new chess player settings objects with the specified values,
-        /// if a value is non-positive it is assumed the relevant setting is false
-        /// </summary>
-        /// <param name="maxTurns">The maximum number of full turns</param>
-        /// <param name="maxTime">The maximum time of the game (in ms)</param>
-        /// <param name="maxTurnTime">The maximum time of a turn (in ms)</param>
-        /// <param name="displayBoards">Whether to display the board after each move or not</param>
-        public ChessPlayerSettings(int maxTurns, float maxTime, float maxTurnTime, bool displayBoards)
-        {
-            this.limitedTurns = maxTurns > 0;
-            this.maxTurns = maxTurns;
+            _DEFAULT_SETTINGS = JsonSerializer.Deserialize<ChessPlayerSettings>(json)!;
 
-            this.limitedTime = maxTime > 0;
-            this.maxTime = maxTime;
-
-            this.limitedTurnTime = maxTurnTime > 0;
-            this.maxTurnTime = maxTurnTime;
-
-            this.displayBoards = displayBoards;
-        }
-
-        /// <summary>
-        /// Creates a new chess player settings objects with the specified values,
-        /// </summary>
-        /// <param name="limitedTurns">true if the game has a limited number of turns</param>
-        /// <param name="maxTurns">The maximum number of turns</param>
-        /// <param name="limitedTime">True if the game has a limited total allowed time per player</param>
-        /// <param name="maxTime">The total allowed time per player</param>
-        /// <param name="limitedTurnTime">True if the game has a limited time per turn</param>
-        /// <param name="maxTurnTime">The max time per turn</param>
-        /// <param name="displayBoards">True if the board should be displayed after each turn</param>
-        public ChessPlayerSettings(bool limitedTurns, int maxTurns, bool limitedTime, float maxTime, bool limitedTurnTime, float maxTurnTime, bool displayBoards)
-        {
-            this.limitedTurns = limitedTurns;
-            this.maxTurns = maxTurns;
-            this.limitedTime = limitedTime;
-            this.maxTime = maxTime;
-            this.limitedTurnTime = limitedTurnTime;
-            this.maxTurnTime = maxTurnTime;
-            this.displayBoards = displayBoards;
+            return _DEFAULT_SETTINGS;
         }
 
         private void DisplaySettings()
@@ -99,7 +59,7 @@ namespace chessPlayer
 
             if (limitedTurns) Console.WriteLine($"Max number of turns: {maxTurns}");
             else Console.WriteLine("No max number of turns");
-            
+
             if (limitedTime) Console.WriteLine($"Allowed total time per player: {maxTime}ms");
             else Console.WriteLine("No max allowed total time per player");
 
@@ -107,6 +67,7 @@ namespace chessPlayer
             else Console.WriteLine("No max allowed time per turn");
 
             Console.WriteLine($"Board is {(displayBoards ? "" : "not ")}displayed after each turn");
+            Console.WriteLine($"Input is {(requireInputAfterEachTurn ? "" : "not ")}reqired after each turn");
 
             Console.WriteLine("-----------------------");
         }
@@ -121,7 +82,7 @@ namespace chessPlayer
 
             string? input = "";
 
-            while(!Regex.IsMatch(input, "^[yn]$"))
+            while (!Regex.IsMatch(input, "^[yn]$"))
             {
                 Console.Write("Do you want to change these settings? [y/n]:");
 
@@ -131,15 +92,37 @@ namespace chessPlayer
 
             if (input.Equals("n")) return DEFAULT_SETTINGS;
 
-            int maxTurns = AskUserForSetting("max turns");
-            int maxTime = AskUserForSetting("max time (in ms)");
-            int maxTurnTime = AskUserForSetting("max time per turn (in ms)");
-            bool displayBoards = AskUserForSettingBool("displaying the board after each turn");
+            ChessPlayerSettings settings = new ChessPlayerSettings();
 
-            ChessPlayerSettings settings = new ChessPlayerSettings(maxTurns, maxTime, maxTurnTime, displayBoards);
+            settings.maxTurns = AskUserForSetting("max turns");
+            settings.maxTime = AskUserForSetting("max time (in ms)");
+            settings.maxTurnTime = AskUserForSetting("max time per turn (in ms)");
+            settings.displayBoards = AskUserForSettingBool("displaying the board after each turn");
+            settings.requireInputAfterEachTurn = AskUserForSettingBool("requiring input after each turn");
+
+            settings.limitedTurns = settings.maxTurns > 0;
+            settings.limitedTime = settings.maxTime > 0;
+            settings.limitedTurnTime = settings.maxTurnTime > 0;
 
             settings.DisplaySettings();
 
+            //ask if the user wants to make the altered settings the new default
+            input = "";
+
+            while (!Regex.IsMatch(input, "^[yn]$"))
+            {
+                Console.Write("Do you want to change the default settings to this? [y/n]:");
+
+                input = Console.ReadLine();
+                if (input == null) input = "";
+            }
+
+            if (input.Equals("y"))
+            {
+                string json = JsonSerializer.Serialize(settings);
+
+                File.WriteAllLines("lib/settings.json", [json]);
+            }
             return settings;
         }
 
@@ -147,7 +130,7 @@ namespace chessPlayer
         {
             string? input = "";
 
-            while(!Regex.IsMatch(input, "^-?[0-9]+$"))
+            while (!Regex.IsMatch(input, "^-?[0-9]+$"))
             {
                 Console.Write($"Enter the {setting}, a negative value will disable this setting:");
 
@@ -155,14 +138,15 @@ namespace chessPlayer
                 if (input == null) input = "";
             }
 
-            return int.Parse(input);
+            int result = int.Parse(input);
+            return result > 0 ? result : 0;
         }
 
         private static bool AskUserForSettingBool(string setting)
         {
             string? input = "";
 
-            while(!Regex.IsMatch(input, "^[yn]$"))
+            while (!Regex.IsMatch(input, "^[yn]$"))
             {
                 Console.Write($"Do you want to enable {setting}? [y/n]:");
 

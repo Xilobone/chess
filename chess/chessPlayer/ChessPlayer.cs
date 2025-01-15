@@ -1,20 +1,27 @@
 using chess;
+using gui;
 
 namespace chessPlayer
 {
     public class ChessPlayer
     {
-        private Player white;
-        private Player black;
+        private Player? white;
+        private Player? black;
 
-        private Board? board;
+        public Board? board { get; private set; }
 
-        private ChessPlayerSettings settings;
+        private ChessPlayerSettings? settings;
         private long runningTime;
 
         private int turnsAtStart;
         private bool whiteStarted;
 
+        public EventHandler<ChessEventArgs>? onChange;
+
+        public ChessPlayer()
+        {
+
+        }
         public ChessPlayer(Player white, Player black) : this(white, black, ChessPlayerSettings.DEFAULT_SETTINGS) { }
 
         public ChessPlayer(Player white, Player black, ChessPlayerSettings settings)
@@ -28,6 +35,7 @@ namespace chessPlayer
 
             this.white.engine.isWhite = true;
             this.black.engine.isWhite = false;
+
         }
 
         public GameResult Play()
@@ -37,7 +45,14 @@ namespace chessPlayer
 
         public GameResult Play(string fen)
         {
+            if (white == null || black == null || settings == null) 
+            {
+                Console.WriteLine("Not all players or settings have been set, game will not be played");
+                return new GameResult(0, 0);
+            }
+
             board = Board.fromFen(fen);
+            onChange?.Invoke(this, new ChessEventArgs(board));
 
             turnsAtStart = board.fullMoves;
             whiteStarted = board.whiteToMove;
@@ -52,6 +67,12 @@ namespace chessPlayer
                     Console.WriteLine("White's evaluation: " + white.evaluator.evaluate(board));
                     Console.WriteLine("Black's evaluation: " + black.evaluator.evaluate(board));
                 }
+
+                if (settings.requireInputAfterEachTurn) 
+                {
+                    Console.Write("Press enter to continue to next move:");
+                    Console.ReadLine();
+                }
                 Move move;
 
                 //select correct player to make a move
@@ -65,6 +86,10 @@ namespace chessPlayer
 
                 if (settings.displayBoards) Console.WriteLine($"move: {move}");
                 board = board.makeMove(move);
+                board.attackMapWhite = BitBoard.ComputeInitial(board);
+
+                onChange?.Invoke(this, new ChessEventArgs(board));
+
                 runningTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startTime;
             }
 
@@ -93,7 +118,7 @@ namespace chessPlayer
                 return true;
             }
 
-            if (settings.limitedTurns && board.fullMoves - turnsAtStart >= settings.maxTurns && whiteStarted == board.whiteToMove)
+            if (settings!.limitedTurns && board.fullMoves - turnsAtStart >= settings.maxTurns && whiteStarted == board.whiteToMove)
             {
                 return true;
             }
@@ -106,20 +131,28 @@ namespace chessPlayer
             return false;
         }
 
-        public static void PlayFromUserInput()
+        public void PlayFromUserInput()
         {
-            Player white = PlayerList.selectPlayer(true);
-            Player black = PlayerList.selectPlayer(false);
+            white = PlayerList.selectPlayer(true);
+            black = PlayerList.selectPlayer(false);
 
-            ChessPlayerSettings settings = ChessPlayerSettings.AskUserForSettings();
-            ChessPlayer player = new ChessPlayer(white, black, settings);
+            settings = ChessPlayerSettings.AskUserForSettings();
 
             Console.Write("Enter the starting fen (or leave empty for the standard position):");
             string? fen = Console.ReadLine();
 
-            if (string.IsNullOrEmpty(fen)) player.Play();
-            else player.Play(fen);
+            if (string.IsNullOrEmpty(fen)) Play();
+            else Play(fen);
 
+        }
+    }
+
+    public class ChessEventArgs : EventArgs
+    {
+        public Board board { get; private set; }
+        public ChessEventArgs(Board board)
+        {
+            this.board = board;
         }
     }
 }
