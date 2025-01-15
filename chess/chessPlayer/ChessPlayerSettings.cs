@@ -111,7 +111,7 @@ namespace chessPlayer
 
             while (!Regex.IsMatch(input, "^[yn]$"))
             {
-                Console.Write("Do you want to change the default settings to this? [y/n]");
+                Console.Write("Do you want to change the default settings to this? [y/n]:");
 
                 input = Console.ReadLine();
                 if (input == null) input = "";
@@ -138,7 +138,8 @@ namespace chessPlayer
                 if (input == null) input = "";
             }
 
-            return int.Parse(input);
+            int result = int.Parse(input);
+            return result > 0 ? result : 0;
         }
 
         private static bool AskUserForSettingBool(string setting)
