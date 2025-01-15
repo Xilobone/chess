@@ -24,6 +24,24 @@ namespace chess
         //they represent board positions from the top left to the bottom right
         public long attackMapWhite;
 
+        public readonly static int BITBOARD_PAWN = 0;
+        public readonly static int BITBOARD_KNIGHT = 1;
+        public readonly static int BITBOARD_BISHOP = 2;
+        public readonly static int BITBOARD_ROOK = 3;
+        public readonly static int BITBOARD_QUEEN = 4;
+        public readonly static int BITBOARD_KING = 5;
+
+        public readonly static int BITBOARD_PAWN_ATTACK = 6;
+        public readonly static int BITBOARD_KNIGHT_ATTACK = 7;
+        public readonly static int BITBOARD_BISHOP_ATTACK = 8;
+        public readonly static int BITBOARD_ROOK_ATTACK = 9;
+        public readonly static int BITBOARD_QUEEN_ATTACK = 10;
+        public readonly static int BITBOARD_KING_ATTACK = 11;
+
+        public readonly long[] bitboardsWhite = new long[12];
+        public readonly long[] bitboardsBlack = new long[12];
+
+
         public Board makeMove(Move move)
         {
             Board result = getCopy();
