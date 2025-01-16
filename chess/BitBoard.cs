@@ -35,6 +35,7 @@ namespace chess
 
             bitboards[PAWN] = ComputePawnAttackingBitboard(board, forWhite);
             bitboards[KNIGHT] = ComputeKnightAttackingBitboard(board, forWhite);
+            bitboards[KING] = ComputeKingAttackingBitboard(board, forWhite);
 
             return bitboards;
         }
@@ -127,6 +128,26 @@ namespace chess
             attackBitboard |= (knightBitboard << 10) & ~ghFile;
             attackBitboard |= (knightBitboard << 15) & ~aFile;
             attackBitboard |= (knightBitboard << 17) & ~hFile;
+
+            return attackBitboard;
+        }
+
+        private static ulong ComputeKingAttackingBitboard(Board board, bool forWhite)
+        {
+            ulong kingBitboard = forWhite ? board.bitboardsWhite[KING] : board.bitboardsBlack[KING];
+
+            ulong attackBitboard = 0;
+
+            attackBitboard |= (kingBitboard >> 9) & ~aFile;
+            attackBitboard |= (kingBitboard >> 8);
+            attackBitboard |= (kingBitboard >> 7) & ~hFile;
+
+            attackBitboard |= (kingBitboard >> 1) & ~aFile;
+            attackBitboard |= (kingBitboard << 1) & ~hFile;
+
+            attackBitboard |= (kingBitboard << 7) & ~aFile;
+            attackBitboard |= (kingBitboard << 8);
+            attackBitboard |= (kingBitboard << 9) & ~hFile;
 
             return attackBitboard;
         }
