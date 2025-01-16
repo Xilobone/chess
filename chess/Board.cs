@@ -24,22 +24,22 @@ namespace chess
         //they represent board positions from the top left to the bottom right
         public long attackMapWhite;
 
-        public readonly static int BITBOARD_PAWN = 0;
-        public readonly static int BITBOARD_KNIGHT = 1;
-        public readonly static int BITBOARD_BISHOP = 2;
-        public readonly static int BITBOARD_ROOK = 3;
-        public readonly static int BITBOARD_QUEEN = 4;
-        public readonly static int BITBOARD_KING = 5;
+        // public readonly static int BITBOARD_PAWN = 0;
+        // public readonly static int BITBOARD_KNIGHT = 1;
+        // public readonly static int BITBOARD_BISHOP = 2;
+        // public readonly static int BITBOARD_ROOK = 3;
+        // public readonly static int BITBOARD_QUEEN = 4;
+        // public readonly static int BITBOARD_KING = 5;
 
-        public readonly static int BITBOARD_PAWN_ATTACK = 6;
-        public readonly static int BITBOARD_KNIGHT_ATTACK = 7;
-        public readonly static int BITBOARD_BISHOP_ATTACK = 8;
-        public readonly static int BITBOARD_ROOK_ATTACK = 9;
-        public readonly static int BITBOARD_QUEEN_ATTACK = 10;
-        public readonly static int BITBOARD_KING_ATTACK = 11;
+        // public readonly static int BITBOARD_PAWN_ATTACK = 6;
+        // public readonly static int BITBOARD_KNIGHT_ATTACK = 7;
+        // public readonly static int BITBOARD_BISHOP_ATTACK = 8;
+        // public readonly static int BITBOARD_ROOK_ATTACK = 9;
+        // public readonly static int BITBOARD_QUEEN_ATTACK = 10;
+        // public readonly static int BITBOARD_KING_ATTACK = 11;
 
-        public readonly long[] bitboardsWhite = new long[12];
-        public readonly long[] bitboardsBlack = new long[12];
+        public long[] bitboardsWhite = new long[12];
+        public long[] bitboardsBlack = new long[12];
 
 
         public Board makeMove(Move move)
@@ -108,6 +108,16 @@ namespace chess
             {
                 result.fullMoves++;
             }
+
+            /*TODO: only the affected pieces bitboards have to be updated, this includes
+                - bitboard of the moved piece
+                - if captute, bitboard of the captured piece
+                - if castling, botboard of the rooks
+                - if promoted, bitboard of the promoted to piece
+            */
+            //update bitboards
+            result.bitboardsWhite = BitBoard.ComputeAll(result, true);
+            result.bitboardsBlack = BitBoard.ComputeAll(result, true);
 
             return result;
         }
@@ -503,7 +513,8 @@ namespace chess
             board.halfMoves = int.Parse(fen[4]);
             board.fullMoves = int.Parse(fen[5]);
 
-            board.attackMapWhite = BitBoard.ComputeInitial(board);
+            board.bitboardsWhite = BitBoard.ComputeAll(board, true);
+            board.bitboardsBlack = BitBoard.ComputeAll(board, true);
             return board;
         }
 

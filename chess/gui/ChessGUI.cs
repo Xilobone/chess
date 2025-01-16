@@ -64,19 +64,35 @@ namespace gui
 
             bitboardComboBox.Items.AddRange([
                 "white: pawn",
+                "white: knight",
+                "white: bishop",
                 "white: rook",
-                "white: knight"]);
+                "white: queen",
+                "white: king",
+                "black: pawn",
+                "black: knight",
+                "black: bishop",
+                "black: rook",
+                "black: queen",
+                "black: king",
+                ]);
 
-            bitboardComboBox.SelectedValueChanged += OnSelectBitboard;
+            bitboardComboBox.SelectedValueChanged += OnSelectBitboardChange;
             Controls.Add(bitboardComboBox);
 
         }
 
-        private void OnSelectBitboard(object? sender, EventArgs e)
+        private void OnSelectBitboardChange(object? sender, EventArgs e)
+        {
+            UpdateBitboard();
+        }
+
+        private void UpdateBitboard()
         {
             if (bitboardComboBox.SelectedItem == null || currentBoard == null)
             {
                 bitboard = 0;
+                Refresh();
                 return;
             }
 
@@ -84,13 +100,23 @@ namespace gui
 
             switch (selectedBitboard)
             {
-                case "white: pawn": bitboard = currentBoard.bitboardsWhite[Board.BITBOARD_PAWN]; break;
-                case "white: rook": bitboard = currentBoard.bitboardsWhite[Board.BITBOARD_ROOK]; break;
-                case "white: knight": bitboard = currentBoard.bitboardsWhite[Board.BITBOARD_KNIGHT]; break;
+                case "white: pawn": bitboard = currentBoard.bitboardsWhite[BitBoard.PAWN]; break;
+                case "white: knight": bitboard = currentBoard.bitboardsWhite[BitBoard.KNIGHT]; break;
+                case "white: bishop": bitboard = currentBoard.bitboardsWhite[BitBoard.BISHOP]; break;
+                case "white: rook": bitboard = currentBoard.bitboardsWhite[BitBoard.ROOK]; break;
+                case "white: queen": bitboard = currentBoard.bitboardsWhite[BitBoard.QUEEN]; break;
+                case "white: king": bitboard = currentBoard.bitboardsWhite[BitBoard.KING]; break;
+                case "black: pawn": bitboard = currentBoard.bitboardsBlack[BitBoard.PAWN]; break;
+                case "black: knight": bitboard = currentBoard.bitboardsBlack[BitBoard.KNIGHT]; break;
+                case "black: bishop": bitboard = currentBoard.bitboardsBlack[BitBoard.BISHOP]; break;
+                case "black: rook": bitboard = currentBoard.bitboardsBlack[BitBoard.ROOK]; break;
+                case "black: queen": bitboard = currentBoard.bitboardsBlack[BitBoard.QUEEN]; break;
+                case "black: king": bitboard = currentBoard.bitboardsBlack[BitBoard.KING]; break;
                 default: bitboard = 0; break;
             }
-        }
 
+            Refresh();
+        }
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
@@ -136,7 +162,7 @@ namespace gui
                 int y = i / 8;
                 int x = i % 8;
 
-                g.FillRectangle(brush, BOARD_OFFSET[0] + SQUARE_SIZE * x, BOARD_OFFSET[1] + SQUARE_SIZE * y, SQUARE_SIZE, SQUARE_SIZE);
+                g.FillRectangle(brush, BOARD_OFFSET[0] + SQUARE_SIZE * x, BOARD_OFFSET[1] + SQUARE_SIZE * (7 - y), SQUARE_SIZE, SQUARE_SIZE);
 
             }
 
@@ -175,6 +201,7 @@ namespace gui
         private void OnChange(object? sender, ChessEventArgs e)
         {
             currentBoard = e.board;
+            UpdateBitboard();
             Refresh();
         }
     }

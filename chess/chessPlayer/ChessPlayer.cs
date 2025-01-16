@@ -86,7 +86,6 @@ namespace chessPlayer
 
                 if (settings.displayBoards) Console.WriteLine($"move: {move}");
                 board = board.makeMove(move);
-                board.attackMapWhite = BitBoard.ComputeInitial(board);
 
                 onChange?.Invoke(this, new ChessEventArgs(board));
 
