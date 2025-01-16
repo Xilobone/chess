@@ -9,7 +9,7 @@ namespace gui
         private static readonly int SQUARE_SIZE = 64;
 
         private ComboBox bitboardComboBox;
-        long bitboard = 0;
+        private ulong bitboard = 0;
 
         private static Dictionary<int, int> IMAGE_INDEX = new Dictionary<int, int>() {
             {Piece.WHITE_KING, 0},
@@ -124,18 +124,18 @@ namespace gui
                 case "black: rook": bitboard = currentBoard.bitboardsBlack[BitBoard.ROOK]; break;
                 case "black: queen": bitboard = currentBoard.bitboardsBlack[BitBoard.QUEEN]; break;
                 case "black: king": bitboard = currentBoard.bitboardsBlack[BitBoard.KING]; break;
-                case "white: pawn attack": bitboard = currentBoard.bitboardsWhite[BitBoard.PAWN_ATTACK]; break;
-                case "white: knight attack": bitboard = currentBoard.bitboardsWhite[BitBoard.KNIGHT_ATTACK]; break;
-                case "white: bishop attack": bitboard = currentBoard.bitboardsWhite[BitBoard.BISHOP_ATTACK]; break;
-                case "white: rook attack": bitboard = currentBoard.bitboardsWhite[BitBoard.ROOK_ATTACK]; break;
-                case "white: queen attack": bitboard = currentBoard.bitboardsWhite[BitBoard.QUEEN_ATTACK]; break;
-                case "white: king attack": bitboard = currentBoard.bitboardsWhite[BitBoard.KING_ATTACK]; break;
-                case "black: pawn attack": bitboard = currentBoard.bitboardsBlack[BitBoard.PAWN_ATTACK]; break;
-                case "black: knight attack": bitboard = currentBoard.bitboardsBlack[BitBoard.KNIGHT_ATTACK]; break;
-                case "black: bishop attack": bitboard = currentBoard.bitboardsBlack[BitBoard.BISHOP_ATTACK]; break;
-                case "black: rook attack": bitboard = currentBoard.bitboardsBlack[BitBoard.ROOK_ATTACK]; break;
-                case "black: queen attack": bitboard = currentBoard.bitboardsBlack[BitBoard.QUEEN_ATTACK]; break;
-                case "black: king attack": bitboard = currentBoard.bitboardsBlack[BitBoard.KING_ATTACK]; break;
+                case "white: pawn attack": bitboard = currentBoard.bitboardsWhiteAttack[BitBoard.PAWN]; break;
+                case "white: knight attack": bitboard = currentBoard.bitboardsWhiteAttack[BitBoard.KNIGHT]; break;
+                case "white: bishop attack": bitboard = currentBoard.bitboardsWhiteAttack[BitBoard.BISHOP]; break;
+                case "white: rook attack": bitboard = currentBoard.bitboardsWhiteAttack[BitBoard.ROOK]; break;
+                case "white: queen attack": bitboard = currentBoard.bitboardsWhiteAttack[BitBoard.QUEEN]; break;
+                case "white: king attack": bitboard = currentBoard.bitboardsWhiteAttack[BitBoard.KING]; break;
+                case "black: pawn attack": bitboard = currentBoard.bitboardsBlackAttack[BitBoard.PAWN]; break;
+                case "black: knight attack": bitboard = currentBoard.bitboardsBlackAttack[BitBoard.KNIGHT]; break;
+                case "black: bishop attack": bitboard = currentBoard.bitboardsBlackAttack[BitBoard.BISHOP]; break;
+                case "black: rook attack": bitboard = currentBoard.bitboardsBlackAttack[BitBoard.ROOK]; break;
+                case "black: queen attack": bitboard = currentBoard.bitboardsBlackAttack[BitBoard.QUEEN]; break;
+                case "black: king attack": bitboard = currentBoard.bitboardsBlackAttack[BitBoard.KING]; break;
                 default: bitboard = 0; break;
             }
 
@@ -171,7 +171,7 @@ namespace gui
         private void DrawBitboard(Graphics g)
         {
             Brush brush = new SolidBrush(bitboardColor);
-            long btb = bitboard;
+            ulong btb = bitboard;
 
             for (int i = 0; i < 64; i++)
             {

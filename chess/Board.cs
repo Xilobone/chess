@@ -24,22 +24,10 @@ namespace chess
         //they represent board positions from the top left to the bottom right
         public long attackMapWhite;
 
-        // public readonly static int BITBOARD_PAWN = 0;
-        // public readonly static int BITBOARD_KNIGHT = 1;
-        // public readonly static int BITBOARD_BISHOP = 2;
-        // public readonly static int BITBOARD_ROOK = 3;
-        // public readonly static int BITBOARD_QUEEN = 4;
-        // public readonly static int BITBOARD_KING = 5;
-
-        // public readonly static int BITBOARD_PAWN_ATTACK = 6;
-        // public readonly static int BITBOARD_KNIGHT_ATTACK = 7;
-        // public readonly static int BITBOARD_BISHOP_ATTACK = 8;
-        // public readonly static int BITBOARD_ROOK_ATTACK = 9;
-        // public readonly static int BITBOARD_QUEEN_ATTACK = 10;
-        // public readonly static int BITBOARD_KING_ATTACK = 11;
-
-        public long[] bitboardsWhite = new long[12];
-        public long[] bitboardsBlack = new long[12];
+        public ulong[] bitboardsWhite = new ulong[6];
+        public ulong[] bitboardsWhiteAttack = new ulong[6];
+        public ulong[] bitboardsBlack = new ulong[6];
+        public ulong[] bitboardsBlackAttack = new ulong[6];
 
 
         public Board makeMove(Move move)
@@ -118,6 +106,10 @@ namespace chess
             //update bitboards
             result.bitboardsWhite = BitBoard.ComputeAll(result, true);
             result.bitboardsBlack = BitBoard.ComputeAll(result, false);
+
+            result.bitboardsWhiteAttack = BitBoard.ComputeAllAttack(result, true);
+            result.bitboardsBlackAttack = BitBoard.ComputeAllAttack(result, false);
+
 
             return result;
         }
@@ -515,6 +507,9 @@ namespace chess
 
             board.bitboardsWhite = BitBoard.ComputeAll(board, true);
             board.bitboardsBlack = BitBoard.ComputeAll(board, false);
+
+            board.bitboardsWhiteAttack = BitBoard.ComputeAllAttack(board, true);
+            board.bitboardsBlackAttack = BitBoard.ComputeAllAttack(board, false);
             return board;
         }
 
@@ -552,6 +547,9 @@ namespace chess
             {
                 copy.bitboardsWhite[i] = bitboardsWhite[i];
                 copy.bitboardsBlack[i] = bitboardsBlack[i];
+
+                copy.bitboardsWhiteAttack[i] = bitboardsWhiteAttack[i];
+                copy.bitboardsBlackAttack[i] = bitboardsBlackAttack[i];
             }
             return copy;
         }
