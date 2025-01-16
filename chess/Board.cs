@@ -117,7 +117,7 @@ namespace chess
             */
             //update bitboards
             result.bitboardsWhite = BitBoard.ComputeAll(result, true);
-            result.bitboardsBlack = BitBoard.ComputeAll(result, true);
+            result.bitboardsBlack = BitBoard.ComputeAll(result, false);
 
             return result;
         }
@@ -514,7 +514,7 @@ namespace chess
             board.fullMoves = int.Parse(fen[5]);
 
             board.bitboardsWhite = BitBoard.ComputeAll(board, true);
-            board.bitboardsBlack = BitBoard.ComputeAll(board, true);
+            board.bitboardsBlack = BitBoard.ComputeAll(board, false);
             return board;
         }
 
@@ -547,7 +547,12 @@ namespace chess
             copy.fullMoves = fullMoves;
 
             copy.previousBoards = new List<Board>(previousBoards);
-            copy.attackMapWhite = attackMapWhite;
+            
+            for(int i = 0; i < bitboardsWhite.Length; i++)
+            {
+                copy.bitboardsWhite[i] = bitboardsWhite[i];
+                copy.bitboardsBlack[i] = bitboardsBlack[i];
+            }
             return copy;
         }
 
