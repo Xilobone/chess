@@ -75,6 +75,18 @@ namespace gui
                 "black: rook",
                 "black: queen",
                 "black: king",
+                "white: pawn attack",
+                "white: knight attack",
+                "white: bishop attack",
+                "white: rook attack",
+                "white: queen attack",
+                "white: king attack",
+                "black: pawn attack",
+                "black: knight attack",
+                "black: bishop attack",
+                "black: rook attack",
+                "black: queen attack",
+                "black: king attack",
                 ]);
 
             bitboardComboBox.SelectedValueChanged += OnSelectBitboardChange;
@@ -112,6 +124,18 @@ namespace gui
                 case "black: rook": bitboard = currentBoard.bitboardsBlack[BitBoard.ROOK]; break;
                 case "black: queen": bitboard = currentBoard.bitboardsBlack[BitBoard.QUEEN]; break;
                 case "black: king": bitboard = currentBoard.bitboardsBlack[BitBoard.KING]; break;
+                case "white: pawn attack": bitboard = currentBoard.bitboardsWhite[BitBoard.PAWN_ATTACK]; break;
+                case "white: knight attack": bitboard = currentBoard.bitboardsWhite[BitBoard.KNIGHT_ATTACK]; break;
+                case "white: bishop attack": bitboard = currentBoard.bitboardsWhite[BitBoard.BISHOP_ATTACK]; break;
+                case "white: rook attack": bitboard = currentBoard.bitboardsWhite[BitBoard.ROOK_ATTACK]; break;
+                case "white: queen attack": bitboard = currentBoard.bitboardsWhite[BitBoard.QUEEN_ATTACK]; break;
+                case "white: king attack": bitboard = currentBoard.bitboardsWhite[BitBoard.KING_ATTACK]; break;
+                case "black: pawn attack": bitboard = currentBoard.bitboardsBlack[BitBoard.PAWN_ATTACK]; break;
+                case "black: knight attack": bitboard = currentBoard.bitboardsBlack[BitBoard.KNIGHT_ATTACK]; break;
+                case "black: bishop attack": bitboard = currentBoard.bitboardsBlack[BitBoard.BISHOP_ATTACK]; break;
+                case "black: rook attack": bitboard = currentBoard.bitboardsBlack[BitBoard.ROOK_ATTACK]; break;
+                case "black: queen attack": bitboard = currentBoard.bitboardsBlack[BitBoard.QUEEN_ATTACK]; break;
+                case "black: king attack": bitboard = currentBoard.bitboardsBlack[BitBoard.KING_ATTACK]; break;
                 default: bitboard = 0; break;
             }
 
