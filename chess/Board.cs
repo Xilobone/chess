@@ -24,6 +24,12 @@ namespace chess
         //they represent board positions from the top left to the bottom right
         public long attackMapWhite;
 
+        public ulong[] bitboardsWhite = new ulong[6];
+        public ulong[] bitboardsWhiteAttack = new ulong[6];
+        public ulong[] bitboardsBlack = new ulong[6];
+        public ulong[] bitboardsBlackAttack = new ulong[6];
+
+
         public Board makeMove(Move move)
         {
             Board result = getCopy();
@@ -90,6 +96,20 @@ namespace chess
             {
                 result.fullMoves++;
             }
+
+            /*TODO: only the affected pieces bitboards have to be updated, this includes
+                - bitboard of the moved piece
+                - if captute, bitboard of the captured piece
+                - if castling, botboard of the rooks
+                - if promoted, bitboard of the promoted to piece
+            */
+            //update bitboards
+            result.bitboardsWhite = BitBoard.ComputeAll(result, true);
+            result.bitboardsBlack = BitBoard.ComputeAll(result, false);
+
+            result.bitboardsWhiteAttack = BitBoard.ComputeAllAttack(result, true);
+            result.bitboardsBlackAttack = BitBoard.ComputeAllAttack(result, false);
+
 
             return result;
         }
@@ -199,50 +219,9 @@ namespace chess
         }
         private bool getInCheck()
         {
-            // get the kings position
-            Position? kingPos = null;
-            for (int x = 0; x < 8; x++)
-            {
-                for (int y = 0; y < 8; y++)
-                {
-                    Position pos = new Position(x, y);
-                    int piece = getPiece(pos);
-
-                    if ((piece == Piece.WHITE_KING || piece == Piece.BLACK_KING) && Piece.isItsTurn(piece, whiteToMove))
-                    {
-                        kingPos = pos;
-                    }
-                }
-            }
-
-            //create a copy of the board and let it be the other players turn
-            Board boardCopy = getCopy();
-            boardCopy.whiteToMove = !boardCopy.whiteToMove;
-
-            for (int x = 0; x < 8; x++)
-            {
-                for (int y = 0; y < 8; y++)
-                {
-                    Position pos = new Position(x, y);
-                    int piece = boardCopy.getPiece(pos);
-
-                    if (!Piece.isItsTurn(piece, boardCopy.whiteToMove))
-                    {
-                        continue;
-                    }
-
-                    List<Move> moves = MoveGenerator.generateMoves(boardCopy, pos, true);
-
-                    Move kingCaptureMove = new Move(pos, kingPos!);
-                    if (moves.Contains(kingCaptureMove))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-
+            return whiteToMove ?
+                (bitboardsWhite[BitBoard.KING] & BitBoard.GetAnyAttack(this, false)) != 0 :
+                (bitboardsBlack[BitBoard.KING] & BitBoard.GetAnyAttack(this, true)) != 0;
         }
 
         public bool isInMate()
@@ -485,7 +464,11 @@ namespace chess
             board.halfMoves = int.Parse(fen[4]);
             board.fullMoves = int.Parse(fen[5]);
 
-            board.attackMapWhite = BitBoard.ComputeInitial(board);
+            board.bitboardsWhite = BitBoard.ComputeAll(board, true);
+            board.bitboardsBlack = BitBoard.ComputeAll(board, false);
+
+            board.bitboardsWhiteAttack = BitBoard.ComputeAllAttack(board, true);
+            board.bitboardsBlackAttack = BitBoard.ComputeAllAttack(board, false);
             return board;
         }
 
@@ -518,7 +501,15 @@ namespace chess
             copy.fullMoves = fullMoves;
 
             copy.previousBoards = new List<Board>(previousBoards);
-            copy.attackMapWhite = attackMapWhite;
+            
+            for(int i = 0; i < bitboardsWhite.Length; i++)
+            {
+                copy.bitboardsWhite[i] = bitboardsWhite[i];
+                copy.bitboardsBlack[i] = bitboardsBlack[i];
+
+                copy.bitboardsWhiteAttack[i] = bitboardsWhiteAttack[i];
+                copy.bitboardsBlackAttack[i] = bitboardsBlackAttack[i];
+            }
             return copy;
         }
 

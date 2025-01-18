@@ -45,7 +45,7 @@ namespace chessPlayer
 
         public GameResult Play(string fen)
         {
-            if (white == null || black == null || settings == null) 
+            if (white == null || black == null || settings == null)
             {
                 Console.WriteLine("Not all players or settings have been set, game will not be played");
                 return new GameResult(0, 0);
@@ -68,7 +68,7 @@ namespace chessPlayer
                     Console.WriteLine("Black's evaluation: " + black.evaluator.evaluate(board));
                 }
 
-                if (settings.requireInputAfterEachTurn) 
+                if (settings.requireInputAfterEachTurn)
                 {
                     Console.Write("Press enter to continue to next move:");
                     Console.ReadLine();
@@ -86,19 +86,15 @@ namespace chessPlayer
 
                 if (settings.displayBoards) Console.WriteLine($"move: {move}");
                 board = board.makeMove(move);
-                board.attackMapWhite = BitBoard.ComputeInitial(board);
 
                 onChange?.Invoke(this, new ChessEventArgs(board));
 
                 runningTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startTime;
             }
 
-            if (settings.displayBoards)
-            {
-                board.display();
-                Console.WriteLine("White's evaluation: " + white.evaluator.evaluate(board));
-                Console.WriteLine("Black's evaluation: " + black.evaluator.evaluate(board));
-            }
+            board.display();
+            Console.WriteLine("White's evaluation: " + white.evaluator.evaluate(board));
+            Console.WriteLine("Black's evaluation: " + black.evaluator.evaluate(board));
 
             long time = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startTime;
             if (settings.displayBoards) Console.WriteLine($"total elapsed time: {time}ms");

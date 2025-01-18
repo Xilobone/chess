@@ -8,6 +8,10 @@ namespace gui
         private static readonly int[] BOARD_OFFSET = [64, 64];
         private static readonly int SQUARE_SIZE = 64;
 
+        private ComboBox bitboardComboBox;
+        private TrackBar bitboardTeamTrackbar;
+        private ulong bitboard = 0;
+
         private static Dictionary<int, int> IMAGE_INDEX = new Dictionary<int, int>() {
             {Piece.WHITE_KING, 0},
             {Piece.WHITE_QUEEN, 1},
@@ -29,7 +33,7 @@ namespace gui
 
         private Color light = Color.FromArgb(219, 198, 140);
         private Color dark = Color.FromArgb(128, 100, 25);
-        private Color bitmapColor = Color.FromArgb(255, 10, 10);
+        private Color bitboardColor = Color.FromArgb(255, 10, 10);
 
         private Board? currentBoard;
 
@@ -53,8 +57,88 @@ namespace gui
             Text = "Chess GUI";
             Size = new Size(600, 600);
 
+            bitboardComboBox = new ComboBox();
+
+            //center combobox above the board
+            bitboardComboBox.Location = new Point(BOARD_OFFSET[0] + 4 * SQUARE_SIZE - bitboardComboBox.Width / 2, BOARD_OFFSET[1] / 2 - bitboardComboBox.Height / 2);
+            bitboardComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+
+            bitboardComboBox.Items.AddRange([
+                "pawn",
+                "knight",
+                "bishop",
+                "rook",
+                "queen",
+                "king",
+                "white: any",
+                "black: any",
+                "pawn attack",
+                "knight attack",
+                "bishop attack",
+                "rook attack",
+                "queen attack",
+                "king attack",
+                "white: any attack",
+                "black: any attack"
+                
+                ]);
+
+            bitboardComboBox.SelectedValueChanged += OnSelectBitboardChange;
+            Controls.Add(bitboardComboBox);
+
+            bitboardTeamTrackbar = new TrackBar();
+            bitboardTeamTrackbar.Location = new Point(bitboardComboBox.Location.X + bitboardComboBox.Width + 16, bitboardComboBox.Location.Y);
+            bitboardTeamTrackbar.Size = new Size(48, 16);
+            bitboardTeamTrackbar.Minimum = 0;
+            bitboardTeamTrackbar.Maximum = 1;
+            bitboardTeamTrackbar.ValueChanged += OnSelectBitboardChange;
+            
+            Controls.Add(bitboardTeamTrackbar);
         }
 
+        private void OnSelectBitboardChange(object? sender, EventArgs e)
+        {
+            UpdateBitboard();
+        }
+
+        private void UpdateBitboard()
+        {
+            if (bitboardComboBox.SelectedItem == null || currentBoard == null)
+            {
+                bitboard = 0;
+                Refresh();
+                return;
+            }
+
+            string? selectedBitboard = bitboardComboBox.SelectedItem.ToString();
+
+            bool white = bitboardTeamTrackbar.Value == 0;
+            ulong[] pieceBitboards = white ? currentBoard.bitboardsWhite : currentBoard.bitboardsBlack;
+            ulong[] attackBitboards = white ? currentBoard.bitboardsWhiteAttack : currentBoard.bitboardsBlackAttack;
+
+            switch (selectedBitboard)
+            {
+                case "pawn": bitboard = pieceBitboards[BitBoard.PAWN]; break;
+                case "knight": bitboard = pieceBitboards[BitBoard.KNIGHT]; break;
+                case "bishop": bitboard = pieceBitboards[BitBoard.BISHOP]; break;
+                case "rook": bitboard = pieceBitboards[BitBoard.ROOK]; break;
+                case "queen": bitboard = pieceBitboards[BitBoard.QUEEN]; break;
+                case "king": bitboard = pieceBitboards[BitBoard.KING]; break;
+                case "white: any": bitboard = BitBoard.GetAny(currentBoard, true); break;
+                case "black: any": bitboard = BitBoard.GetAny(currentBoard, false); break;
+                case "pawn attack": bitboard = attackBitboards[BitBoard.PAWN]; break;
+                case "knight attack": bitboard = attackBitboards[BitBoard.KNIGHT]; break;
+                case "bishop attack": bitboard = attackBitboards[BitBoard.BISHOP]; break;
+                case "rook attack": bitboard = attackBitboards[BitBoard.ROOK]; break;
+                case "queen attack": bitboard = attackBitboards[BitBoard.QUEEN]; break;
+                case "king attack": bitboard = attackBitboards[BitBoard.KING]; break;
+                case "white: any attack": bitboard = BitBoard.GetAnyAttack(currentBoard, true); break;
+                case "black: any attack": bitboard = BitBoard.GetAnyAttack(currentBoard, false); break;
+                default: bitboard = 0; break;
+            }
+
+            Refresh();
+        }
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
@@ -78,21 +162,19 @@ namespace gui
             lightBrush.Dispose();
             darkBrush.Dispose();
 
-            DrawAttackMap(g);
+            DrawBitboard(g);
             DrawPieces(g);
         }
 
-        private void DrawAttackMap(Graphics g)
+        private void DrawBitboard(Graphics g)
         {
-            if (currentBoard == null) return;
-
-            Brush brush = new SolidBrush(bitmapColor);
-            long attackMap = currentBoard.attackMapWhite;
+            Brush brush = new SolidBrush(bitboardColor);
+            ulong btb = bitboard;
 
             for (int i = 0; i < 64; i++)
             {
-                bool isAttacking = (attackMap & 1) == 1;
-                attackMap >>= 1;
+                bool isAttacking = (btb & 1) == 1;
+                btb >>= 1;
 
                 if (!isAttacking)
                 {
@@ -102,7 +184,7 @@ namespace gui
                 int y = i / 8;
                 int x = i % 8;
 
-                g.FillRectangle(brush, BOARD_OFFSET[0] + SQUARE_SIZE * x, BOARD_OFFSET[1] + SQUARE_SIZE * y, SQUARE_SIZE, SQUARE_SIZE);
+                g.FillRectangle(brush, BOARD_OFFSET[0] + SQUARE_SIZE * x, BOARD_OFFSET[1] + SQUARE_SIZE * (7 - y), SQUARE_SIZE, SQUARE_SIZE);
 
             }
 
@@ -141,6 +223,7 @@ namespace gui
         private void OnChange(object? sender, ChessEventArgs e)
         {
             currentBoard = e.board;
+            UpdateBitboard();
             Refresh();
         }
     }
