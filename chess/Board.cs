@@ -219,50 +219,9 @@ namespace chess
         }
         private bool getInCheck()
         {
-            // get the kings position
-            Position? kingPos = null;
-            for (int x = 0; x < 8; x++)
-            {
-                for (int y = 0; y < 8; y++)
-                {
-                    Position pos = new Position(x, y);
-                    int piece = getPiece(pos);
-
-                    if ((piece == Piece.WHITE_KING || piece == Piece.BLACK_KING) && Piece.isItsTurn(piece, whiteToMove))
-                    {
-                        kingPos = pos;
-                    }
-                }
-            }
-
-            //create a copy of the board and let it be the other players turn
-            Board boardCopy = getCopy();
-            boardCopy.whiteToMove = !boardCopy.whiteToMove;
-
-            for (int x = 0; x < 8; x++)
-            {
-                for (int y = 0; y < 8; y++)
-                {
-                    Position pos = new Position(x, y);
-                    int piece = boardCopy.getPiece(pos);
-
-                    if (!Piece.isItsTurn(piece, boardCopy.whiteToMove))
-                    {
-                        continue;
-                    }
-
-                    List<Move> moves = MoveGenerator.generateMoves(boardCopy, pos, true);
-
-                    Move kingCaptureMove = new Move(pos, kingPos!);
-                    if (moves.Contains(kingCaptureMove))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-
+            return whiteToMove ?
+                (bitboardsWhite[BitBoard.KING] & BitBoard.GetAnyAttack(this, false)) != 0 :
+                (bitboardsBlack[BitBoard.KING] & BitBoard.GetAnyAttack(this, true)) != 0;
         }
 
         public bool isInMate()
