@@ -91,7 +91,8 @@ namespace gui
             bitboardTeamTrackbar.Size = new Size(48, 16);
             bitboardTeamTrackbar.Minimum = 0;
             bitboardTeamTrackbar.Maximum = 1;
-
+            bitboardTeamTrackbar.ValueChanged += OnSelectBitboardChange;
+            
             Controls.Add(bitboardTeamTrackbar);
         }
 
