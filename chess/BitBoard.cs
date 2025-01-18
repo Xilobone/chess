@@ -35,10 +35,14 @@ namespace chess
 
             bitboards[PAWN] = ComputePawnAttackingBitboard(board, forWhite);
             bitboards[KNIGHT] = ComputeKnightAttackingBitboard(board, forWhite);
+            bitboards[BISHOP] = ComputeBishopAttackingBitboard(board, forWhite);
+            bitboards[ROOK] = ComputeRookAttackingBitboard(board, forWhite);
+            bitboards[QUEEN] = ComputeQueenAttackingBitboard(board, forWhite);
             bitboards[KING] = ComputeKingAttackingBitboard(board, forWhite);
 
             return bitboards;
         }
+        
         /// <summary>
         /// Computes a specific type of bitboard
         /// </summary>
@@ -150,6 +154,120 @@ namespace chess
             attackBitboard |= (kingBitboard << 9) & ~hFile;
 
             return attackBitboard;
+        }
+
+        private static ulong ComputeRookAttackingBitboard(Board board, bool forWhite)
+        {
+            ulong rookBitboard = forWhite ? board.bitboardsWhite[ROOK] : board.bitboardsBlack[ROOK];
+
+            //create bitboard of any occupied piece
+            ulong any = GetAny(board);
+            ulong attackBitboard = 0;
+
+            while (rookBitboard != 0)
+            {
+                ulong singleRook = rookBitboard & ~(rookBitboard - 1);
+
+                attackBitboard |= SearchDirection(singleRook, any, 8);
+                attackBitboard |= SearchDirection(singleRook, any, -8);
+                attackBitboard |= SearchDirection(singleRook, any, 1);
+                attackBitboard |= SearchDirection(singleRook, any, -1);
+
+                rookBitboard &= rookBitboard - 1;
+            }
+
+            return attackBitboard;
+        }
+
+        private static ulong ComputeBishopAttackingBitboard(Board board, bool forWhite)
+        {
+            ulong bishopBitboard = forWhite ? board.bitboardsWhite[BISHOP] : board.bitboardsBlack[BISHOP];
+            
+            //create bitboard of any occupied piece
+            ulong any = GetAny(board);
+            ulong attackBitboard = 0;
+
+            while (bishopBitboard != 0)
+            {
+                ulong singleBishop = bishopBitboard & ~(bishopBitboard - 1);
+
+                attackBitboard |= SearchDirection(singleBishop, any, 9);
+                attackBitboard |= SearchDirection(singleBishop, any, 7);
+                attackBitboard |= SearchDirection(singleBishop, any, -7);
+                attackBitboard |= SearchDirection(singleBishop, any, -9);
+
+                bishopBitboard &= bishopBitboard - 1;
+            }
+
+            return attackBitboard;
+        }
+
+        private static ulong ComputeQueenAttackingBitboard(Board board, bool forWhite)
+        {
+            ulong queenBitboard = forWhite ? board.bitboardsWhite[QUEEN] : board.bitboardsBlack[QUEEN];
+            
+            //create bitboard of any occupied piece
+            ulong any = GetAny(board);
+            ulong attackBitboard = 0;
+
+            while (queenBitboard != 0)
+            {
+                ulong singleQueen = queenBitboard & ~(queenBitboard - 1);
+
+                attackBitboard |= SearchDirection(singleQueen, any, 9);
+                attackBitboard |= SearchDirection(singleQueen, any, 8);
+                attackBitboard |= SearchDirection(singleQueen, any, 7);
+                attackBitboard |= SearchDirection(singleQueen, any, 1);
+                attackBitboard |= SearchDirection(singleQueen, any, -1);
+                attackBitboard |= SearchDirection(singleQueen, any, -7);
+                attackBitboard |= SearchDirection(singleQueen, any, -8);
+                attackBitboard |= SearchDirection(singleQueen, any, -9);
+
+                queenBitboard &= queenBitboard - 1;
+            }
+
+            return attackBitboard;
+        }
+
+        private static ulong SearchDirection(ulong piece, ulong any, int shift)
+        {
+            ulong result = 0;
+            while (true)
+            {   
+                piece = shift > 0 ? (piece << shift) : (piece >> -shift);
+
+                result |= piece;
+
+                //encountered a piece
+                if ((piece & any) != 0) break;
+
+                // reached top or bottom of board
+                if (piece == 0) break;
+
+                //reached left or right edge of board
+                if (shift != 8 && shift != -8 && ((piece & aFile) != 0 || (piece & hFile) != 0)) break;
+            }
+
+            return result;
+        }
+
+        private static ulong GetAny(Board board)
+        {
+            ulong white = board.bitboardsWhite[PAWN] |
+                            board.bitboardsWhite[KNIGHT] |
+                            board.bitboardsWhite[BISHOP] |
+                            board.bitboardsWhite[ROOK] |
+                            board.bitboardsWhite[QUEEN] |
+                            board.bitboardsWhite[KING];
+
+            ulong black = board.bitboardsBlack[PAWN] |
+                            board.bitboardsBlack[KNIGHT] |
+                            board.bitboardsBlack[BISHOP] |
+                            board.bitboardsBlack[ROOK] |
+                            board.bitboardsBlack[QUEEN] |
+                            board.bitboardsBlack[KING];
+
+            return white | black;
         }
     }
 
