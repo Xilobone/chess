@@ -9,6 +9,7 @@ namespace gui
         private static readonly int SQUARE_SIZE = 64;
 
         private ComboBox bitboardComboBox;
+        private TrackBar bitboardTeamTrackbar;
         private ulong bitboard = 0;
 
         private static Dictionary<int, int> IMAGE_INDEX = new Dictionary<int, int>() {
@@ -63,35 +64,35 @@ namespace gui
             bitboardComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
 
             bitboardComboBox.Items.AddRange([
-                "white: pawn",
-                "white: knight",
-                "white: bishop",
-                "white: rook",
-                "white: queen",
-                "white: king",
-                "black: pawn",
-                "black: knight",
-                "black: bishop",
-                "black: rook",
-                "black: queen",
-                "black: king",
-                "white: pawn attack",
-                "white: knight attack",
-                "white: bishop attack",
-                "white: rook attack",
-                "white: queen attack",
-                "white: king attack",
-                "black: pawn attack",
-                "black: knight attack",
-                "black: bishop attack",
-                "black: rook attack",
-                "black: queen attack",
-                "black: king attack",
+                "pawn",
+                "knight",
+                "bishop",
+                "rook",
+                "queen",
+                "king",
+                "white: any",
+                "black: any",
+                "pawn attack",
+                "knight attack",
+                "bishop attack",
+                "rook attack",
+                "queen attack",
+                "king attack",
+                "white: any attack",
+                "black: any attack"
+                
                 ]);
 
             bitboardComboBox.SelectedValueChanged += OnSelectBitboardChange;
             Controls.Add(bitboardComboBox);
 
+            bitboardTeamTrackbar = new TrackBar();
+            bitboardTeamTrackbar.Location = new Point(bitboardComboBox.Location.X + bitboardComboBox.Width + 16, bitboardComboBox.Location.Y);
+            bitboardTeamTrackbar.Size = new Size(48, 16);
+            bitboardTeamTrackbar.Minimum = 0;
+            bitboardTeamTrackbar.Maximum = 1;
+
+            Controls.Add(bitboardTeamTrackbar);
         }
 
         private void OnSelectBitboardChange(object? sender, EventArgs e)
@@ -110,32 +111,28 @@ namespace gui
 
             string? selectedBitboard = bitboardComboBox.SelectedItem.ToString();
 
+            bool white = bitboardTeamTrackbar.Value == 0;
+            ulong[] pieceBitboards = white ? currentBoard.bitboardsWhite : currentBoard.bitboardsBlack;
+            ulong[] attackBitboards = white ? currentBoard.bitboardsWhiteAttack : currentBoard.bitboardsBlackAttack;
+
             switch (selectedBitboard)
             {
-                case "white: pawn": bitboard = currentBoard.bitboardsWhite[BitBoard.PAWN]; break;
-                case "white: knight": bitboard = currentBoard.bitboardsWhite[BitBoard.KNIGHT]; break;
-                case "white: bishop": bitboard = currentBoard.bitboardsWhite[BitBoard.BISHOP]; break;
-                case "white: rook": bitboard = currentBoard.bitboardsWhite[BitBoard.ROOK]; break;
-                case "white: queen": bitboard = currentBoard.bitboardsWhite[BitBoard.QUEEN]; break;
-                case "white: king": bitboard = currentBoard.bitboardsWhite[BitBoard.KING]; break;
-                case "black: pawn": bitboard = currentBoard.bitboardsBlack[BitBoard.PAWN]; break;
-                case "black: knight": bitboard = currentBoard.bitboardsBlack[BitBoard.KNIGHT]; break;
-                case "black: bishop": bitboard = currentBoard.bitboardsBlack[BitBoard.BISHOP]; break;
-                case "black: rook": bitboard = currentBoard.bitboardsBlack[BitBoard.ROOK]; break;
-                case "black: queen": bitboard = currentBoard.bitboardsBlack[BitBoard.QUEEN]; break;
-                case "black: king": bitboard = currentBoard.bitboardsBlack[BitBoard.KING]; break;
-                case "white: pawn attack": bitboard = currentBoard.bitboardsWhiteAttack[BitBoard.PAWN]; break;
-                case "white: knight attack": bitboard = currentBoard.bitboardsWhiteAttack[BitBoard.KNIGHT]; break;
-                case "white: bishop attack": bitboard = currentBoard.bitboardsWhiteAttack[BitBoard.BISHOP]; break;
-                case "white: rook attack": bitboard = currentBoard.bitboardsWhiteAttack[BitBoard.ROOK]; break;
-                case "white: queen attack": bitboard = currentBoard.bitboardsWhiteAttack[BitBoard.QUEEN]; break;
-                case "white: king attack": bitboard = currentBoard.bitboardsWhiteAttack[BitBoard.KING]; break;
-                case "black: pawn attack": bitboard = currentBoard.bitboardsBlackAttack[BitBoard.PAWN]; break;
-                case "black: knight attack": bitboard = currentBoard.bitboardsBlackAttack[BitBoard.KNIGHT]; break;
-                case "black: bishop attack": bitboard = currentBoard.bitboardsBlackAttack[BitBoard.BISHOP]; break;
-                case "black: rook attack": bitboard = currentBoard.bitboardsBlackAttack[BitBoard.ROOK]; break;
-                case "black: queen attack": bitboard = currentBoard.bitboardsBlackAttack[BitBoard.QUEEN]; break;
-                case "black: king attack": bitboard = currentBoard.bitboardsBlackAttack[BitBoard.KING]; break;
+                case "pawn": bitboard = pieceBitboards[BitBoard.PAWN]; break;
+                case "knight": bitboard = pieceBitboards[BitBoard.KNIGHT]; break;
+                case "bishop": bitboard = pieceBitboards[BitBoard.BISHOP]; break;
+                case "rook": bitboard = pieceBitboards[BitBoard.ROOK]; break;
+                case "queen": bitboard = pieceBitboards[BitBoard.QUEEN]; break;
+                case "king": bitboard = pieceBitboards[BitBoard.KING]; break;
+                case "white: any": bitboard = BitBoard.GetAny(currentBoard, true); break;
+                case "black: any": bitboard = BitBoard.GetAny(currentBoard, false); break;
+                case "pawn attack": bitboard = attackBitboards[BitBoard.PAWN]; break;
+                case "knight attack": bitboard = attackBitboards[BitBoard.KNIGHT]; break;
+                case "bishop attack": bitboard = attackBitboards[BitBoard.BISHOP]; break;
+                case "rook attack": bitboard = attackBitboards[BitBoard.ROOK]; break;
+                case "queen attack": bitboard = attackBitboards[BitBoard.QUEEN]; break;
+                case "king attack": bitboard = attackBitboards[BitBoard.KING]; break;
+                case "white: any attack": bitboard = BitBoard.GetAnyAttack(currentBoard, true); break;
+                case "black: any attack": bitboard = BitBoard.GetAnyAttack(currentBoard, false); break;
                 default: bitboard = 0; break;
             }
 
