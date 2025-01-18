@@ -4,7 +4,6 @@ namespace chess
 {
     public class MoveGenerator
     {
-        public static Counter<long> checkCounter = new Counter<long>("Move generation check");
         private static Position[] KNIGHT_OFFSETS = new Position[]
         {
         new Position(-1,-2),
@@ -318,10 +317,7 @@ namespace chess
 
             if (!allowCheck)
             {
-                long s = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                bool isInCheck = resultingBoard.isInCheck();
-                checkCounter.Increment(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - s);
-                if (isInCheck)
+                if (resultingBoard.isInCheck())
                 {
                     return;
                 }
