@@ -5,7 +5,7 @@ namespace improved_minimax_engine
 {
     public class Engine : chess.Engine
     {
-        private const int MAX_DEPTH = 3;
+        private const int MAX_DEPTH = 4;
 
         private int depth;
 
