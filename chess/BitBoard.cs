@@ -42,7 +42,7 @@ namespace chess
 
             return bitboards;
         }
-        
+
         /// <summary>
         /// Computes a specific type of bitboard
         /// </summary>
@@ -182,7 +182,7 @@ namespace chess
         private static ulong ComputeBishopAttackingBitboard(Board board, bool forWhite)
         {
             ulong bishopBitboard = forWhite ? board.bitboardsWhite[BISHOP] : board.bitboardsBlack[BISHOP];
-            
+
             //create bitboard of any occupied piece
             ulong any = GetAny(board);
             ulong attackBitboard = 0;
@@ -205,7 +205,7 @@ namespace chess
         private static ulong ComputeQueenAttackingBitboard(Board board, bool forWhite)
         {
             ulong queenBitboard = forWhite ? board.bitboardsWhite[QUEEN] : board.bitboardsBlack[QUEEN];
-            
+
             //create bitboard of any occupied piece
             ulong any = GetAny(board);
             ulong attackBitboard = 0;
@@ -233,7 +233,7 @@ namespace chess
         {
             ulong result = 0;
             while (true)
-            {   
+            {
                 piece = shift > 0 ? (piece << shift) : (piece >> -shift);
 
                 result |= piece;
@@ -251,23 +251,56 @@ namespace chess
             return result;
         }
 
-        private static ulong GetAny(Board board)
+        public static ulong GetAny(Board board)
         {
-            ulong white = board.bitboardsWhite[PAWN] |
-                            board.bitboardsWhite[KNIGHT] |
-                            board.bitboardsWhite[BISHOP] |
-                            board.bitboardsWhite[ROOK] |
-                            board.bitboardsWhite[QUEEN] |
-                            board.bitboardsWhite[KING];
+            return GetAny(board, true) | GetAny(board, false);
+        }
 
-            ulong black = board.bitboardsBlack[PAWN] |
-                            board.bitboardsBlack[KNIGHT] |
-                            board.bitboardsBlack[BISHOP] |
-                            board.bitboardsBlack[ROOK] |
-                            board.bitboardsBlack[QUEEN] |
-                            board.bitboardsBlack[KING];
+        public static ulong GetAny(Board board, bool forWhite)
+        {
+            if (forWhite)
+            {
+                return  board.bitboardsWhite[PAWN] |
+                        board.bitboardsWhite[KNIGHT] |
+                        board.bitboardsWhite[BISHOP] |
+                        board.bitboardsWhite[ROOK] |
+                        board.bitboardsWhite[QUEEN] |
+                        board.bitboardsWhite[KING];
+            } else
+            {
+                return  board.bitboardsBlack[PAWN] |
+                        board.bitboardsBlack[KNIGHT] |
+                        board.bitboardsBlack[BISHOP] |
+                        board.bitboardsBlack[ROOK] |
+                        board.bitboardsBlack[QUEEN] |
+                        board.bitboardsBlack[KING];
+            }
+        }
 
-            return white | black;
+        public static ulong GetAnyAttack(Board board)
+        {
+            return GetAnyAttack(board, true) | GetAnyAttack(board, false);
+        }
+
+        public static ulong GetAnyAttack(Board board, bool forWhite)
+        {
+            if (forWhite)
+            {
+                return  board.bitboardsWhiteAttack[PAWN] |
+                        board.bitboardsWhiteAttack[KNIGHT] |
+                        board.bitboardsWhiteAttack[BISHOP] |
+                        board.bitboardsWhiteAttack[ROOK] |
+                        board.bitboardsWhiteAttack[QUEEN] |
+                        board.bitboardsWhiteAttack[KING];
+            } else
+            {
+                return  board.bitboardsBlackAttack[PAWN] |
+                        board.bitboardsBlackAttack[KNIGHT] |
+                        board.bitboardsBlackAttack[BISHOP] |
+                        board.bitboardsBlackAttack[ROOK] |
+                        board.bitboardsBlackAttack[QUEEN] |
+                        board.bitboardsBlackAttack[KING];
+            }
         }
     }
 
