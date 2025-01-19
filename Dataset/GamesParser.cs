@@ -75,7 +75,6 @@ namespace parser
         {
             List<Board> boards = new List<Board>();
             Board board = Board.startPosition();
-
             //moves will be <whiteMove> <blackMove> <moveNr + 1>
             string[] moves = line.Split(". ");
 

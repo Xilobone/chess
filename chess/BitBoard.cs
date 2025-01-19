@@ -234,7 +234,12 @@ namespace chess
             ulong result = 0;
             while (true)
             {
+                ulong before = piece;
                 piece = shift > 0 ? (piece << shift) : (piece >> -shift);
+
+                //break if wrapped around the board
+                if (((before & aFile) != 0) && ((piece & hFile) != 0)) break;
+                if (((before & hFile) != 0) && ((piece & aFile) != 0)) break;
 
                 result |= piece;
 
