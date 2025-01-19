@@ -208,6 +208,30 @@ namespace chess
             return pieces[position.x, position.y];
         }
 
+        /// <summary>
+        /// Gets the piece that is at the given index, board is indexed left to right, top to bottom
+        /// </summary>
+        /// <param name="index">The index of which to get the piece from</param>
+        /// <returns>The piece at the index</returns>
+        public int getPiece(int index)
+        {
+            if (((bitboardsWhite[BitBoard.PAWN] >> index) & 1) == 1) return Piece.WHITE_PAWN;
+            if (((bitboardsWhite[BitBoard.KNIGHT] >> index) & 1) == 1) return Piece.WHITE_KNIGHT;
+            if (((bitboardsWhite[BitBoard.BISHOP] >> index) & 1) == 1) return Piece.WHITE_BISHOP;
+            if (((bitboardsWhite[BitBoard.ROOK] >> index) & 1) == 1) return Piece.WHITE_ROOK;
+            if (((bitboardsWhite[BitBoard.QUEEN] >> index) & 1) == 1) return Piece.WHITE_QUEEN;
+            if (((bitboardsWhite[BitBoard.KING] >> index) & 1) == 1) return Piece.WHITE_KING;
+
+            if (((bitboardsBlack[BitBoard.PAWN] >> index) & 1) == 1) return Piece.BLACK_PAWN;
+            if (((bitboardsBlack[BitBoard.KNIGHT] >> index) & 1) == 1) return Piece.BLACK_KNIGHT;
+            if (((bitboardsBlack[BitBoard.BISHOP] >> index) & 1) == 1) return Piece.BLACK_BISHOP;
+            if (((bitboardsBlack[BitBoard.ROOK] >> index) & 1) == 1) return Piece.BLACK_ROOK;
+            if (((bitboardsBlack[BitBoard.QUEEN] >> index) & 1) == 1) return Piece.BLACK_QUEEN;
+            if (((bitboardsBlack[BitBoard.KING] >> index) & 1) == 1) return Piece.BLACK_KING;
+
+            return 0;
+        }
+
         public bool isInCheck()
         {
             if (checkKnown) return inCheck;

@@ -34,6 +34,7 @@ namespace chessTesting
             //show counter with differences from baseline
             foreach(ICounter counter in player.engine.counters)
             {
+                // counter.write();
                 counter.DisplayOverview(true);
             }
         }
