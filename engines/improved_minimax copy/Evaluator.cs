@@ -11,11 +11,15 @@ namespace improved_minimax_eval_engine
         { Piece.WHITE_KNIGHT, 3 },
         { Piece.WHITE_BISHOP, 3 },
         { Piece.WHITE_QUEEN, 9 },
+        { Piece.WHITE_KING, 0 },
         { Piece.BLACK_PAWN, -1 },
         { Piece.BLACK_ROOK, -5 },
         { Piece.BLACK_KNIGHT, -3 },
         { Piece.BLACK_BISHOP, -3 },
         { Piece.BLACK_QUEEN, -9 },
+        { Piece.BLACK_KING, 0 },
+        { Piece.EMPTY, 0 },
+
     };
 
         private static ulong centerSquares = 0b0000000000000000000000000001100000011000000000000000000000000000;
@@ -38,18 +42,24 @@ namespace improved_minimax_eval_engine
         {
             float value = 0;
 
-            for (int x = 0; x < 8; x++)
+            for (int i = 0; i < 64; i++)
             {
-                for (int y = 0; y < 8; y++)
-                {
-                    int piece = board.getPiece(new Position(x, y));
+                int piece = board.getPiece(i);
 
-                    if (PIECE_VALUES.Keys.Contains(piece))
-                    {
-                        value += PIECE_VALUES[piece];
-                    }
-                }
+                value += PIECE_VALUES[piece];
             }
+            // for (int x = 0; x < 8; x++)
+            // {
+            //     for (int y = 0; y < 8; y++)
+            //     {
+            //         int piece = board.getPiece(new Position(x, y));
+
+            //         if (PIECE_VALUES.Keys.Contains(piece))
+            //         {
+            //             value += PIECE_VALUES[piece];
+            //         }
+            //     }
+            // }
 
             return value;
         }

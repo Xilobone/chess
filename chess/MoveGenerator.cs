@@ -225,11 +225,11 @@ namespace chess
             int piece = board.getPiece(pos);
             if (piece == Piece.WHITE_KING)
             {
-                if (board.castlingOptions[Move.CASTLE_WHITE_QUEENSIDE] && board.getPiece(new Position(1, 0)) == Piece.EMPTY && board.getPiece(new Position(2, 0)) == Piece.EMPTY && board.getPiece(new Position(3, 0)) == Piece.EMPTY)
+                if (board.castlingOptions[Move.CASTLE_WHITE_QUEENSIDE] && board.getPiece(1) == Piece.EMPTY && board.getPiece(2) == Piece.EMPTY && board.getPiece(3) == Piece.EMPTY)
                 {
                     appendMove(moves, board, pos, KING_CASTLE_POSITIONS[Move.CASTLE_WHITE_QUEENSIDE], allowCheck, Move.FLAG_CASTLING);
                 }
-                if (board.castlingOptions[Move.CASTLE_WHITE_KINGSIDE] && board.getPiece(new Position(5, 0)) == Piece.EMPTY && board.getPiece(new Position(6, 0)) == Piece.EMPTY)
+                if (board.castlingOptions[Move.CASTLE_WHITE_KINGSIDE] && board.getPiece(5) == Piece.EMPTY && board.getPiece(6) == Piece.EMPTY)
                 {
                     appendMove(moves, board, pos, KING_CASTLE_POSITIONS[Move.CASTLE_WHITE_KINGSIDE], allowCheck, Move.FLAG_CASTLING);
                 }
