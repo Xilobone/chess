@@ -77,19 +77,14 @@ namespace chess
         private static ulong ComputePieceBitboard(Board board, int piece)
         {
             ulong bitboard = 0;
-            for (int x = 0; x < 8; x++)
+            for (int bit = 0; bit < 64; bit++)
             {
-                for (int y = 0; y < 8; y++)
-                {
-                    if (board.pieces[x, y] != piece)
+                if (board.pieces[bit] != piece)
                     {
                         continue;
                     }
 
-                    int bit = x + y * 8;
-
                     bitboard = bitboard | (1uL << bit);
-                }
             }
 
             return bitboard;

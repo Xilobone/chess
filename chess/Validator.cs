@@ -4,7 +4,7 @@ namespace chess
     {
         public static Move? getValidMove(Move move, Board board)
         {
-            List<Move> possibleMoves = MoveGenerator.generateMoves(board, move.fr);
+            List<Move> possibleMoves = MoveGenerator.generateMoves(board, Position.toPosition(move.frIndex));
 
             foreach (Move m in possibleMoves)
             {

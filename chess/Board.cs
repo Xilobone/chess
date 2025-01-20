@@ -36,8 +36,9 @@ namespace chess
             result.previousBoards.Add(this);
 
             int piece = getPiece(move.frIndex);
-
-            if (piece == Piece.WHITE_PAWN || piece == Piece.BLACK_PAWN || getPiece(move.to) != Piece.EMPTY)
+            int frRank = Index.GetRank(move.frIndex);
+            int toRank = Index.GetRank(move.toIndex);
+            if (piece == Piece.WHITE_PAWN || piece == Piece.BLACK_PAWN || getPiece(move.toIndex) != Piece.EMPTY)
             {
                 result.halfMoves = 0;
             }
@@ -49,19 +50,17 @@ namespace chess
             //move was en passant
             if ((piece == Piece.WHITE_PAWN || piece == Piece.BLACK_PAWN) && move.toIndex == enpassantIndex)
             {
-                if (move.to.y == 2)
+                if (toRank == 2)
                 {
                     result.pieces[move.toIndex + 8] = Piece.EMPTY;
                 }
-                if (move.to.y == 5)
+                if (toRank == 5)
                 {
                     result.pieces[move.toIndex - 8] = Piece.EMPTY;
                 }
             }
 
             //check if move creates an en passant option for black
-            int frRank = Index.GetRank(move.frIndex);
-            int toRank = Index.GetRank(move.toIndex);
             if (piece == Piece.WHITE_PAWN && frRank == 1 && toRank == 3)
             {
                 result.enpassantIndex = move.frIndex + 8;
@@ -118,7 +117,7 @@ namespace chess
 
         private void checkCastlingOptions(Move move)
         {
-            int piece = getPiece(move.fr);
+            int piece = getPiece(move.frIndex);
 
             //check if king has moved
             if (piece == Piece.WHITE_KING)
@@ -155,22 +154,22 @@ namespace chess
 
         private void castle(Move move)
         {
-            if (move.to == new Position(2, 0))
+            if (move.toIndex == 2)
             {
                 pieces[3] = pieces[0];
                 pieces[0] = Piece.EMPTY;
             }
-            else if (move.to == new Position(6, 0))
+            else if (move.toIndex == 6)
             {
                 pieces[5] = pieces[7];
                 pieces[7] = Piece.EMPTY;
             }
-            else if (move.to == new Position(2, 7))
+            else if (move.toIndex == 58)
             {
                 pieces[59] = pieces[56];
                 pieces[56] = Piece.EMPTY;
             }
-            else if (move.to == new Position(6, 7))
+            else if (move.toIndex == 62)
             {
                 pieces[61] = pieces[63];
                 pieces[63] = Piece.EMPTY;
@@ -179,7 +178,7 @@ namespace chess
 
         private void promote(Move move)
         {
-            int piece = getPiece(move.to);
+            int piece = getPiece(move.toIndex);
             int promotedPiece = -1;
             if (Piece.isWhite(piece))
             {

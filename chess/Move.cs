@@ -31,8 +31,6 @@ namespace chess
     };
 
         public int flag { get; set; }
-        public Position fr { get; private set; }
-        public Position to { get; private set; }
 
         public int frIndex {get; private set; }
         public int toIndex {get; private set; }
@@ -46,9 +44,6 @@ namespace chess
         {
             this.frIndex = fr;
             this.toIndex = to;
-
-            this.fr = Position.toPosition(fr);
-            this.to = Position.toPosition(to);
 
             this.flag = flag;
         }
@@ -89,17 +84,17 @@ namespace chess
 
             Move other = (Move)obj;
 
-            return fr == other.fr && to == other.to;
+            return frIndex == other.frIndex && toIndex == other.toIndex;
         }
 
         public override int GetHashCode()
         {
-            return fr.GetHashCode() + to.GetHashCode();
+            return frIndex * 100 + toIndex;
         }
 
         public override string ToString()
         {
-            return $"(From:{fr}, To:{to})";
+            return $"(From:{NotationConverter.toCoordinates(frIndex)}, To:{NotationConverter.toCoordinates(toIndex)})";
         } 
     }
 }

@@ -111,7 +111,7 @@ namespace converter
 
             int piece = Piece.VALUES[pieceStr];
 
-            Position to = toPosition(move.Substring(move.Length - 2, 2));
+            int to = toIndex(move.Substring(move.Length - 2, 2));
 
 
             bool fileSpecified = move.Length >= 4 && move[1] != 'x' && char.IsLetter(move[1]);
@@ -134,11 +134,14 @@ namespace converter
             //get correct move
             List<Move> moves = MoveGenerator.generateAllMoves(board);
             foreach(Move mv in moves)
-            {
-                if (mv.to != to) continue;
-                if (board.getPiece(mv.fr) != piece) continue;
-                if ((fileSpecified || bothSpecified) && mv.fr.x != file) continue;
-                if ((rankSpecified || bothSpecified) && mv.fr.y != rank) continue;
+            {   
+                if (mv.toIndex != to) continue;
+                if (board.getPiece(mv.frIndex) != piece) continue;
+
+                int frFile = chess.Index.GetFile(mv.frIndex);
+
+                if ((fileSpecified || bothSpecified) && frFile != file) continue;
+                if ((rankSpecified || bothSpecified) && frFile != rank) continue;
 
                 return mv;
             }
