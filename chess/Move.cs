@@ -34,6 +34,9 @@ namespace chess
         public Position fr { get; private set; }
         public Position to { get; private set; }
 
+        public int frIndex {get; private set; }
+        public int toIndex {get; private set; }
+
         public Move(Position fr, Position to) : this(fr, to, FLAG_NONE) { }
 
         public Move(Position fr, Position to, int flag)
@@ -41,6 +44,11 @@ namespace chess
             this.fr = fr;
             this.to = to;
             this.flag = flag;
+        }
+
+        public Move(int fr, int to, int flag)
+        {
+            throw new NotImplementedException();
         }
      
         
