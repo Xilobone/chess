@@ -204,10 +204,13 @@ namespace counters
         public void write()
         {
             string path = $"{BASE_FILE_PATH}{name}.cntr";
+            string text = "";
             foreach (T value in history)
             {
-                File.AppendAllText(path, value.ToString() + "\n");
+                text += value.ToString() + "\n";
             }
+
+            File.WriteAllText(path, text);
         }
 
         /// <summary>

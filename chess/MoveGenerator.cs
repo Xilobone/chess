@@ -237,11 +237,11 @@ namespace chess
 
             if (piece == Piece.BLACK_KING)
             {
-                if (board.castlingOptions[Move.CASTLE_BLACK_QUEENSIDE] && board.getPiece(new Position(1, 7)) == Piece.EMPTY && board.getPiece(new Position(2, 7)) == Piece.EMPTY && board.getPiece(new Position(3, 7)) == Piece.EMPTY)
+                if (board.castlingOptions[Move.CASTLE_BLACK_QUEENSIDE] && board.getPiece(57) == Piece.EMPTY && board.getPiece(58) == Piece.EMPTY && board.getPiece(59) == Piece.EMPTY)
                 {
                     appendMove(moves, board, pos, KING_CASTLE_POSITIONS[Move.CASTLE_BLACK_QUEENSIDE], allowCheck, Move.FLAG_CASTLING);
                 }
-                if (board.castlingOptions[Move.CASTLE_BLACK_KINGSIDE] && board.getPiece(new Position(5, 7)) == Piece.EMPTY && board.getPiece(new Position(6, 7)) == Piece.EMPTY)
+                if (board.castlingOptions[Move.CASTLE_BLACK_KINGSIDE] && board.getPiece(61) == Piece.EMPTY && board.getPiece(62) == Piece.EMPTY)
                 {
                     appendMove(moves, board, pos, KING_CASTLE_POSITIONS[Move.CASTLE_BLACK_KINGSIDE], allowCheck, Move.FLAG_CASTLING);
                 }

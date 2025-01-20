@@ -42,6 +42,7 @@ namespace chess
             this.to = to;
             this.flag = flag;
         }
+     
         
         public static bool isValid(string? move_str)
         {
