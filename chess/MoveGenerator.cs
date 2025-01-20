@@ -129,7 +129,7 @@ namespace chess
 
             if (capturePos1.x >= 0 && capturePos1.y >= 0 && capturePos1.y <= 7)
             {
-                if (Piece.isDifferentColor(board.getPiece(capturePos1), piece) || capturePos1 == board.enpassantPos)
+                if (Piece.isDifferentColor(board.getPiece(capturePos1), piece) || capturePos1.toIndex() == board.enpassantIndex)
                 {
                     appendMove(moves, board, pos, capturePos1, allowCheck);
                 }
@@ -137,7 +137,7 @@ namespace chess
 
             if (capturePos2.x <= 7 && capturePos2.y >= 0 && capturePos2.y <= 7)
             {
-                if (Piece.isDifferentColor(board.getPiece(capturePos2), piece) || capturePos2 == board.enpassantPos)
+                if (Piece.isDifferentColor(board.getPiece(capturePos2), piece) || capturePos2.toIndex() == board.enpassantIndex)
                 {
                     appendMove(moves, board, pos, capturePos2, allowCheck);
                 }

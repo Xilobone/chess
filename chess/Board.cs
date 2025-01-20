@@ -6,7 +6,7 @@ namespace chess
     {
         public const string START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-        public int[,] pieces { get; private set; } = new int[8, 8];
+        public int[] pieces { get; private set; } = new int[64];
         public bool whiteToMove { get; set; }
         public int enpassantIndex { get; private set; }
         public bool[] castlingOptions { get; private set; } = new bool[4];
@@ -51,23 +51,25 @@ namespace chess
             {
                 if (move.to.y == 2)
                 {
-                    result.pieces[move.to.x, move.to.y + 1] = Piece.EMPTY;
+                    result.pieces[move.toIndex + 8] = Piece.EMPTY;
                 }
                 if (move.to.y == 5)
                 {
-                    result.pieces[move.to.x, move.to.y - 1] = Piece.EMPTY;
+                    result.pieces[move.toIndex - 8] = Piece.EMPTY;
                 }
             }
 
             //check if move creates an en passant option for black
-            if (piece == Piece.WHITE_PAWN && move.fr.y == 1 && move.to.y == 3)
+            int frRank = Index.GetRank(move.frIndex);
+            int toRank = Index.GetRank(move.toIndex);
+            if (piece == Piece.WHITE_PAWN && frRank == 1 && toRank == 3)
             {
                 result.enpassantIndex = move.frIndex + 8;
                 //check if move creates an en passant option for white
             }
-            else if (piece == Piece.BLACK_PAWN && move.fr.y == 6 && move.to.y == 4)
+            else if (piece == Piece.BLACK_PAWN && frRank == 6 && toRank == 4)
             {
-                result.enpassantIndex = move.frIndex -8;
+                result.enpassantIndex = move.frIndex - 8;
             }
             else
             {
@@ -82,8 +84,8 @@ namespace chess
             }
 
             //move pieces around
-            result.pieces[move.to.x, move.to.y] = pieces[move.fr.x, move.fr.y];
-            result.pieces[move.fr.x, move.fr.y] = Piece.EMPTY;
+            result.pieces[move.toIndex] = pieces[move.frIndex];
+            result.pieces[move.frIndex] = Piece.EMPTY;
 
             if (Move.FLAG_PROMOTIONS.Contains(move.flag))
             {
@@ -155,23 +157,23 @@ namespace chess
         {
             if (move.to == new Position(2, 0))
             {
-                pieces[3, 0] = pieces[0, 0];
-                pieces[0, 0] = Piece.EMPTY;
+                pieces[3] = pieces[0];
+                pieces[0] = Piece.EMPTY;
             }
             else if (move.to == new Position(6, 0))
             {
-                pieces[5, 0] = pieces[7, 0];
-                pieces[7, 0] = Piece.EMPTY;
+                pieces[5] = pieces[7];
+                pieces[7] = Piece.EMPTY;
             }
             else if (move.to == new Position(2, 7))
             {
-                pieces[3, 7] = pieces[0, 7];
-                pieces[0, 7] = Piece.EMPTY;
+                pieces[59] = pieces[56];
+                pieces[56] = Piece.EMPTY;
             }
             else if (move.to == new Position(6, 7))
             {
-                pieces[5, 7] = pieces[7, 7];
-                pieces[7, 7] = Piece.EMPTY;
+                pieces[61] = pieces[63];
+                pieces[63] = Piece.EMPTY;
             }
         }
 
@@ -200,12 +202,12 @@ namespace chess
                 }
             }
 
-            pieces[move.to.x, move.to.y] = promotedPiece;
+            pieces[move.toIndex] = promotedPiece;
         }
 
         public int getPiece(Position position)
         {
-            return pieces[position.x, position.y];
+            return pieces[position.toIndex()];
         }
 
         /// <summary>
@@ -317,7 +319,8 @@ namespace chess
                 Console.Write((y + 1) + " |");
                 for (int x = 0; x < 8; x++)
                 {
-                    Console.Write(" " + Piece.DISPLAY[pieces[x, y]] + " |");
+                    int index = new Position(x, y).toIndex();
+                    Console.Write(" " + Piece.DISPLAY[pieces[index]] + " |");
                 }
                 Console.WriteLine();
                 Console.WriteLine("  +---+---+---+---+---+---+---+---+");
@@ -375,7 +378,8 @@ namespace chess
 
                 for (int x = 0; x < 8; x++)
                 {
-                    if (pieces[x, y] == Piece.EMPTY)
+                    int index = new Position(x, y).toIndex();
+                    if (pieces[index] == Piece.EMPTY)
                     {
                         emptySquares++;
                     }
@@ -387,7 +391,7 @@ namespace chess
                             emptySquares = 0;
                         }
 
-                        fen += Piece.DISPLAY[pieces[x, y]];
+                        fen += Piece.DISPLAY[pieces[index]];
                     }
                 }
 
@@ -438,7 +442,7 @@ namespace chess
             string[] fen = fenString.Split(' ');
 
             Board board = new Board();
-            board.pieces = new int[8, 8];
+            board.pieces = new int[64];
 
             //setup pieces
             int x = 0;
@@ -451,7 +455,8 @@ namespace chess
 
                 if (Piece.VALUES.Keys.Contains(i))
                 {
-                    board.pieces[x, y] = Piece.VALUES[i];
+                    int index = new Position(x, y).toIndex();
+                    board.pieces[index] = Piece.VALUES[i];
                     x++;
                 }
                 else if (i == "/")
@@ -500,14 +505,11 @@ namespace chess
         {
             Board copy = new Board();
 
-            copy.pieces = new int[8, 8];
+            copy.pieces = new int[64];
 
-            for (int x = 0; x < 8; x++)
+            for (int i = 0; i < 64; i++)
             {
-                for (int y = 0; y < 8; y++)
-                {
-                    copy.pieces[x, y] = pieces[x, y];
-                }
+                copy.pieces[i] = pieces[i];
             }
 
             copy.whiteToMove = whiteToMove;
@@ -525,8 +527,8 @@ namespace chess
             copy.fullMoves = fullMoves;
 
             copy.previousBoards = new List<Board>(previousBoards);
-            
-            for(int i = 0; i < bitboardsWhite.Length; i++)
+
+            for (int i = 0; i < bitboardsWhite.Length; i++)
             {
                 copy.bitboardsWhite[i] = bitboardsWhite[i];
                 copy.bitboardsBlack[i] = bitboardsBlack[i];
@@ -548,12 +550,9 @@ namespace chess
             Board other = (Board)obj;
 
             //check if pieces are the same
-            for (int x = 0; x < 8; x++)
+            for (int i = 0; i < 64; i++)
             {
-                for (int y = 0; y < 8; y++)
-                {
-                    if (pieces[x, y] != other.pieces[x, y]) return false;
-                }
+                if (pieces[i] != other.pieces[i]) return false;
             }
 
             //check white to move
@@ -575,13 +574,11 @@ namespace chess
         {
             int hash = 0;
 
-            for (int x = 0; x < 8; x++)
+            for (int i = 0; i < 8; i++)
             {
-                for (int y = 0; y < 8; y++)
-                {
-                    hash += (17 * pieces[x, y]) + (19 * x) + (23 * y);
-                }
+                hash += (17 * pieces[i]) + (19 * i);
             }
+
 
             if (whiteToMove) hash += 29;
 

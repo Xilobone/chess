@@ -76,7 +76,7 @@ namespace chess
         public static Position toPosition(int index)
         {
             int y = index / 8;
-            int x = index - 8*y;
+            int x = index - 8 * y;
 
             return new Position(x,y);
         }
