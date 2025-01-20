@@ -8,7 +8,7 @@ namespace chess
 
         public int[,] pieces { get; private set; } = new int[8, 8];
         public bool whiteToMove { get; set; }
-        public Position? enpassantPos { get; private set; }
+        public int enpassantPos { get; private set; }
         public bool[] castlingOptions { get; private set; } = new bool[4];
         public int halfMoves { get; private set; }
         public int fullMoves { get; private set; }
@@ -47,7 +47,7 @@ namespace chess
             }
 
             //move was en passant
-            if ((piece == Piece.WHITE_PAWN || piece == Piece.BLACK_PAWN) && move.to == enpassantPos)
+            if ((piece == Piece.WHITE_PAWN || piece == Piece.BLACK_PAWN) && move.toIndex == enpassantPos)
             {
                 if (move.to.y == 2)
                 {
@@ -62,16 +62,16 @@ namespace chess
             //check if move creates an en passant option for black
             if (piece == Piece.WHITE_PAWN && move.fr.y == 1 && move.to.y == 3)
             {
-                result.enpassantPos = move.fr + new Position(0, 1);
+                result.enpassantPos = move.frIndex + 8;
                 //check if move creates an en passant option for white
             }
             else if (piece == Piece.BLACK_PAWN && move.fr.y == 6 && move.to.y == 4)
             {
-                result.enpassantPos = move.fr + new Position(0, -1);
+                result.enpassantPos = move.frIndex -8;
             }
             else
             {
-                result.enpassantPos = null;
+                result.enpassantPos = -1;
             }
 
             result.checkCastlingOptions(move);
@@ -417,7 +417,7 @@ namespace chess
 
             fen += " " + castle + " ";
 
-            if (enpassantPos == null)
+            if (enpassantPos == -1)
             {
                 fen += "-";
             }
@@ -483,7 +483,7 @@ namespace chess
             }
 
             //en passant
-            board.enpassantPos = fen[3] == "-" ? null : NotationConverter.toPosition(fen[3]);
+            board.enpassantPos = fen[3] == "-" ? -1 : NotationConverter.toIndex(fen[3]);
 
             board.halfMoves = int.Parse(fen[4]);
             board.fullMoves = int.Parse(fen[5]);
@@ -512,7 +512,7 @@ namespace chess
 
             copy.whiteToMove = whiteToMove;
 
-            copy.enpassantPos = enpassantPos != null ? new Position(enpassantPos.x, enpassantPos.y) : null;
+            copy.enpassantPos = enpassantPos;
 
             copy.castlingOptions = new bool[4];
 
@@ -560,12 +560,7 @@ namespace chess
             if (whiteToMove != other.whiteToMove) return false;
 
             //check en passant
-            if (enpassantPos is null && other.enpassantPos is not null) return false;
-
-            if (enpassantPos is not null && other.enpassantPos is not null)
-            {
-                if (enpassantPos.Equals(other.enpassantPos)) return false;
-            }
+            if (enpassantPos != other.enpassantPos) return false;
 
             //check castling options
             for (int i = 0; i < castlingOptions.Length; i++)
@@ -590,10 +585,9 @@ namespace chess
 
             if (whiteToMove) hash += 29;
 
-            if (enpassantPos is not null)
+            if (enpassantPos != -1)
             {
-                hash += 31 * enpassantPos.x;
-                hash += 37 * enpassantPos.y;
+                hash += 31 * enpassantPos;
             }
 
             for (int i = 0; i < castlingOptions.Length; i++)
