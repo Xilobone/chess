@@ -39,19 +39,20 @@ namespace chess
 
         public Move(Position fr, Position to) : this(fr, to, FLAG_NONE) { }
 
-        public Move(Position fr, Position to, int flag)
-        {
-            this.fr = fr;
-            this.to = to;
-            this.flag = flag;
-        }
+        public Move(Position fr, Position to, int flag) : this(fr.toIndex(), to.toIndex(), flag) { }
 
+        public Move(int fr, int to) : this(fr, to, FLAG_NONE) {}
         public Move(int fr, int to, int flag)
         {
-            throw new NotImplementedException();
+            this.frIndex = fr;
+            this.toIndex = to;
+
+            this.fr = Position.toPosition(fr);
+            this.to = Position.toPosition(to);
+
+            this.flag = flag;
         }
      
-        
         public static bool isValid(string? move_str)
         {
             if (move_str == null)

@@ -35,7 +35,7 @@ namespace chess
             Board result = getCopy();
             result.previousBoards.Add(this);
 
-            int piece = getPiece(move.fr);
+            int piece = getPiece(move.frIndex);
 
             if (piece == Piece.WHITE_PAWN || piece == Piece.BLACK_PAWN || getPiece(move.to) != Piece.EMPTY)
             {
@@ -134,21 +134,21 @@ namespace chess
             //check if rook has moved
             if (piece == Piece.WHITE_ROOK)
             {
-                if (move.fr == new Position(0, 0)) castlingOptions[Move.CASTLE_WHITE_QUEENSIDE] = false;
-                if (move.fr == new Position(7, 0)) castlingOptions[Move.CASTLE_WHITE_KINGSIDE] = false;
+                if (move.frIndex == 0) castlingOptions[Move.CASTLE_WHITE_QUEENSIDE] = false;
+                if (move.frIndex == 7) castlingOptions[Move.CASTLE_WHITE_KINGSIDE] = false;
             }
 
             if (piece == Piece.BLACK_ROOK)
             {
-                if (move.fr == new Position(0, 0)) castlingOptions[Move.CASTLE_BLACK_QUEENSIDE] = false;
-                if (move.fr == new Position(7, 0)) castlingOptions[Move.CASTLE_BLACK_KINGSIDE] = false;
+                if (move.frIndex == 56) castlingOptions[Move.CASTLE_BLACK_QUEENSIDE] = false;
+                if (move.frIndex == 63) castlingOptions[Move.CASTLE_BLACK_KINGSIDE] = false;
             }
 
             //check if rook has been captured
-            if (move.to == new Position(0, 0)) castlingOptions[Move.CASTLE_WHITE_QUEENSIDE] = false;
-            if (move.to == new Position(7, 0)) castlingOptions[Move.CASTLE_WHITE_KINGSIDE] = false;
-            if (move.to == new Position(0, 7)) castlingOptions[Move.CASTLE_BLACK_QUEENSIDE] = false;
-            if (move.to == new Position(7, 7)) castlingOptions[Move.CASTLE_BLACK_KINGSIDE] = false;
+            if (move.toIndex == 0) castlingOptions[Move.CASTLE_WHITE_QUEENSIDE] = false;
+            if (move.toIndex == 7) castlingOptions[Move.CASTLE_WHITE_KINGSIDE] = false;
+            if (move.toIndex == 56) castlingOptions[Move.CASTLE_BLACK_QUEENSIDE] = false;
+            if (move.toIndex == 63) castlingOptions[Move.CASTLE_BLACK_KINGSIDE] = false;
         }
 
         private void castle(Move move)
