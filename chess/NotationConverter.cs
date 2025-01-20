@@ -160,6 +160,11 @@ namespace converter
             return new Position(x, y);
         }
 
+        public static int toIndex(string coordinates)
+        {
+            return toPosition(coordinates).toIndex();
+        }
+
         /// <summary>
         /// Converts a position to a coordinate (eg. b2)
         /// </summary>
@@ -169,5 +174,15 @@ namespace converter
         {
             return (char)(position.x + 'a') + (position.y + 1).ToString();
         }  
+
+        /// <summary>
+        /// Converts an index to a coordinate (eg. b2)
+        /// </summary>
+        /// <param name="index">The index to convert</param>
+        /// <returns>The converted index</returns>
+        public static string toCoordinates(int index)
+        {
+            return toCoordinates(Position.toPosition(index));
+        }
     }
 }

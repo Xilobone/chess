@@ -1,5 +1,7 @@
 using System.IO;
+using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace counters
 {
@@ -20,7 +22,7 @@ namespace counters
         private T min;
         private T max;
         private T avg;
-        private T stdDev;
+        private float stdDev;
 
         private List<T> history;
 
@@ -111,15 +113,22 @@ namespace counters
 
             avg = sum / count;
 
-            T stdDevSum = T.Zero;
+            float stdDevSum = 0;
 
-            foreach (T v in history)
+            if (count > T.One)
             {
-                stdDevSum += (v - avg) * (v - avg);
+                foreach (T v in history)
+                {   
+                    float dev = (float) Convert.ChangeType((v - avg),typeof(float));
+                    float num = (float) Convert.ChangeType(count,typeof(float)) - 1;
+                    stdDevSum += (dev * dev) / num;
+                }
             }
 
-            stdDev = T.Zero;
-            if (count > T.One) stdDev = Sqrt(stdDevSum / (count - T.One));
+
+            stdDev = 0;
+
+            if (count > T.One) stdDev = (float) Math.Sqrt((double) stdDevSum);
         }
 
         /// <summary>
@@ -164,7 +173,7 @@ namespace counters
             {
                 Counter<T> comparison = read<T>(name);
 
-         
+
                 double countDiv = getFractionDifference(count, comparison.count);
                 double avgDiv = getFractionDifference(avg, comparison.avg);
                 double stdDevDiv = getFractionDifference(stdDev, comparison.stdDev);
@@ -195,10 +204,13 @@ namespace counters
         public void write()
         {
             string path = $"{BASE_FILE_PATH}{name}.cntr";
+            string text = "";
             foreach (T value in history)
             {
-                File.AppendAllText(path, value.ToString() + "\n");
+                text += value.ToString() + "\n";
             }
+
+            File.WriteAllText(path, text);
         }
 
         /// <summary>
@@ -237,10 +249,18 @@ namespace counters
             return T.CreateChecked(sqrt);
         }
 
-        private static double getFractionDifference(T value1, T value2) {
+        private static double getFractionDifference(T value1, T value2)
+        {
             if (value2 == T.Zero) return 0;
 
             return (Convert.ToDouble(value1) - Convert.ToDouble(value2)) / Convert.ToDouble(value2);
+        }
+
+        private static double getFractionDifference(double value1, double value2)
+        {
+            if (value2 == 0) return 0;
+
+            return (value1 - value2) / value2;
         }
 
 

@@ -67,5 +67,18 @@ namespace chess
         {
             return NotationConverter.toCoordinates(this);
         }
+
+        public int toIndex()
+        {
+            return x + 8*y;
+        }
+
+        public static Position toPosition(int index)
+        {
+            int y = index / 8;
+            int x = index - 8*y;
+
+            return new Position(x,y);
+        }
     }
 }

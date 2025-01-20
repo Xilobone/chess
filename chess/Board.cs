@@ -8,7 +8,7 @@ namespace chess
 
         public int[,] pieces { get; private set; } = new int[8, 8];
         public bool whiteToMove { get; set; }
-        public Position? enpassantPos { get; private set; }
+        public int enpassantIndex { get; private set; }
         public bool[] castlingOptions { get; private set; } = new bool[4];
         public int halfMoves { get; private set; }
         public int fullMoves { get; private set; }
@@ -35,7 +35,7 @@ namespace chess
             Board result = getCopy();
             result.previousBoards.Add(this);
 
-            int piece = getPiece(move.fr);
+            int piece = getPiece(move.frIndex);
 
             if (piece == Piece.WHITE_PAWN || piece == Piece.BLACK_PAWN || getPiece(move.to) != Piece.EMPTY)
             {
@@ -47,7 +47,7 @@ namespace chess
             }
 
             //move was en passant
-            if ((piece == Piece.WHITE_PAWN || piece == Piece.BLACK_PAWN) && move.to == enpassantPos)
+            if ((piece == Piece.WHITE_PAWN || piece == Piece.BLACK_PAWN) && move.toIndex == enpassantIndex)
             {
                 if (move.to.y == 2)
                 {
@@ -62,16 +62,16 @@ namespace chess
             //check if move creates an en passant option for black
             if (piece == Piece.WHITE_PAWN && move.fr.y == 1 && move.to.y == 3)
             {
-                result.enpassantPos = move.fr + new Position(0, 1);
+                result.enpassantIndex = move.frIndex + 8;
                 //check if move creates an en passant option for white
             }
             else if (piece == Piece.BLACK_PAWN && move.fr.y == 6 && move.to.y == 4)
             {
-                result.enpassantPos = move.fr + new Position(0, -1);
+                result.enpassantIndex = move.frIndex -8;
             }
             else
             {
-                result.enpassantPos = null;
+                result.enpassantIndex = -1;
             }
 
             result.checkCastlingOptions(move);
@@ -134,21 +134,21 @@ namespace chess
             //check if rook has moved
             if (piece == Piece.WHITE_ROOK)
             {
-                if (move.fr == new Position(0, 0)) castlingOptions[Move.CASTLE_WHITE_QUEENSIDE] = false;
-                if (move.fr == new Position(7, 0)) castlingOptions[Move.CASTLE_WHITE_KINGSIDE] = false;
+                if (move.frIndex == 0) castlingOptions[Move.CASTLE_WHITE_QUEENSIDE] = false;
+                if (move.frIndex == 7) castlingOptions[Move.CASTLE_WHITE_KINGSIDE] = false;
             }
 
             if (piece == Piece.BLACK_ROOK)
             {
-                if (move.fr == new Position(0, 0)) castlingOptions[Move.CASTLE_BLACK_QUEENSIDE] = false;
-                if (move.fr == new Position(7, 0)) castlingOptions[Move.CASTLE_BLACK_KINGSIDE] = false;
+                if (move.frIndex == 56) castlingOptions[Move.CASTLE_BLACK_QUEENSIDE] = false;
+                if (move.frIndex == 63) castlingOptions[Move.CASTLE_BLACK_KINGSIDE] = false;
             }
 
             //check if rook has been captured
-            if (move.to == new Position(0, 0)) castlingOptions[Move.CASTLE_WHITE_QUEENSIDE] = false;
-            if (move.to == new Position(7, 0)) castlingOptions[Move.CASTLE_WHITE_KINGSIDE] = false;
-            if (move.to == new Position(0, 7)) castlingOptions[Move.CASTLE_BLACK_QUEENSIDE] = false;
-            if (move.to == new Position(7, 7)) castlingOptions[Move.CASTLE_BLACK_KINGSIDE] = false;
+            if (move.toIndex == 0) castlingOptions[Move.CASTLE_WHITE_QUEENSIDE] = false;
+            if (move.toIndex == 7) castlingOptions[Move.CASTLE_WHITE_KINGSIDE] = false;
+            if (move.toIndex == 56) castlingOptions[Move.CASTLE_BLACK_QUEENSIDE] = false;
+            if (move.toIndex == 63) castlingOptions[Move.CASTLE_BLACK_KINGSIDE] = false;
         }
 
         private void castle(Move move)
@@ -206,6 +206,30 @@ namespace chess
         public int getPiece(Position position)
         {
             return pieces[position.x, position.y];
+        }
+
+        /// <summary>
+        /// Gets the piece that is at the given index, board is indexed left to right, top to bottom
+        /// </summary>
+        /// <param name="index">The index of which to get the piece from</param>
+        /// <returns>The piece at the index</returns>
+        public int getPiece(int index)
+        {
+            if (((bitboardsWhite[BitBoard.PAWN] >> index) & 1) == 1) return Piece.WHITE_PAWN;
+            if (((bitboardsWhite[BitBoard.KNIGHT] >> index) & 1) == 1) return Piece.WHITE_KNIGHT;
+            if (((bitboardsWhite[BitBoard.BISHOP] >> index) & 1) == 1) return Piece.WHITE_BISHOP;
+            if (((bitboardsWhite[BitBoard.ROOK] >> index) & 1) == 1) return Piece.WHITE_ROOK;
+            if (((bitboardsWhite[BitBoard.QUEEN] >> index) & 1) == 1) return Piece.WHITE_QUEEN;
+            if (((bitboardsWhite[BitBoard.KING] >> index) & 1) == 1) return Piece.WHITE_KING;
+
+            if (((bitboardsBlack[BitBoard.PAWN] >> index) & 1) == 1) return Piece.BLACK_PAWN;
+            if (((bitboardsBlack[BitBoard.KNIGHT] >> index) & 1) == 1) return Piece.BLACK_KNIGHT;
+            if (((bitboardsBlack[BitBoard.BISHOP] >> index) & 1) == 1) return Piece.BLACK_BISHOP;
+            if (((bitboardsBlack[BitBoard.ROOK] >> index) & 1) == 1) return Piece.BLACK_ROOK;
+            if (((bitboardsBlack[BitBoard.QUEEN] >> index) & 1) == 1) return Piece.BLACK_QUEEN;
+            if (((bitboardsBlack[BitBoard.KING] >> index) & 1) == 1) return Piece.BLACK_KING;
+
+            return 0;
         }
 
         public bool isInCheck()
@@ -393,13 +417,13 @@ namespace chess
 
             fen += " " + castle + " ";
 
-            if (enpassantPos == null)
+            if (enpassantIndex == -1)
             {
                 fen += "-";
             }
             else
             {
-                fen += NotationConverter.toCoordinates(enpassantPos);
+                fen += NotationConverter.toCoordinates(enpassantIndex);
             }
 
             //add move counters
@@ -459,7 +483,7 @@ namespace chess
             }
 
             //en passant
-            board.enpassantPos = fen[3] == "-" ? null : NotationConverter.toPosition(fen[3]);
+            board.enpassantIndex = fen[3] == "-" ? -1 : NotationConverter.toIndex(fen[3]);
 
             board.halfMoves = int.Parse(fen[4]);
             board.fullMoves = int.Parse(fen[5]);
@@ -488,7 +512,7 @@ namespace chess
 
             copy.whiteToMove = whiteToMove;
 
-            copy.enpassantPos = enpassantPos != null ? new Position(enpassantPos.x, enpassantPos.y) : null;
+            copy.enpassantIndex = enpassantIndex;
 
             copy.castlingOptions = new bool[4];
 
@@ -536,12 +560,7 @@ namespace chess
             if (whiteToMove != other.whiteToMove) return false;
 
             //check en passant
-            if (enpassantPos is null && other.enpassantPos is not null) return false;
-
-            if (enpassantPos is not null && other.enpassantPos is not null)
-            {
-                if (enpassantPos.Equals(other.enpassantPos)) return false;
-            }
+            if (enpassantIndex != other.enpassantIndex) return false;
 
             //check castling options
             for (int i = 0; i < castlingOptions.Length; i++)
@@ -566,10 +585,9 @@ namespace chess
 
             if (whiteToMove) hash += 29;
 
-            if (enpassantPos is not null)
+            if (enpassantIndex != -1)
             {
-                hash += 31 * enpassantPos.x;
-                hash += 37 * enpassantPos.y;
+                hash += 31 * enpassantIndex;
             }
 
             for (int i = 0; i < castlingOptions.Length; i++)

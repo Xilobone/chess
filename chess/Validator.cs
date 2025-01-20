@@ -8,7 +8,7 @@ namespace chess
 
             foreach (Move m in possibleMoves)
             {
-                if (m.fr == move.fr && m.to == move.to)
+                if (m.frIndex == move.frIndex && m.toIndex == move.toIndex)
                 {
                     return m;
                 }

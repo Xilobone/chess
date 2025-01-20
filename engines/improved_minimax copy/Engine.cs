@@ -1,7 +1,7 @@
 using chess;
 using counters;
 
-namespace improved_minimax_engine
+namespace improved_minimax_eval_engine
 {
     public class Engine : chess.Engine
     {

@@ -34,15 +34,25 @@ namespace chess
         public Position fr { get; private set; }
         public Position to { get; private set; }
 
+        public int frIndex {get; private set; }
+        public int toIndex {get; private set; }
+
         public Move(Position fr, Position to) : this(fr, to, FLAG_NONE) { }
 
-        public Move(Position fr, Position to, int flag)
+        public Move(Position fr, Position to, int flag) : this(fr.toIndex(), to.toIndex(), flag) { }
+
+        public Move(int fr, int to) : this(fr, to, FLAG_NONE) {}
+        public Move(int fr, int to, int flag)
         {
-            this.fr = fr;
-            this.to = to;
+            this.frIndex = fr;
+            this.toIndex = to;
+
+            this.fr = Position.toPosition(fr);
+            this.to = Position.toPosition(to);
+
             this.flag = flag;
         }
-        
+     
         public static bool isValid(string? move_str)
         {
             if (move_str == null)
