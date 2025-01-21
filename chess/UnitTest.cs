@@ -1,0 +1,55 @@
+namespace chess
+{
+    public static class UnitTest
+    {
+        public static bool Run()
+        {   
+            bool allPass = true;
+
+            allPass = allPass & TestMoveGeneration("Movegeneration start position", "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 4, 197281);
+            
+            allPass = allPass & TestMoveGeneration("Movegeneration 2nd position", "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1", 2, 2039);
+            allPass = allPass & TestMoveGeneration("Movegeneration 2nd position 2", "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1", 3, 97862);
+
+            DisplayResult("All tests passed?", allPass, true);
+            return allPass;
+        }
+
+        private static void DisplayResult(string name, int result, int expectedResult)
+        {
+            bool passed = result == expectedResult;
+
+            Console.Write($"Test: {name} ");
+
+            Console.ForegroundColor = passed ? ConsoleColor.Green : ConsoleColor.Red;
+
+            string res = passed ? "PASSED" : $"FAILED (expected:{expectedResult}, got:{result})";
+            Console.WriteLine(res);
+            Console.ResetColor();
+        }
+
+        private static void DisplayResult(string name, bool result, bool expectedResult)
+        {
+            bool passed = result == expectedResult;
+
+            Console.Write($"Test: {name} ");
+
+            Console.ForegroundColor = passed ? ConsoleColor.Green : ConsoleColor.Red;
+
+            string res = passed ? "PASSED" : $"FAILED (expected:{expectedResult}, got:{result})";
+            Console.WriteLine(res);
+            Console.ResetColor();
+        }
+
+        private static bool TestMoveGeneration(string name, string fen, int depth, int expectedResult)
+        {
+            Board board = Board.fromFen(fen);
+
+            int result = MoveGenerator.perft(board, depth, false);
+
+            DisplayResult(name, result, expectedResult);
+            return expectedResult == result;
+
+        }
+    }
+}

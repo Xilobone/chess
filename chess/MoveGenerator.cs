@@ -36,6 +36,17 @@ namespace chess
         { Move.CASTLE_BLACK_QUEENSIDE, new Position(2,7) }
     };
 
+    //positions that must be clear of any piece, and any attack from the opponent to allow check
+    private static ulong[] bitboardSafeCastleWhite = [
+        0b0011100000000000000000000000000000000000000000000000000000000000,
+        0b0000111000000000000000000000000000000000000000000000000000000000
+    ];
+
+    private static ulong[] bitboardSafeCastleBlack = [
+        0b0000000000000000000000000000000000000000000000000000000000111000,
+        0b0000000000000000000000000000000000000000000000000000000000001110
+    ];
+
         public static List<Move> generateAllMoves(Board board) {
             List<Move> moves = new List<Move>();
 
@@ -224,27 +235,60 @@ namespace chess
             //add castling moves
             int piece = board.getPiece(pos);
             if (piece == Piece.WHITE_KING)
-            {
-                if (board.castlingOptions[Move.CASTLE_WHITE_QUEENSIDE] && board.getPiece(1) == Piece.EMPTY && board.getPiece(2) == Piece.EMPTY && board.getPiece(3) == Piece.EMPTY)
+            {   
+                ulong allPiecesExceptWhiteKing = BitBoard.GetAny(board) & ~board.bitboardsWhite[BitBoard.KING];
+
+                bool safeToCastle = (bitboardSafeCastleWhite[0] & (allPiecesExceptWhiteKing | BitBoard.GetAnyAttack(board,false))) == 0;
+                if (board.castlingOptions[Move.CASTLE_WHITE_QUEENSIDE] && safeToCastle)
                 {
                     appendMove(moves, board, pos, KING_CASTLE_POSITIONS[Move.CASTLE_WHITE_QUEENSIDE], allowCheck, Move.FLAG_CASTLING);
                 }
-                if (board.castlingOptions[Move.CASTLE_WHITE_KINGSIDE] && board.getPiece(5) == Piece.EMPTY && board.getPiece(6) == Piece.EMPTY)
+
+                safeToCastle = (bitboardSafeCastleWhite[1] & (allPiecesExceptWhiteKing | BitBoard.GetAnyAttack(board,false))) == 0;
+                if (board.castlingOptions[Move.CASTLE_WHITE_KINGSIDE] && safeToCastle)
                 {
-                    appendMove(moves, board, pos, KING_CASTLE_POSITIONS[Move.CASTLE_WHITE_KINGSIDE], allowCheck, Move.FLAG_CASTLING);
+                    appendMove(moves, board, pos, KING_CASTLE_POSITIONS[Move.CASTLE_WHITE_QUEENSIDE], allowCheck, Move.FLAG_CASTLING);
                 }
+
+
+                // if (board.castlingOptions[Move.CASTLE_WHITE_QUEENSIDE] && board.getPiece(1) == Piece.EMPTY && board.getPiece(2) == Piece.EMPTY && board.getPiece(3) == Piece.EMPTY)
+                // {
+                //     appendMove(moves, board, pos, KING_CASTLE_POSITIONS[Move.CASTLE_WHITE_QUEENSIDE], allowCheck, Move.FLAG_CASTLING);
+                // }
+
+
+                // if (board.castlingOptions[Move.CASTLE_WHITE_KINGSIDE] && board.getPiece(5) == Piece.EMPTY && board.getPiece(6) == Piece.EMPTY)
+                // {
+                //     appendMove(moves, board, pos, KING_CASTLE_POSITIONS[Move.CASTLE_WHITE_KINGSIDE], allowCheck, Move.FLAG_CASTLING);
+                // }
             }
 
             if (piece == Piece.BLACK_KING)
             {
-                if (board.castlingOptions[Move.CASTLE_BLACK_QUEENSIDE] && board.getPiece(57) == Piece.EMPTY && board.getPiece(58) == Piece.EMPTY && board.getPiece(59) == Piece.EMPTY)
+                ulong allPiecesExceptBlackKing = BitBoard.GetAny(board) & ~board.bitboardsBlack[BitBoard.KING];
+
+                bool safeToCastle = (bitboardSafeCastleBlack[0] & (allPiecesExceptBlackKing | BitBoard.GetAnyAttack(board,true))) == 0;
+                if (board.castlingOptions[Move.CASTLE_WHITE_QUEENSIDE] && safeToCastle)
                 {
-                    appendMove(moves, board, pos, KING_CASTLE_POSITIONS[Move.CASTLE_BLACK_QUEENSIDE], allowCheck, Move.FLAG_CASTLING);
+                    appendMove(moves, board, pos, KING_CASTLE_POSITIONS[Move.CASTLE_WHITE_QUEENSIDE], allowCheck, Move.FLAG_CASTLING);
                 }
-                if (board.castlingOptions[Move.CASTLE_BLACK_KINGSIDE] && board.getPiece(61) == Piece.EMPTY && board.getPiece(62) == Piece.EMPTY)
+
+                safeToCastle = (bitboardSafeCastleBlack[1] & (allPiecesExceptBlackKing | BitBoard.GetAnyAttack(board,true))) == 0;
+                if (board.castlingOptions[Move.CASTLE_WHITE_KINGSIDE] && safeToCastle)
                 {
-                    appendMove(moves, board, pos, KING_CASTLE_POSITIONS[Move.CASTLE_BLACK_KINGSIDE], allowCheck, Move.FLAG_CASTLING);
+                    appendMove(moves, board, pos, KING_CASTLE_POSITIONS[Move.CASTLE_WHITE_QUEENSIDE], allowCheck, Move.FLAG_CASTLING);
                 }
+
+
+
+                // if (board.castlingOptions[Move.CASTLE_BLACK_QUEENSIDE] && board.getPiece(57) == Piece.EMPTY && board.getPiece(58) == Piece.EMPTY && board.getPiece(59) == Piece.EMPTY)
+                // {
+                //     appendMove(moves, board, pos, KING_CASTLE_POSITIONS[Move.CASTLE_BLACK_QUEENSIDE], allowCheck, Move.FLAG_CASTLING);
+                // }
+                // if (board.castlingOptions[Move.CASTLE_BLACK_KINGSIDE] && board.getPiece(61) == Piece.EMPTY && board.getPiece(62) == Piece.EMPTY)
+                // {
+                //     appendMove(moves, board, pos, KING_CASTLE_POSITIONS[Move.CASTLE_BLACK_KINGSIDE], allowCheck, Move.FLAG_CASTLING);
+                // }
             }
 
             return moves;
@@ -334,6 +378,52 @@ namespace chess
             }
 
             moves.Add(new Move(pos, newPos, flag));
+        }
+
+        /// <summary>
+        /// Performs an performance test (perft) for the given board, calculates the number of positions generated up to a given depth
+        /// used to test whether the move generation is accurate
+        /// </summary>
+        /// <param name="board">The board to start the generation from</param>
+        /// <param name="depth">The number of ply's to generate</param>
+        /// <param name="showDetailedOutput">true if output should be showed, false otherwise</param>
+        /// <returns></returns>
+        public static int perft(Board board, int depth, bool showDetailedOutput)
+        {
+            if (depth == 0) throw new Exception("Depth must be positive");
+
+            if (!showDetailedOutput) return perft(board, depth);
+
+            int nBoards = 0;
+            foreach(Move move in generateAllMoves(board))
+            {   
+                Board result = board.makeMove(move);
+                int resultBoards = perft(board.makeMove(move), depth - 1);
+
+                Console.WriteLine($"move:{move} positions:{resultBoards}");
+
+                nBoards += resultBoards;
+            }
+
+            Console.WriteLine($"\nTotal positions:{nBoards}");
+            return nBoards;
+        }
+
+        private static int perft(Board board, int depth)
+        {
+            if (depth == 0) return 1;
+
+            int nBoards = 0;
+
+            List<Move> moves = generateAllMoves(board);
+            foreach(Move move in moves)
+            {
+                Board result = board.makeMove(move);
+
+                nBoards += perft(result, depth - 1);
+            }
+
+            return nBoards;
         }
     }
 }

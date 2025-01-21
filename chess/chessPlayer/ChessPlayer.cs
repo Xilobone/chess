@@ -85,12 +85,6 @@ namespace chessPlayer
                 }
 
                 if (settings.displayBoards) Console.WriteLine($"move: {move}");
-
-                if (move == null)
-                {
-                    Console.WriteLine("null move detected");
-                    board.display();
-                }
                 
                 board = board.makeMove(move);
 
