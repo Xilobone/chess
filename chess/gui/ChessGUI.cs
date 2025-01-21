@@ -47,9 +47,23 @@ namespace gui
             });
             guiThread.Start();
         }
-        public ChessGUI(ChessPlayer player)
+
+        public static ChessGUI Create()
         {
-            player.onChange += OnChange;
+            ChessGUI gui = new ChessGUI(null);
+            Thread guiThread = new Thread(() =>
+            {
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+                Application.Run(gui);
+            });
+            guiThread.Start();
+
+            return gui;
+        }
+        public ChessGUI(ChessPlayer? player)
+        {
+            if (player != null) player.onChange += OnChange;
 
             image = Image.FromFile("lib/chess_pieces.png");
             DoubleBuffered = true;
@@ -220,7 +234,7 @@ namespace gui
             }
         }
 
-        private void OnChange(object? sender, ChessEventArgs e)
+        public void OnChange(object? sender, ChessEventArgs e)
         {
             currentBoard = e.board;
             UpdateBitboard();

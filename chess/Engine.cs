@@ -14,5 +14,28 @@ namespace chess
         }
         public abstract Move makeMove(Board board);
         public abstract Move makeMove(Board board, float maxTime);
+
+        protected void clearCounters()
+        {
+            foreach(ICounter counter in counters)
+            {
+                counter.Reset();
+            }
+        }
+        protected long getCurrentTime()
+        {
+            return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        }
+        public class SearchResult
+        {
+            public float evaluation;
+            public Move? move;
+
+            public SearchResult(float evaluation, Move? move)
+            {
+                this.evaluation = evaluation;
+                this.move = move;
+            }
+        }
     }
 }

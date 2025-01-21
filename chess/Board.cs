@@ -178,7 +178,8 @@ namespace chess
 
         private void promote(Move move)
         {
-            int piece = getPiece(move.toIndex);
+            int piece = getPiece(move.frIndex);
+
             int promotedPiece = -1;
             if (Piece.isWhite(piece))
             {

@@ -165,30 +165,5 @@ namespace improved_minimax_engine
 
             return new SearchResult(min, bestMove);
         }
-
-        private void clearCounters()
-        {
-            computationTime.Reset();
-            evaluationTime.Reset();
-            generationTime.Reset();
-            evaluatedBoards.Reset();
-        }
-
-        private long getCurrentTime()
-        {
-            return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        }
-
-        private class SearchResult
-        {
-            public float evaluation;
-            public Move? move;
-
-            public SearchResult(float evaluation, Move? move)
-            {
-                this.evaluation = evaluation;
-                this.move = move;
-            }
-        }
     }
 }

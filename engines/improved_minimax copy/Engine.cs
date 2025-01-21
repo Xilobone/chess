@@ -5,7 +5,7 @@ namespace improved_minimax_eval_engine
 {
     public class Engine : chess.Engine
     {
-        private const int MAX_DEPTH = 4;
+        private const int MAX_DEPTH = 5;
 
         private int depth;
 
@@ -43,29 +43,90 @@ namespace improved_minimax_eval_engine
 
         public override Move makeMove(Board board, float maxTime)
         {
-            remainingTime = maxTime;
             long startTime = getCurrentTime();
+            remainingTime = maxTime;
 
-            SearchResult result;
-            if (isWhite)
+            Move? bestMove = null;
+            float bestValue = board.whiteToMove ? float.MinValue : float.MaxValue;
+
+            foreach (Move move in MoveGenerator.generateAllMoves(board))
             {
-                result = maxi(board, float.MinValue, float.MaxValue, depth);
-            }
-            else
-            {
-                result = mini(board, float.MinValue, float.MaxValue, depth);
+                float eval = Minimax(board.makeMove(move), depth - 1, float.MinValue, float.MaxValue, !board.whiteToMove);
+                if (board.whiteToMove && eval > bestValue)
+                {
+                    bestValue = eval;
+                    bestMove = move;
+                }
+                else if (!board.whiteToMove && eval < bestValue)
+                {
+                    bestValue = eval;
+                    bestMove = move;
+                }
             }
 
             computationTime.Set(getCurrentTime() - startTime);
-
             clearCounters();
-
-            return result.move!;
+            return bestMove!;
         }
 
-        private SearchResult maxi(Board board, float alpha, float beta, int depth)
+        public float maxi(Board board, int depth, float alpha, float beta)
+        {
+            float maxEval = float.MinValue;
+            long startTime = getCurrentTime();
+            List<Move> moves = MoveGenerator.generateAllMoves(board);
+            generationTime.Increment(getCurrentTime() - startTime);
+            remainingTime -= getCurrentTime() - startTime;
+
+            foreach (Move move in moves)
+            {
+                startTime = getCurrentTime();
+                Board resultingBoard = board.makeMove(move);
+                remainingTime -= getCurrentTime() - startTime;
+
+                float eval = Minimax(resultingBoard, depth - 1, alpha, beta, false);
+                maxEval = Math.Max(maxEval, eval);
+                alpha = Math.Max(alpha, eval);
+
+                if (beta <= alpha)
+                {
+                    break;
+                }
+            }
+
+            return maxEval;
+        }
+
+        public float mini(Board board, int depth, float alpha, float beta)
+        {
+            float minEval = float.MaxValue;
+            long startTime = getCurrentTime();
+            List<Move> moves = MoveGenerator.generateAllMoves(board);
+            generationTime.Increment(getCurrentTime() - startTime);
+            remainingTime -= getCurrentTime() - startTime;
+
+            foreach (Move move in moves)
+            {
+                startTime = getCurrentTime();
+                Board resultingBoard = board.makeMove(move);
+                remainingTime -= getCurrentTime() - startTime;
+
+                float eval = Minimax(resultingBoard, depth - 1, alpha, beta, true);
+
+                minEval = Math.Min(minEval, eval);
+                beta = Math.Min(beta, eval);
+
+                if (beta <= alpha)
+                {
+                    break;
+                }
+            }
+            return minEval;
+        }
+
+        public float Minimax(Board board, int depth, float alpha, float beta, bool isMaximizingPlayer)
         {
             long startTime;
+
             if (depth == 0 || board.isInMate() || remainingTime <= 0)
             {
                 evaluatedBoards.Increment();
@@ -75,119 +136,17 @@ namespace improved_minimax_eval_engine
                 evaluationTime.Increment(getCurrentTime() - startTime);
 
                 remainingTime -= getCurrentTime() - startTime;
-                return new SearchResult(eval, null);
+
+                return eval;
             }
 
-            float max = float.MinValue;
-            Move? bestMove = null;
-
-            startTime = getCurrentTime();
-            List<Move> moves = MoveGenerator.generateAllMoves(board);
-            generationTime.Increment(getCurrentTime() - startTime);
-
-            remainingTime -= getCurrentTime() - startTime;
-
-            foreach (Move move in moves)
+            if (isMaximizingPlayer)
             {
-                startTime = getCurrentTime();
-                Board resultingBoard = board.makeMove(move);
-                remainingTime -= getCurrentTime() - startTime;
-
-                SearchResult result = mini(resultingBoard, alpha, beta, depth - 1);
-
-                if (result.evaluation > max)
-                {
-                    max = alpha;
-                    if (result.evaluation > alpha)
-                    {
-                        alpha = result.evaluation;
-                        bestMove = move;
-                    }
-                }
-
-                if (result.evaluation >= beta)
-                {
-                    return new SearchResult(result.evaluation, bestMove);
-                }
+                return maxi(board, depth, alpha, beta);
             }
-
-            return new SearchResult(max, bestMove);
-        }
-
-        private SearchResult mini(Board board, float alpha, float beta, int depth)
-        {
-            long startTime;
-
-            if (depth == 0 || board.isInMate() || remainingTime <= 0)
+            else
             {
-                evaluatedBoards.Increment();
-
-                startTime = getCurrentTime();
-                float eval = evaluator.evaluate(board);
-                evaluationTime.Increment(getCurrentTime() - startTime);
-
-                remainingTime -= getCurrentTime() - startTime;
-                return new SearchResult(eval, null);
-            }
-
-            float min = float.MaxValue;
-            Move? bestMove = null;
-
-            startTime = getCurrentTime();
-            List<Move> moves = MoveGenerator.generateAllMoves(board);
-            generationTime.Increment(getCurrentTime() - startTime);
-
-            remainingTime -= getCurrentTime() - startTime;
-
-            foreach (Move move in moves)
-            {
-                startTime = getCurrentTime();
-                Board resultingBoard = board.makeMove(move);
-                remainingTime -= getCurrentTime() - startTime;
-
-                SearchResult result = maxi(resultingBoard, alpha, beta, depth - 1);
-
-                if (result.evaluation < min)
-                {
-                    min = result.evaluation;
-                    if (result.evaluation < beta)
-                    {
-                        beta = result.evaluation;
-                        bestMove = move;
-                    }
-                }
-
-                if (result.evaluation <= alpha)
-                {
-                    return new SearchResult(result.evaluation, bestMove);
-                }
-            }
-
-            return new SearchResult(min, bestMove);
-        }
-
-        private void clearCounters()
-        {
-            computationTime.Reset();
-            evaluationTime.Reset();
-            generationTime.Reset();
-            evaluatedBoards.Reset();
-        }
-
-        private long getCurrentTime()
-        {
-            return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        }
-
-        private class SearchResult
-        {
-            public float evaluation;
-            public Move? move;
-
-            public SearchResult(float evaluation, Move? move)
-            {
-                this.evaluation = evaluation;
-                this.move = move;
+                return mini(board, depth, alpha, beta);
             }
         }
     }

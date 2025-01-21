@@ -71,7 +71,7 @@ namespace parser
             return selectedBoards;
         }
 
-        private List<Board> getAllPositions(string line, float range)
+        public List<Board> getAllPositions(string line, float range)
         {
             List<Board> boards = new List<Board>();
             Board board = Board.startPosition();

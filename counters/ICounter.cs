@@ -6,6 +6,7 @@ namespace counters
         public void DisplayOverview();
         public void DisplayOverview(bool showComparision);
 
+        public void Reset();
         public void write();
     }
 }

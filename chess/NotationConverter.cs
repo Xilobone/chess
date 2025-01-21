@@ -133,15 +133,38 @@ namespace converter
             
             //get correct move
             List<Move> moves = MoveGenerator.generateAllMoves(board);
+            if (move.Equals("Rxb8"))
+            {
+                board.display();
+                Console.WriteLine($"to:{to}, {NotationConverter.toCoordinates(to)}");
+            }
+            
             foreach(Move mv in moves)
-            {   
-                if (mv.toIndex != to) continue;
-                if (board.getPiece(mv.frIndex) != piece) continue;
+            {
+                if (move.Equals("Rxb8")) Console.WriteLine(mv);
+
+                if (mv.toIndex != to)
+                {
+                    continue;
+                }
+                if (board.getPiece(mv.frIndex) != piece)
+                {   
+                    continue;
+                }
 
                 int frFile = chess.Index.GetFile(mv.frIndex);
+                int frRank = chess.Index.GetRank(mv.frIndex);
 
-                if ((fileSpecified || bothSpecified) && frFile != file) continue;
-                if ((rankSpecified || bothSpecified) && frFile != rank) continue;
+                if ((fileSpecified || bothSpecified) && frFile != file)
+                {
+                    continue;
+                }
+                if ((rankSpecified || bothSpecified) && frRank != rank)
+                {
+                    if (move.Equals("Rxb8")) Console.WriteLine("rank not equal, skipped");
+
+                    continue;
+                }
 
                 return mv;
             }

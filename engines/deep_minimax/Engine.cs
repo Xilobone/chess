@@ -1,3 +1,4 @@
+using System.Configuration;
 using chess;
 
 namespace deep_minimax_engine
@@ -60,7 +61,7 @@ namespace deep_minimax_engine
             if (displayStats)
             {
                 displayOverview();
-                clearCounters();
+                clearIntCounters();
             }
 
             //Console.WriteLine(result.move);
@@ -180,30 +181,13 @@ namespace deep_minimax_engine
             Console.WriteLine("-- Boards evaluated: " + evaluatedBoards + " ( " + prunedBranches + " branches pruned )");
         }
 
-        private void clearCounters()
+        private void clearIntCounters()
         {
             computationTime = 0;
             evaluationTime = 0;
             generationTime = 0;
             evaluatedBoards = 0;
             prunedBranches = 0;
-        }
-
-        private long getCurrentTime()
-        {
-            return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        }
-
-        private class SearchResult
-        {
-            public float evaluation;
-            public Move? move;
-
-            public SearchResult(float evaluation, Move? move)
-            {
-                this.evaluation = evaluation;
-                this.move = move;
-            }
         }
     }
 }
