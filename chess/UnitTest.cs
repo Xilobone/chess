@@ -11,6 +11,12 @@ namespace chess
             allPass = allPass & TestMoveGeneration("Movegeneration 2nd position", "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1", 2, 2039);
             allPass = allPass & TestMoveGeneration("Movegeneration 2nd position 2", "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1", 3, 97862);
 
+            allPass = allPass & TestMoveGeneration("Movegeneration endgame position", "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1", 4, 43238);
+            allPass = allPass & TestMoveGeneration("Movegeneration endgame position deeper perft", "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1", 5, 674624);
+
+
+            
+
             DisplayResult("All tests passed?", allPass, true);
             return allPass;
         }

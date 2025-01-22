@@ -36,18 +36,21 @@ namespace chess
         { Move.CASTLE_BLACK_QUEENSIDE, new Position(2,7) }
     };
 
-    //positions that must be clear of any piece, and any attack from the opponent to allow check
-    private static ulong[] bitboardSafeCastleWhite = [
-        0b0011100000000000000000000000000000000000000000000000000000000000,
-        0b0000111000000000000000000000000000000000000000000000000000000000
+        //positions that must be clear of any piece, and any attack from the opponent to allow check
+        private static ulong[] bitboardSafeCastleWhite = [
+        0b0000000000000000000000000000000000000000000000000000000001110000,
+        0b0000000000000000000000000000000000000000000000000000000000011100
+        ];
+
+        private static ulong[] bitboardSafeCastleBlack = [
+        0b0111000000000000000000000000000000000000000000000000000000000000,
+        0b0001110000000000000000000000000000000000000000000000000000000000,
     ];
 
-    private static ulong[] bitboardSafeCastleBlack = [
-        0b0000000000000000000000000000000000000000000000000000000000111000,
-        0b0000000000000000000000000000000000000000000000000000000000001110
-    ];
 
-        public static List<Move> generateAllMoves(Board board) {
+
+        public static List<Move> generateAllMoves(Board board)
+        {
             List<Move> moves = new List<Move>();
 
             for (int x = 0; x < 8; x++)
@@ -232,20 +235,25 @@ namespace chess
                 moves.AddRange(searchOffset(board, pos, offset, allowCheck));
             }
 
+            // Console.WriteLine($"safecastlewhite kingside: {bitboardSafeCastleWhite[0]}");
+            // Console.WriteLine($"safecastlewhite kingside: {bitboardSafeCastleWhite[1]}");
             //add castling moves
             int piece = board.getPiece(pos);
             if (piece == Piece.WHITE_KING)
-            {   
+            {
+
+
                 ulong allPiecesExceptWhiteKing = BitBoard.GetAny(board) & ~board.bitboardsWhite[BitBoard.KING];
 
-                bool safeToCastle = (bitboardSafeCastleWhite[0] & (allPiecesExceptWhiteKing | BitBoard.GetAnyAttack(board,false))) == 0;
-                if (board.castlingOptions[Move.CASTLE_WHITE_QUEENSIDE] && safeToCastle)
+                bool safeToCastle = (bitboardSafeCastleWhite[0] & (allPiecesExceptWhiteKing | BitBoard.GetAnyAttack(board, false))) == 0;
+                if (board.castlingOptions[Move.CASTLE_WHITE_KINGSIDE] && safeToCastle)
                 {
-                    appendMove(moves, board, pos, KING_CASTLE_POSITIONS[Move.CASTLE_WHITE_QUEENSIDE], allowCheck, Move.FLAG_CASTLING);
+                    appendMove(moves, board, pos, KING_CASTLE_POSITIONS[Move.CASTLE_WHITE_KINGSIDE], allowCheck, Move.FLAG_CASTLING);
                 }
 
-                safeToCastle = (bitboardSafeCastleWhite[1] & (allPiecesExceptWhiteKing | BitBoard.GetAnyAttack(board,false))) == 0;
-                if (board.castlingOptions[Move.CASTLE_WHITE_KINGSIDE] && safeToCastle)
+                //last condition checks if b1 is empty
+                safeToCastle = (bitboardSafeCastleWhite[1] & (allPiecesExceptWhiteKing | BitBoard.GetAnyAttack(board, false))) == 0 & (allPiecesExceptWhiteKing & (1UL << 1)) == 0;
+                if (board.castlingOptions[Move.CASTLE_WHITE_QUEENSIDE] && safeToCastle)
                 {
                     appendMove(moves, board, pos, KING_CASTLE_POSITIONS[Move.CASTLE_WHITE_QUEENSIDE], allowCheck, Move.FLAG_CASTLING);
                 }
@@ -265,18 +273,27 @@ namespace chess
 
             if (piece == Piece.BLACK_KING)
             {
+                // Console.WriteLine("checking castle options black");
                 ulong allPiecesExceptBlackKing = BitBoard.GetAny(board) & ~board.bitboardsBlack[BitBoard.KING];
 
-                bool safeToCastle = (bitboardSafeCastleBlack[0] & (allPiecesExceptBlackKing | BitBoard.GetAnyAttack(board,true))) == 0;
-                if (board.castlingOptions[Move.CASTLE_WHITE_QUEENSIDE] && safeToCastle)
+                // Console.WriteLine($"all pieces except black king: {allPiecesExceptBlackKing}");
+                // Console.WriteLine($"all pieces except black king and all attacks: {allPiecesExceptBlackKing | BitBoard.GetAnyAttack(board,true)}");
+                // Console.WriteLine($"safecastleblack kingside: {bitboardSafeCastleBlack[0]}");
+
+                bool safeToCastle = (bitboardSafeCastleBlack[0] & (allPiecesExceptBlackKing | BitBoard.GetAnyAttack(board, true))) == 0;
+                // Console.WriteLine($"can castle kingside {safeToCastle}");
+                if (board.castlingOptions[Move.CASTLE_BLACK_KINGSIDE] && safeToCastle)
                 {
-                    appendMove(moves, board, pos, KING_CASTLE_POSITIONS[Move.CASTLE_WHITE_QUEENSIDE], allowCheck, Move.FLAG_CASTLING);
+                    appendMove(moves, board, pos, KING_CASTLE_POSITIONS[Move.CASTLE_BLACK_KINGSIDE], allowCheck, Move.FLAG_CASTLING);
                 }
 
-                safeToCastle = (bitboardSafeCastleBlack[1] & (allPiecesExceptBlackKing | BitBoard.GetAnyAttack(board,true))) == 0;
-                if (board.castlingOptions[Move.CASTLE_WHITE_KINGSIDE] && safeToCastle)
+                //last condition checks if b8 is empty
+                safeToCastle = (bitboardSafeCastleBlack[1] & (allPiecesExceptBlackKing | BitBoard.GetAnyAttack(board, true))) == 0 & (allPiecesExceptBlackKing & (1UL << 57)) == 0;
+                // Console.WriteLine($"can castle queenside {safeToCastle}");
+
+                if (board.castlingOptions[Move.CASTLE_BLACK_QUEENSIDE] && safeToCastle)
                 {
-                    appendMove(moves, board, pos, KING_CASTLE_POSITIONS[Move.CASTLE_WHITE_QUEENSIDE], allowCheck, Move.FLAG_CASTLING);
+                    appendMove(moves, board, pos, KING_CASTLE_POSITIONS[Move.CASTLE_BLACK_QUEENSIDE], allowCheck, Move.FLAG_CASTLING);
                 }
 
 
@@ -395,8 +412,8 @@ namespace chess
             if (!showDetailedOutput) return perft(board, depth);
 
             int nBoards = 0;
-            foreach(Move move in generateAllMoves(board))
-            {   
+            foreach (Move move in generateAllMoves(board))
+            {
                 Board result = board.makeMove(move);
                 int resultBoards = perft(board.makeMove(move), depth - 1);
 
@@ -416,7 +433,7 @@ namespace chess
             int nBoards = 0;
 
             List<Move> moves = generateAllMoves(board);
-            foreach(Move move in moves)
+            foreach (Move move in moves)
             {
                 Board result = board.makeMove(move);
 

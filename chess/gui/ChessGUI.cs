@@ -10,6 +10,8 @@ namespace gui
 
         private ComboBox bitboardComboBox;
         private TrackBar bitboardTeamTrackbar;
+
+        private TextBox bitboardTextbox;
         private ulong bitboard = 0;
 
         private static Dictionary<int, int> IMAGE_INDEX = new Dictionary<int, int>() {
@@ -106,8 +108,13 @@ namespace gui
             bitboardTeamTrackbar.Minimum = 0;
             bitboardTeamTrackbar.Maximum = 1;
             bitboardTeamTrackbar.ValueChanged += OnSelectBitboardChange;
-            
             Controls.Add(bitboardTeamTrackbar);
+            
+            bitboardTextbox = new TextBox();
+            bitboardTextbox.Location = new Point(bitboardTeamTrackbar.Location.X + bitboardTeamTrackbar.Width + 16, bitboardTeamTrackbar.Location.Y);
+            bitboardTextbox.Size = new Size(128,32);
+            Controls.Add(bitboardTextbox);
+
         }
 
         private void OnSelectBitboardChange(object? sender, EventArgs e)
@@ -150,6 +157,8 @@ namespace gui
                 case "black: any attack": bitboard = BitBoard.GetAnyAttack(currentBoard, false); break;
                 default: bitboard = 0; break;
             }
+
+            if (!string.IsNullOrEmpty(bitboardTextbox.Text)) bitboard = ulong.Parse(bitboardTextbox.Text);
 
             Refresh();
         }

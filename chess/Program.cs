@@ -17,7 +17,7 @@ public class Program
     public static void Main(string[] args)
     {
         UnitTest.Run();
-        test();
+        // test();
         // new Program();
     }
 
@@ -59,8 +59,12 @@ public class Program
     private static void test()
     {
         Board board = Board.fromFen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
-        Move move = new Move(NotationConverter.toIndex("e5"), NotationConverter.toIndex("c6"));
+        Move move = new Move(NotationConverter.toIndex("c3"), NotationConverter.toIndex("b1"));
         board = board.makeMove(move);
+
+        move = new Move(NotationConverter.toIndex("a6"), NotationConverter.toIndex("b7"));
+        board = board.makeMove(move);
+
         board.display();
 
         ChessGUI gui = ChessGUI.Create();
