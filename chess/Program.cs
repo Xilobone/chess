@@ -3,6 +3,7 @@ using chess;
 using chessPlayer;
 using chessTesting;
 using converter;
+using counters;
 using gui;
 
 public class Program
@@ -17,7 +18,7 @@ public class Program
     public static void Main(string[] args)
     {
         UnitTest.Run();
-        // test();
+        test3();
         // new Program();
     }
 
@@ -59,17 +60,48 @@ public class Program
     private static void test()
     {
         Board board = Board.fromFen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
-        Move move = new Move(NotationConverter.toIndex("c3"), NotationConverter.toIndex("b1"));
+        board.display();
+
+        // ChessGUI.Create().OnChange(null, new ChessEventArgs(board));
+
+        Counter<long> counter = new Counter<long>("Move generation","ms");
+        long startTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+        MoveGenerator.perft(board, 4, true);
+
+        counter.Set(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startTime);
+        counter.Reset();
+
+        counter.DisplayOverview(true);
+    }
+
+    private static void test2()
+    {
+        Board board = Board.fromFen("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1");
+        Move move = new Move(NotationConverter.toIndex("c4"), NotationConverter.toIndex("c5"));
+        board = board.makeMove(move);
+        
+        move = new Move(NotationConverter.toIndex("b2"), NotationConverter.toIndex("b1"), 2);
         board = board.makeMove(move);
 
-        move = new Move(NotationConverter.toIndex("a6"), NotationConverter.toIndex("b7"));
+        move = new Move(NotationConverter.toIndex("h6"), NotationConverter.toIndex("g8"));
         board = board.makeMove(move);
 
         board.display();
-
-        ChessGUI gui = ChessGUI.Create();
-        gui.OnChange(null, new ChessEventArgs(board));
+        ChessGUI.Create().OnChange(null, new ChessEventArgs(board));
 
         MoveGenerator.perft(board, 1, true);
+
+    }
+
+    private static void test3()
+    {
+        int[] KNIGHT_OFFSETS2 = new int[] {-17, -15, -10, -6, 6, 10, 15, 17 };
+        
+        foreach(int offset in KNIGHT_OFFSETS2)
+        {
+            Position pos = Position.toPosition(offset);
+            Console.WriteLine($"{offset}: {pos.x}, {pos.y}");
+        }
     }
 }

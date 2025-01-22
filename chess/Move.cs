@@ -20,7 +20,7 @@ namespace chess
         public const int FLAG_PROMOTE_BISHOP = 4;
         public const int FLAG_PROMOTE_KNIGHT = 5;
 
-        public static int[] FLAG_PROMOTIONS = [FLAG_PROMOTE_QUEEN, FLAG_PROMOTE_ROOK, FLAG_PROMOTE_KNIGHT, FLAG_PROMOTE_KNIGHT];
+        public static int[] FLAG_PROMOTIONS = [FLAG_PROMOTE_QUEEN, FLAG_PROMOTE_ROOK, FLAG_PROMOTE_KNIGHT, FLAG_PROMOTE_BISHOP];
 
         public static Dictionary<string, int> PROMOTION_VALUES = new Dictionary<string, int>
     {
@@ -94,7 +94,7 @@ namespace chess
 
         public override string ToString()
         {
-            return $"(From:{NotationConverter.toCoordinates(frIndex)}, To:{NotationConverter.toCoordinates(toIndex)})";
+            return $"(From:{NotationConverter.toCoordinates(frIndex)}, To:{NotationConverter.toCoordinates(toIndex)} {((flag != 0) ? $" Flag:{flag}" : "")})";
         } 
     }
 }

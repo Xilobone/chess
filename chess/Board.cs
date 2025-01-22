@@ -266,27 +266,23 @@ namespace chess
                 return false;
             }
 
-            for (int x = 0; x < 8; x++)
+            for (int i = 0; i < 64; i++)
             {
-                for (int y = 0; y < 8; y++)
-                {
-                    Position pos = new Position(x, y);
-                    int piece = getPiece(pos);
+                    int piece = getPiece(i);
 
                     if (!Piece.isItsTurn(piece, whiteToMove))
                     {
                         continue;
                     }
 
-                    List<Move> moves = MoveGenerator.generateMoves(this, pos, false);
+                    List<Move> moves = MoveGenerator.generateMoves(this, i, false);
 
                     if (moves.Count > 0)
                     {
                         return false;
                     }
-                }
             }
-
+            
             return true;
         }
 

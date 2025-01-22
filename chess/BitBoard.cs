@@ -9,10 +9,10 @@ namespace chess
         public const int QUEEN = 4;
         public const int KING = 5;
 
-        private static ulong aFile = 0b1000000010000000100000001000000010000000100000001000000010000000;
-        private static ulong abFile = 0b1100000011000000110000001100000011000000110000001100000011000000;
-        private static ulong ghFile = 0b0000001100000011000000110000001100000011000000110000001100000011;
-        private static ulong hFile = 0b0000000100000001000000010000000100000001000000010000000100000001;
+        public static ulong hFile = 0b1000000010000000100000001000000010000000100000001000000010000000;
+        public static ulong ghFile = 0b1100000011000000110000001100000011000000110000001100000011000000;
+        public static ulong abFile = 0b0000001100000011000000110000001100000011000000110000001100000011;
+        public static ulong aFile = 0b0000000100000001000000010000000100000001000000010000000100000001;
 
         public static ulong[] ComputeAll(Board board, bool forWhite)
         {
@@ -98,13 +98,13 @@ namespace chess
             ulong right;
             if (forWhite)
             {
-                left = (pawnBitboard << 7) & ~aFile;
-                right = (pawnBitboard << 9) & ~hFile;
+                left = (pawnBitboard << 9) & ~aFile;
+                right = (pawnBitboard << 7) & ~hFile;
             }
             else
             {
-                left = (pawnBitboard >> 9) & ~aFile;
-                right = (pawnBitboard >> 7) & ~hFile;
+                left = (pawnBitboard >> 7) & ~aFile;
+                right = (pawnBitboard >> 9) & ~hFile;
             }
 
             //set bits of right and left attack, unless wrapping around the board
@@ -118,15 +118,15 @@ namespace chess
 
             ulong attackBitboard = 0;
 
-            attackBitboard |= (knightBitboard >> 6) & ~ghFile;
-            attackBitboard |= (knightBitboard >> 10) & ~abFile;
-            attackBitboard |= (knightBitboard >> 15) & ~hFile;
-            attackBitboard |= (knightBitboard >> 17) & ~aFile;
+            attackBitboard |= (knightBitboard >> 6) & ~abFile;
+            attackBitboard |= (knightBitboard >> 10) & ~ghFile;
+            attackBitboard |= (knightBitboard >> 15) & ~aFile;
+            attackBitboard |= (knightBitboard >> 17) & ~hFile;
 
-            attackBitboard |= (knightBitboard << 6) & ~abFile;
-            attackBitboard |= (knightBitboard << 10) & ~ghFile;
-            attackBitboard |= (knightBitboard << 15) & ~aFile;
-            attackBitboard |= (knightBitboard << 17) & ~hFile;
+            attackBitboard |= (knightBitboard << 6) & ~ghFile;
+            attackBitboard |= (knightBitboard << 10) & ~abFile;
+            attackBitboard |= (knightBitboard << 15) & ~hFile;
+            attackBitboard |= (knightBitboard << 17) & ~aFile;
 
             return attackBitboard;
         }
@@ -137,16 +137,16 @@ namespace chess
 
             ulong attackBitboard = 0;
 
-            attackBitboard |= (kingBitboard >> 9) & ~aFile;
+            attackBitboard |= (kingBitboard >> 9) & ~hFile;
             attackBitboard |= (kingBitboard >> 8);
-            attackBitboard |= (kingBitboard >> 7) & ~hFile;
+            attackBitboard |= (kingBitboard >> 7) & ~aFile;
 
-            attackBitboard |= (kingBitboard >> 1) & ~aFile;
-            attackBitboard |= (kingBitboard << 1) & ~hFile;
+            attackBitboard |= (kingBitboard >> 1) & ~hFile;
+            attackBitboard |= (kingBitboard << 1) & ~aFile;
 
-            attackBitboard |= (kingBitboard << 7) & ~aFile;
+            attackBitboard |= (kingBitboard << 7) & ~hFile;
             attackBitboard |= (kingBitboard << 8);
-            attackBitboard |= (kingBitboard << 9) & ~hFile;
+            attackBitboard |= (kingBitboard << 9) & ~aFile;
 
             return attackBitboard;
         }
