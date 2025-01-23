@@ -30,8 +30,6 @@ namespace chess
         0b0001110000000000000000000000000000000000000000000000000000000000,
     ];
 
-
-
         public static List<Move> generateAllMoves(Board board)
         {
             List<Move> moves = new List<Move>();

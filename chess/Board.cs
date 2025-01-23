@@ -38,6 +38,7 @@ namespace chess
             int piece = getPiece(move.frIndex);
             int frRank = Index.GetRank(move.frIndex);
             int toRank = Index.GetRank(move.toIndex);
+
             if (piece == Piece.WHITE_PAWN || piece == Piece.BLACK_PAWN || getPiece(move.toIndex) != Piece.EMPTY)
             {
                 result.halfMoves = 0;
@@ -47,9 +48,11 @@ namespace chess
                 result.halfMoves++;
             }
 
+            bool wasEnpassant = false;
             //move was en passant
             if ((piece == Piece.WHITE_PAWN || piece == Piece.BLACK_PAWN) && move.toIndex == enpassantIndex)
             {
+                wasEnpassant = true;
                 if (toRank == 2)
                 {
                     result.pieces[move.toIndex + 8] = Piece.EMPTY;
@@ -100,13 +103,81 @@ namespace chess
 
             /*TODO: only the affected pieces bitboards have to be updated, this includes
                 - bitboard of the moved piece
-                - if captute, bitboard of the captured piece
+                - if capture, bitboard of the captured piece
                 - if castling, botboard of the rooks
                 - if promoted, bitboard of the promoted to piece
+                - if en passant, bitboard of the opposing pawns
             */
+
+            switch (piece)
+            {
+                case Piece.WHITE_PAWN: result.bitboardsWhite[BitBoard.PAWN] = BitBoard.Compute(result, BitBoard.PAWN, true); break;
+                case Piece.WHITE_KNIGHT: result.bitboardsWhite[BitBoard.KNIGHT] = BitBoard.Compute(result, BitBoard.KNIGHT, true); break;
+                case Piece.WHITE_BISHOP: result.bitboardsWhite[BitBoard.BISHOP] = BitBoard.Compute(result, BitBoard.BISHOP, true); break;
+                case Piece.WHITE_ROOK: result.bitboardsWhite[BitBoard.ROOK] = BitBoard.Compute(result, BitBoard.ROOK, true); break;
+                case Piece.WHITE_QUEEN: result.bitboardsWhite[BitBoard.QUEEN] = BitBoard.Compute(result, BitBoard.QUEEN, true); break;
+                case Piece.WHITE_KING: result.bitboardsWhite[BitBoard.KING] = BitBoard.Compute(result, BitBoard.KING, true); break;
+                case Piece.BLACK_PAWN: result.bitboardsBlack[BitBoard.PAWN] = BitBoard.Compute(result, BitBoard.PAWN, false); break;
+                case Piece.BLACK_KNIGHT: result.bitboardsBlack[BitBoard.KNIGHT] = BitBoard.Compute(result, BitBoard.KNIGHT, false); break;
+                case Piece.BLACK_BISHOP: result.bitboardsBlack[BitBoard.BISHOP] = BitBoard.Compute(result, BitBoard.BISHOP, false); break;
+                case Piece.BLACK_ROOK: result.bitboardsBlack[BitBoard.ROOK] = BitBoard.Compute(result, BitBoard.ROOK, false); break;
+                case Piece.BLACK_QUEEN: result.bitboardsBlack[BitBoard.QUEEN] = BitBoard.Compute(result, BitBoard.QUEEN, false); break;
+                case Piece.BLACK_KING: result.bitboardsBlack[BitBoard.KING] = BitBoard.Compute(result, BitBoard.KING, false); break;
+            }
+
+            int capturedPiece = getPiece(move.toIndex);
+            switch (capturedPiece)
+            {
+                case Piece.WHITE_PAWN: result.bitboardsWhite[BitBoard.PAWN] = BitBoard.Compute(result, BitBoard.PAWN, true); break;
+                case Piece.WHITE_KNIGHT: result.bitboardsWhite[BitBoard.KNIGHT] = BitBoard.Compute(result, BitBoard.KNIGHT, true); break;
+                case Piece.WHITE_BISHOP: result.bitboardsWhite[BitBoard.BISHOP] = BitBoard.Compute(result, BitBoard.BISHOP, true); break;
+                case Piece.WHITE_ROOK: result.bitboardsWhite[BitBoard.ROOK] = BitBoard.Compute(result, BitBoard.ROOK, true); break;
+                case Piece.WHITE_QUEEN: result.bitboardsWhite[BitBoard.QUEEN] = BitBoard.Compute(result, BitBoard.QUEEN, true); break;
+                case Piece.WHITE_KING: result.bitboardsWhite[BitBoard.KING] = BitBoard.Compute(result, BitBoard.KING, true); break;
+                case Piece.BLACK_PAWN: result.bitboardsBlack[BitBoard.PAWN] = BitBoard.Compute(result, BitBoard.PAWN, false); break;
+                case Piece.BLACK_KNIGHT: result.bitboardsBlack[BitBoard.KNIGHT] = BitBoard.Compute(result, BitBoard.KNIGHT, false); break;
+                case Piece.BLACK_BISHOP: result.bitboardsBlack[BitBoard.BISHOP] = BitBoard.Compute(result, BitBoard.BISHOP, false); break;
+                case Piece.BLACK_ROOK: result.bitboardsBlack[BitBoard.ROOK] = BitBoard.Compute(result, BitBoard.ROOK, false); break;
+                case Piece.BLACK_QUEEN: result.bitboardsBlack[BitBoard.QUEEN] = BitBoard.Compute(result, BitBoard.QUEEN, false); break;
+                case Piece.BLACK_KING: result.bitboardsBlack[BitBoard.KING] = BitBoard.Compute(result, BitBoard.KING, false); break;
+            }
+
+            //update rooks bitboard if castled
+            if (move.flag == Move.FLAG_CASTLING)
+            {
+                if (Piece.isWhite(piece)) result.bitboardsWhite[BitBoard.ROOK] = BitBoard.Compute(result, BitBoard.ROOK, true);
+                else result.bitboardsBlack[BitBoard.ROOK] = BitBoard.Compute(result, BitBoard.ROOK, false);
+            }
+
+            if (Piece.isWhite(piece))
+            {
+                switch (move.flag)
+                {
+                    case Move.FLAG_PROMOTE_KNIGHT: result.bitboardsWhite[BitBoard.KNIGHT] = BitBoard.Compute(result, BitBoard.KNIGHT, true); break;
+                    case Move.FLAG_PROMOTE_BISHOP: result.bitboardsWhite[BitBoard.BISHOP] = BitBoard.Compute(result, BitBoard.BISHOP, true); break;
+                    case Move.FLAG_PROMOTE_ROOK: result.bitboardsWhite[BitBoard.ROOK] = BitBoard.Compute(result, BitBoard.ROOK, true); break;
+                    case Move.FLAG_PROMOTE_QUEEN: result.bitboardsWhite[BitBoard.QUEEN] = BitBoard.Compute(result, BitBoard.QUEEN, true); break;
+                }
+            } else
+            {
+                switch (move.flag)
+                {
+                    case Move.FLAG_PROMOTE_KNIGHT: result.bitboardsBlack[BitBoard.KNIGHT] = BitBoard.Compute(result, BitBoard.KNIGHT, false); break;
+                    case Move.FLAG_PROMOTE_BISHOP: result.bitboardsBlack[BitBoard.BISHOP] = BitBoard.Compute(result, BitBoard.BISHOP, false); break;
+                    case Move.FLAG_PROMOTE_ROOK: result.bitboardsBlack[BitBoard.ROOK] = BitBoard.Compute(result, BitBoard.ROOK, false); break;
+                    case Move.FLAG_PROMOTE_QUEEN: result.bitboardsBlack[BitBoard.QUEEN] = BitBoard.Compute(result, BitBoard.QUEEN, false); break;
+                }
+            }
+
+            if (wasEnpassant)
+            {
+                if (Piece.isWhite(piece)) result.bitboardsBlack[BitBoard.PAWN] = BitBoard.Compute(result, BitBoard.PAWN, false);
+                else result.bitboardsWhite[BitBoard.PAWN] = BitBoard.Compute(result, BitBoard.PAWN, true);
+            }
+
             //update bitboards
-            result.bitboardsWhite = BitBoard.ComputeAll(result, true);
-            result.bitboardsBlack = BitBoard.ComputeAll(result, false);
+            // result.bitboardsWhite = BitBoard.ComputeAll(result, true);
+            // result.bitboardsBlack = BitBoard.ComputeAll(result, false);
 
             result.bitboardsWhiteAttack = BitBoard.ComputeAllAttack(result, true);
             result.bitboardsBlackAttack = BitBoard.ComputeAllAttack(result, false);
@@ -268,21 +339,21 @@ namespace chess
 
             for (int i = 0; i < 64; i++)
             {
-                    int piece = getPiece(i);
+                int piece = getPiece(i);
 
-                    if (!Piece.isItsTurn(piece, whiteToMove))
-                    {
-                        continue;
-                    }
+                if (!Piece.isItsTurn(piece, whiteToMove))
+                {
+                    continue;
+                }
 
-                    List<Move> moves = MoveGenerator.generateMoves(this, i, false);
+                List<Move> moves = MoveGenerator.generateMoves(this, i, false);
 
-                    if (moves.Count > 0)
-                    {
-                        return false;
-                    }
+                if (moves.Count > 0)
+                {
+                    return false;
+                }
             }
-            
+
             return true;
         }
 
