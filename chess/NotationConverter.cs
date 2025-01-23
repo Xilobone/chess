@@ -14,15 +14,15 @@ namespace converter
             //castling
             if (move == "O-O")
             {
-                Position fr = board.whiteToMove ? new Position(4, 0) : new Position(4, 7);
-                Position to = board.whiteToMove ? new Position(6, 0) : new Position(6, 7);
+                int fr = board.whiteToMove ? 4 : 60;
+                int to = board.whiteToMove ? 6 : 62;
                 return new Move(fr, to, Move.FLAG_CASTLING);
             }
 
             if (move == "O-O-O")
             {
-                Position fr = board.whiteToMove ? new Position(4, 0) : new Position(4, 7);
-                Position to = board.whiteToMove ? new Position(2, 0) : new Position(2, 7);
+                int fr = board.whiteToMove ? 4 : 60;
+                int to = board.whiteToMove ? 2 : 58;
                 return new Move(fr, to, Move.FLAG_CASTLING);
             }
 

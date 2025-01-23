@@ -18,7 +18,7 @@ public class Program
     public static void Main(string[] args)
     {
         UnitTest.Run();
-        test3();
+        test();
         // new Program();
     }
 

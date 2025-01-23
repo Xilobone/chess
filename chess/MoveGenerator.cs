@@ -2,40 +2,21 @@ using counters;
 
 namespace chess
 {
-    public class MoveGenerator
+    public static class MoveGenerator
     {
-        private static Position[] KNIGHT_OFFSETS = new Position[]
-        {
-        new Position(-1,-2),
-        new Position(1,-2),
-        new Position(-1,2),
-        new Position(1,2),
-        new Position(-2, -1),
-        new Position(-2,1),
-        new Position(2,-1),
-        new Position(2,1)
-        };
+        private static int[] KNIGHT_OFFSETS = new int[] { -17, -15, -10, -6, 6, 10, 15, 17 };
+        private static ulong[] KNIGHT_OFFSETS_EXCLUDE = new ulong[] { BitBoard.aFile, BitBoard.hFile, BitBoard.abFile, BitBoard.ghFile, BitBoard.abFile, BitBoard.ghFile, BitBoard.aFile, BitBoard.hFile };
 
-        private static int[] KNIGHT_OFFSETS_INDEX = new int[] {-17, -15, -10, -6, 6, 10, 15, 17 };
+        private static int[] KING_OFFSETS = new int[] { -9, -8, -7, -1, 1, 7, 8, 9 };
+        private static ulong[] KING_OFFSETS_EXCLUDE = new ulong[] { BitBoard.aFile, 0, BitBoard.hFile, BitBoard.aFile, BitBoard.hFile, BitBoard.aFile, 0, BitBoard.hFile };
 
-        private static Position[] KING_OFFSETS = new Position[]
-        {
-        new Position(-1,-1),
-        new Position(-1,0),
-        new Position(-1,1),
-        new Position(0,-1),
-        new Position(0, 1),
-        new Position(1,-1),
-        new Position(1,0),
-        new Position(1,1)
-        };
 
-        private static Dictionary<int, Position> KING_CASTLE_POSITIONS = new Dictionary<int, Position>
+        private static Dictionary<int, int> KING_CASTLE_POSITIONS = new Dictionary<int, int>
     {
-        { Move.CASTLE_WHITE_KINGSIDE, new Position(6,0) },
-        { Move.CASTLE_WHITE_QUEENSIDE, new Position(2,0) },
-        { Move.CASTLE_BLACK_KINGSIDE, new Position(6,7) },
-        { Move.CASTLE_BLACK_QUEENSIDE, new Position(2,7) }
+        { Move.CASTLE_WHITE_KINGSIDE, 6},
+        { Move.CASTLE_WHITE_QUEENSIDE, 2 },
+        { Move.CASTLE_BLACK_KINGSIDE, 62 },
+        { Move.CASTLE_BLACK_QUEENSIDE, 58 }
     };
 
         //positions that must be clear of any piece, and any attack from the opponent to allow check
@@ -68,8 +49,6 @@ namespace chess
         }
         public static List<Move> generateMoves(Board board, int index, bool allowCheck)
         {
-            Position pos = Position.toPosition(index);
-
             List<Move> moves = new List<Move>();
 
             int piece = board.getPiece(index);
@@ -96,27 +75,27 @@ namespace chess
 
             if (piece == Piece.WHITE_ROOK || piece == Piece.BLACK_ROOK)
             {
-                moves.AddRange(getRookMoves(board, pos, allowCheck));
+                moves.AddRange(getRookMoves(board, index, allowCheck));
             }
 
             if (piece == Piece.WHITE_BISHOP || piece == Piece.BLACK_BISHOP)
             {
-                moves.AddRange(getBishopMoves(board, pos, allowCheck));
+                moves.AddRange(getBishopMoves(board, index, allowCheck));
             }
 
             if (piece == Piece.WHITE_QUEEN || piece == Piece.BLACK_QUEEN)
             {
-                moves.AddRange(getQueenMoves(board, pos, allowCheck));
+                moves.AddRange(getQueenMoves(board, index, allowCheck));
             }
 
             if (piece == Piece.WHITE_KNIGHT || piece == Piece.BLACK_KNIGHT)
             {
-                moves.AddRange(getKnightMoves(board, pos, allowCheck));
+                moves.AddRange(getKnightMoves(board, index, allowCheck));
             }
 
             if (piece == Piece.WHITE_KING || piece == Piece.BLACK_KING)
             {
-                moves.AddRange(getKingMoves(board, pos, allowCheck));
+                moves.AddRange(getKingMoves(board, index, allowCheck));
             }
 
             return moves;
@@ -183,143 +162,131 @@ namespace chess
             return moves;
         }
 
-        private static List<Move> getRookMoves(Board board, Position pos, bool allowCheck)
+        private static List<Move> getRookMoves(Board board, int index, bool allowCheck)
         {
             List<Move> moves = new List<Move>();
 
-            moves.AddRange(searchDirection(board, pos, new Position(1, 0), allowCheck));
-            moves.AddRange(searchDirection(board, pos, new Position(-1, 0), allowCheck));
-            moves.AddRange(searchDirection(board, pos, new Position(0, 1), allowCheck));
-            moves.AddRange(searchDirection(board, pos, new Position(0, -1), allowCheck));
+            moves.AddRange(searchDirection(board, index, 1, allowCheck));
+            moves.AddRange(searchDirection(board, index, -1, allowCheck));
+            moves.AddRange(searchDirection(board, index, 8, allowCheck));
+            moves.AddRange(searchDirection(board, index, -8, allowCheck));
 
             return moves;
         }
 
-        private static List<Move> getBishopMoves(Board board, Position pos, bool allowCheck)
+        private static List<Move> getBishopMoves(Board board, int index, bool allowCheck)
         {
             List<Move> moves = new List<Move>();
 
-            moves.AddRange(searchDirection(board, pos, new Position(1, 1), allowCheck));
-            moves.AddRange(searchDirection(board, pos, new Position(1, -1), allowCheck));
-            moves.AddRange(searchDirection(board, pos, new Position(-1, 1), allowCheck));
-            moves.AddRange(searchDirection(board, pos, new Position(-1, -1), allowCheck));
+            moves.AddRange(searchDirection(board, index, 9, allowCheck));
+            moves.AddRange(searchDirection(board, index, 7, allowCheck));
+            moves.AddRange(searchDirection(board, index, -7, allowCheck));
+            moves.AddRange(searchDirection(board, index, -9, allowCheck));
 
             return moves;
         }
 
-        private static List<Move> getQueenMoves(Board board, Position pos, bool allowCheck)
+        private static List<Move> getQueenMoves(Board board, int index, bool allowCheck)
         {
             List<Move> moves = new List<Move>();
 
-            moves.AddRange(getRookMoves(board, pos, allowCheck));
-            moves.AddRange(getBishopMoves(board, pos, allowCheck));
+            moves.AddRange(getRookMoves(board, index, allowCheck));
+            moves.AddRange(getBishopMoves(board, index, allowCheck));
 
             return moves;
         }
 
-        private static List<Move> getKnightMoves(Board board, Position pos, bool allowCheck)
+        private static List<Move> searchOffset(Board board, int index, int[] offsets, ulong[] exclude, bool allowCheck)
         {
             List<Move> moves = new List<Move>();
 
-            foreach (Position offset in KNIGHT_OFFSETS)
+            ulong bitboardPiece = 1ul << index;
+            bool isWhite = Piece.isWhite(board.getPiece(index));
+
+            for (int i = 0; i < offsets.Length; i++)
             {
-                moves.AddRange(searchOffset(board, pos, offset, allowCheck));
+                //do not add move if the knight is on the files to exclude
+                if ((bitboardPiece & exclude[i]) != 0) continue;
+
+                int to = index + offsets[i];
+
+                if (to < 0 || to >= 64) continue;
+                //do not add move if the to position is occupied by a friendly piece
+                ulong friendlyPieces = BitBoard.GetAny(board, isWhite);
+                if (((1uL << to) & friendlyPieces) != 0) continue;
+
+                appendMove(moves, board, index, to, allowCheck);
+
             }
 
             return moves;
         }
-
-        private static List<Move> getKingMoves(Board board, Position pos, bool allowCheck)
+        private static List<Move> getKnightMoves(Board board, int index, bool allowCheck)
         {
-            List<Move> moves = new List<Move>();
+            return searchOffset(board, index, KNIGHT_OFFSETS, KNIGHT_OFFSETS_EXCLUDE, allowCheck);
+        }
 
-            foreach (Position offset in KING_OFFSETS)
-            {
-                moves.AddRange(searchOffset(board, pos, offset, allowCheck));
-            }
+        private static List<Move> getKingMoves(Board board, int index, bool allowCheck)
+        {
+            List<Move> moves = searchOffset(board, index, KING_OFFSETS, KING_OFFSETS_EXCLUDE, allowCheck);
 
-            // Console.WriteLine($"safecastlewhite kingside: {bitboardSafeCastleWhite[0]}");
-            // Console.WriteLine($"safecastlewhite kingside: {bitboardSafeCastleWhite[1]}");
             //add castling moves
-            int piece = board.getPiece(pos);
-            if (piece == Piece.WHITE_KING)
+            ulong bitboardKing = board.whiteToMove ? board.bitboardsWhite[BitBoard.KING] : board.bitboardsBlack[BitBoard.KING];
+            ulong[] bitboardSafeCastle = board.whiteToMove ? bitboardSafeCastleWhite : bitboardSafeCastleBlack;
+            int kingside = board.whiteToMove ? Move.CASTLE_WHITE_KINGSIDE : Move.CASTLE_BLACK_KINGSIDE;
+            int queenside = board.whiteToMove ? Move.CASTLE_WHITE_QUEENSIDE : Move.CASTLE_BLACK_QUEENSIDE;
+            int queensideCheck = board.whiteToMove ? 1 : 57;
+
+            ulong allPiecesExceptKing = BitBoard.GetAny(board) & ~bitboardKing;
+
+            bool safeToCastle = (bitboardSafeCastle[0] & (allPiecesExceptKing | BitBoard.GetAnyAttack(board, !board.whiteToMove))) == 0;
+            if (board.castlingOptions[kingside] && safeToCastle)
             {
-
-
-                ulong allPiecesExceptWhiteKing = BitBoard.GetAny(board) & ~board.bitboardsWhite[BitBoard.KING];
-
-                bool safeToCastle = (bitboardSafeCastleWhite[0] & (allPiecesExceptWhiteKing | BitBoard.GetAnyAttack(board, false))) == 0;
-                if (board.castlingOptions[Move.CASTLE_WHITE_KINGSIDE] && safeToCastle)
-                {
-                    appendMove(moves, board, pos.toIndex(), KING_CASTLE_POSITIONS[Move.CASTLE_WHITE_KINGSIDE].toIndex(), allowCheck, Move.FLAG_CASTLING);
-                }
-
-                //last condition checks if b1 is empty
-                safeToCastle = (bitboardSafeCastleWhite[1] & (allPiecesExceptWhiteKing | BitBoard.GetAnyAttack(board, false))) == 0 & (allPiecesExceptWhiteKing & (1UL << 1)) == 0;
-                if (board.castlingOptions[Move.CASTLE_WHITE_QUEENSIDE] && safeToCastle)
-                {
-                    appendMove(moves, board, pos.toIndex(), KING_CASTLE_POSITIONS[Move.CASTLE_WHITE_QUEENSIDE].toIndex(), allowCheck, Move.FLAG_CASTLING);
-                }
+                appendMove(moves, board, index, KING_CASTLE_POSITIONS[kingside], allowCheck, Move.FLAG_CASTLING);
             }
 
-            if (piece == Piece.BLACK_KING)
+            //last condition checks if b1 is empty
+            safeToCastle = (bitboardSafeCastle[1] & (allPiecesExceptKing | BitBoard.GetAnyAttack(board, !board.whiteToMove))) == 0 & (allPiecesExceptKing & (1UL << queensideCheck)) == 0;
+            if (board.castlingOptions[queenside] && safeToCastle)
             {
-                // Console.WriteLine("checking castle options black");
-                ulong allPiecesExceptBlackKing = BitBoard.GetAny(board) & ~board.bitboardsBlack[BitBoard.KING];
-
-                bool safeToCastle = (bitboardSafeCastleBlack[0] & (allPiecesExceptBlackKing | BitBoard.GetAnyAttack(board, true))) == 0;
-                // Console.WriteLine($"can castle kingside {safeToCastle}");
-                if (board.castlingOptions[Move.CASTLE_BLACK_KINGSIDE] && safeToCastle)
-                {
-                    appendMove(moves, board, pos.toIndex(), KING_CASTLE_POSITIONS[Move.CASTLE_BLACK_KINGSIDE].toIndex(), allowCheck, Move.FLAG_CASTLING);
-                }
-
-                //last condition checks if b8 is empty
-                safeToCastle = (bitboardSafeCastleBlack[1] & (allPiecesExceptBlackKing | BitBoard.GetAnyAttack(board, true))) == 0 & (allPiecesExceptBlackKing & (1UL << 57)) == 0;
-
-                if (board.castlingOptions[Move.CASTLE_BLACK_QUEENSIDE] && safeToCastle)
-                {
-                    appendMove(moves, board, pos.toIndex(), KING_CASTLE_POSITIONS[Move.CASTLE_BLACK_QUEENSIDE].toIndex(), allowCheck, Move.FLAG_CASTLING);
-                }
-
-
-
-                // if (board.castlingOptions[Move.CASTLE_BLACK_QUEENSIDE] && board.getPiece(57) == Piece.EMPTY && board.getPiece(58) == Piece.EMPTY && board.getPiece(59) == Piece.EMPTY)
-                // {
-                //     appendMove(moves, board, pos, KING_CASTLE_POSITIONS[Move.CASTLE_BLACK_QUEENSIDE], allowCheck, Move.FLAG_CASTLING);
-                // }
-                // if (board.castlingOptions[Move.CASTLE_BLACK_KINGSIDE] && board.getPiece(61) == Piece.EMPTY && board.getPiece(62) == Piece.EMPTY)
-                // {
-                //     appendMove(moves, board, pos, KING_CASTLE_POSITIONS[Move.CASTLE_BLACK_KINGSIDE], allowCheck, Move.FLAG_CASTLING);
-                // }
+                appendMove(moves, board, index, KING_CASTLE_POSITIONS[queenside], allowCheck, Move.FLAG_CASTLING);
             }
 
             return moves;
         }
 
-        private static List<Move> searchDirection(Board board, Position pos, Position dir, bool allowCheck)
+        private static List<Move> searchDirection(Board board, int index, int shift, bool allowCheck)
         {
+            bool isWhite = Piece.isWhite(board.getPiece(index));
             List<Move> moves = new List<Move>();
-            int piece = board.getPiece(pos);
-            Position newPos = pos + dir;
+            int to = index;
+            ulong pos = 1ul << index;
 
-            while (newPos.x >= 0 && newPos.y >= 0 && newPos.x < 8 && newPos.y < 8)
+            while (true)
             {
-                int occupiedPiece = board.getPiece(newPos);
+                ulong before = pos;
+                pos = shift > 0 ? (pos << shift) : (pos >> -shift);
+                to += shift;
 
-                if (Piece.isSameColor(piece, occupiedPiece))
-                {
-                    break;
-                }
+                //break if wrapped around the board
+                if (((before & BitBoard.aFile) != 0) && ((pos & BitBoard.hFile) != 0)) break;
+                if (((before & BitBoard.hFile) != 0) && ((pos & BitBoard.aFile) != 0)) break;
 
-                if (Piece.isDifferentColor(piece, occupiedPiece))
-                {
-                    appendMove(moves, board, pos.toIndex(), newPos.toIndex(), allowCheck);
-                    break;
-                }
+                //break if encountered a friendly piece
+                if ((pos & BitBoard.GetAny(board, isWhite)) != 0) break;
 
-                appendMove(moves, board, pos.toIndex(), newPos.toIndex(), allowCheck);
-                newPos += dir;
+                if (to < 0 || to >= 64) break;
+
+                appendMove(moves, board, index, to, allowCheck);
+
+                //break if just captured an enemy piece
+                if ((pos & BitBoard.GetAny(board, !isWhite)) != 0) break;
+
+                // reached top or bottom of board
+                if (pos == 0) break;
+
+                //reached left or right edge of board
+                if (shift != 8 && shift != -8 && ((pos & BitBoard.aFile) != 0 || (pos & BitBoard.hFile) != 0)) break;
             }
 
             return moves;
@@ -372,7 +339,7 @@ namespace chess
 
             //add promotions
             int rank = Index.GetRank(to);
-            if ((piece == Piece.WHITE_PAWN || piece == Piece.BLACK_PAWN) && ( rank == 0 || rank == 7))
+            if ((piece == Piece.WHITE_PAWN || piece == Piece.BLACK_PAWN) && (rank == 0 || rank == 7))
             {
                 foreach (int prom_flag in Move.FLAG_PROMOTIONS)
                 {
