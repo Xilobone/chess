@@ -158,7 +158,8 @@ namespace chess
                     case Move.FLAG_PROMOTE_ROOK: result.bitboardsWhite[BitBoard.ROOK] = BitBoard.Compute(result, BitBoard.ROOK, true); break;
                     case Move.FLAG_PROMOTE_QUEEN: result.bitboardsWhite[BitBoard.QUEEN] = BitBoard.Compute(result, BitBoard.QUEEN, true); break;
                 }
-            } else
+            }
+            else
             {
                 switch (move.flag)
                 {
@@ -337,21 +338,29 @@ namespace chess
                 return false;
             }
 
-            for (int i = 0; i < 64; i++)
-            {
-                int piece = getPiece(i);
+            ulong allFriendlyPieces = BitBoard.GetAny(this, whiteToMove);
 
-                if (!Piece.isItsTurn(piece, whiteToMove))
+            int index = 0;
+            while (allFriendlyPieces != 0)
+            {   
+                //if last bit is zero, shift and continue
+                if ((allFriendlyPieces & 1) == 0)
                 {
+                    allFriendlyPieces >>= 1;
+                    index++;
                     continue;
                 }
 
-                List<Move> moves = MoveGenerator.generateMoves(this, i, false);
+                List<Move> moves = MoveGenerator.generateMoves(this, index, false);
 
                 if (moves.Count > 0)
                 {
                     return false;
                 }
+
+                allFriendlyPieces >>= 1;
+                index++;
+
             }
 
             return true;

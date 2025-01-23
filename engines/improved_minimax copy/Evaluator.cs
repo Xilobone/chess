@@ -48,18 +48,6 @@ namespace improved_minimax_eval_engine
 
                 value += PIECE_VALUES[piece];
             }
-            // for (int x = 0; x < 8; x++)
-            // {
-            //     for (int y = 0; y < 8; y++)
-            //     {
-            //         int piece = board.getPiece(new Position(x, y));
-
-            //         if (PIECE_VALUES.Keys.Contains(piece))
-            //         {
-            //             value += PIECE_VALUES[piece];
-            //         }
-            //     }
-            // }
 
             return value;
         }
