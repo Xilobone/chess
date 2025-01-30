@@ -5,8 +5,8 @@ namespace transposition_table
 {
     public class Engine : chess.Engine
     {
-        private const int MAX_DEPTH = 1;
-
+        private const int MAX_DEPTH = 4;
+        // private const int 
         private int depth;
 
         public Counter<int> evaluatedBoards { get; private set; }
@@ -46,7 +46,6 @@ namespace transposition_table
             float bestValue = board.whiteToMove ? float.MinValue : float.MaxValue;
 
             List<Move> moves = MoveGenerator.generateAllMoves(board);
-            List<MovePair> sorted = new List<MovePair>();
 
             foreach (Move move in moves)
             {
@@ -148,18 +147,6 @@ namespace transposition_table
             else
             {
                 return mini(board, depth, alpha, beta);
-            }
-        }
-
-        private class MovePair
-        {
-            public Move move;
-            public float eval;
-
-            public MovePair(Move move, float eval)
-            {
-                this.move = move;
-                this.eval = eval;
             }
         }
     }

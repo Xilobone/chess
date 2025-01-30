@@ -1,3 +1,4 @@
+using System.Text.Json;
 using counters;
 
 namespace chess
@@ -10,12 +11,27 @@ namespace chess
 
         protected IEvaluator evaluator;
 
+        protected EngineConfig config;
+
         public Engine(bool isWhite, IEvaluator evaluator)
         {
             counters = new List<ICounter>();
 
             this.isWhite = isWhite;
             this.evaluator = evaluator;
+
+            //try to read config file
+            try
+            {
+                string configJson = File.ReadAllText($"./config/engines/{GetType().Namespace}.json");
+                config = JsonSerializer.Deserialize<EngineConfig>(configJson)!;
+
+            } catch (IOException)
+            {
+                config = new EngineConfig();
+            }
+
+        // Deserialize JSON into a C# object
         }
         public abstract Move makeMove(Board board);
         public abstract Move makeMove(Board board, float maxTime);
@@ -41,6 +57,14 @@ namespace chess
                 this.evaluation = evaluation;
                 this.move = move;
             }
+        }
+
+        protected class EngineConfig
+        {
+            public int maxDepth { get; private set; }
+            public int transpositionTableSize { get; private set; }
+
+
         }
     }
 }
