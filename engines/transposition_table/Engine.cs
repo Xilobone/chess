@@ -1,3 +1,4 @@
+using System.Reflection.Emit;
 using chess;
 using counters;
 
@@ -5,10 +6,6 @@ namespace transposition_table
 {
     public class Engine : chess.Engine
     {
-        private const int MAX_DEPTH = 4;
-        // private const int 
-        private int depth;
-
         public Counter<int> evaluatedBoards { get; private set; }
         public Counter<long> computationTime { get; private set; }
         public Counter<long> evaluationTime { get; private set; }
@@ -17,19 +14,20 @@ namespace transposition_table
 
         private float remainingTime;
 
-        public Engine() : this(true, MAX_DEPTH) { }
+        private TranspositionItem[] transpositionTable;
 
-        public Engine(bool isWhite) : this(isWhite, MAX_DEPTH) { }
+        public Engine() : this(true) { }
 
-        public Engine(bool isWhite, int depth) : base(isWhite, new Evaluator())
+
+        public Engine(bool isWhite) : base(isWhite, new Evaluator())
         {
-            this.depth = depth;
-
             evaluatedBoards = new Counter<int>("Evaluated boards");
             computationTime = new Counter<long>("Computation time", "ms");
             evaluationTime = new Counter<long>("Evaluation time", "ms");
             generationTime = new Counter<long>("Generation time", "ms");
             counters.AddRange(evaluatedBoards, computationTime, evaluationTime, generationTime);
+
+            transpositionTable = new TranspositionItem[config.transpositionTableSize];
         }
 
         public override Move makeMove(Board board)
@@ -49,7 +47,7 @@ namespace transposition_table
 
             foreach (Move move in moves)
             {
-                float eval = Minimax(board.makeMove(move), depth - 1, float.MinValue, float.MaxValue, !board.whiteToMove);
+                float eval = Minimax(board.makeMove(move), config.maxDepth - 1, float.MinValue, float.MaxValue, !board.whiteToMove);
                 if (board.whiteToMove && eval > bestValue)
                 {
                     bestValue = eval;
@@ -148,6 +146,21 @@ namespace transposition_table
             {
                 return mini(board, depth, alpha, beta);
             }
+        }
+
+        private class TranspositionItem
+        {
+            public Move bestMove { get; private set; }
+            public float evaluation { get; private set; }
+            public int searchedDepth { get; private set;  }
+
+            public TranspositionItem(Move bestMove, float evaluation, int searchedDepth)
+            {
+                this.bestMove = bestMove;
+                this.evaluation = evaluation;
+                this.searchedDepth = searchedDepth;
+            }
+
         }
     }
 }
