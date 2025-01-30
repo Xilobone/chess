@@ -7,8 +7,8 @@ namespace chess
             new Player("minimax", new minimax_engine.Engine(), new minimax_engine.Evaluator()),
             new Player("deep minimax", new deep_minimax_engine.Engine(), new deep_minimax_engine.Evaluator()),
             new Player("improved minimax", new improved_minimax_engine.Engine(), new improved_minimax_engine.Evaluator()),
-            new Player("improved eval minimax", new improved_minimax_eval_engine.Engine(), new improved_minimax_eval_engine.Evaluator())
-        
+            new Player("improved eval minimax", new improved_minimax_eval_engine.Engine(), new improved_minimax_eval_engine.Evaluator()),
+            new Player("iterative deepening", new iterative_deepening.Engine(), new iterative_deepening.Evaluator())
         };
 
         public static Player[] blackPlayers = {
@@ -16,7 +16,8 @@ namespace chess
             new Player("minimax", new minimax_engine.Engine(), new minimax_engine.Evaluator()),
             new Player("deep minimax", new deep_minimax_engine.Engine(), new deep_minimax_engine.Evaluator()),
             new Player("improved minimax", new improved_minimax_engine.Engine(), new improved_minimax_engine.Evaluator()),
-            new Player("improved eval minimax", new improved_minimax_eval_engine.Engine(), new improved_minimax_eval_engine.Evaluator())
+            new Player("improved eval minimax", new improved_minimax_eval_engine.Engine(), new improved_minimax_eval_engine.Evaluator()),
+            new Player("iterative deepening", new iterative_deepening.Engine(), new iterative_deepening.Evaluator())
         };
 
         public static Player selectPlayer(bool isWhite) 

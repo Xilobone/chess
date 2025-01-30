@@ -13,16 +13,13 @@ namespace minimax_engine
         private long generationTime;
         private int prunedBranches;
 
-        private float remainingTime;
-        private Evaluator evaluator;
-        
+        private float remainingTime;        
         public Engine() : this(true, MAX_DEPTH) { }
 
         public Engine(bool isWhite) : this(isWhite, MAX_DEPTH) { }
 
-        public Engine(bool isWhite, int depth)
+        public Engine(bool isWhite, int depth) : base(isWhite, new Evaluator())
         {
-            this.isWhite = isWhite;
             this.depth = depth;
 
             evaluatedBoards = 0;
@@ -30,8 +27,6 @@ namespace minimax_engine
             evaluationTime = 0;
             generationTime = 0;
             prunedBranches = 0;
-
-            evaluator = new Evaluator();
         }
 
         public override Move makeMove(Board board)

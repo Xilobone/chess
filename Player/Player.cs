@@ -4,6 +4,7 @@ namespace player
 {
     public class Player : Engine
     {
+        public Player() : base(true, new Evaluator()) { }
 
         public override Move makeMove(Board board, float maxTime)
         {

@@ -1,11 +1,11 @@
 using chess;
 using counters;
 
-namespace improved_minimax_eval_engine
+namespace iterative_deepening
 {
     public class Engine : chess.Engine
     {
-        private const int MAX_DEPTH = 4;
+        private const int MAX_DEPTH = 1;
 
         private int depth;
 
@@ -14,7 +14,6 @@ namespace improved_minimax_eval_engine
         public Counter<long> evaluationTime { get; private set; }
         public Counter<long> generationTime { get; private set; }
 
-        private Evaluator evaluator;
 
         private float remainingTime;
 
@@ -22,9 +21,8 @@ namespace improved_minimax_eval_engine
 
         public Engine(bool isWhite) : this(isWhite, MAX_DEPTH) { }
 
-        public Engine(bool isWhite, int depth)
+        public Engine(bool isWhite, int depth) : base(isWhite, new Evaluator())
         {
-            this.isWhite = isWhite;
             this.depth = depth;
 
             evaluatedBoards = new Counter<int>("Evaluated boards");
@@ -32,8 +30,6 @@ namespace improved_minimax_eval_engine
             evaluationTime = new Counter<long>("Evaluation time", "ms");
             generationTime = new Counter<long>("Generation time", "ms");
             counters.AddRange(evaluatedBoards, computationTime, evaluationTime, generationTime);
-
-            evaluator = new Evaluator();
         }
 
         public override Move makeMove(Board board)
@@ -49,7 +45,10 @@ namespace improved_minimax_eval_engine
             Move? bestMove = null;
             float bestValue = board.whiteToMove ? float.MinValue : float.MaxValue;
 
-            foreach (Move move in MoveGenerator.generateAllMoves(board))
+            List<Move> moves = MoveGenerator.generateAllMoves(board);
+            List<MovePair> sorted = new List<MovePair>();
+
+            foreach (Move move in moves)
             {
                 float eval = Minimax(board.makeMove(move), depth - 1, float.MinValue, float.MaxValue, !board.whiteToMove);
                 if (board.whiteToMove && eval > bestValue)
@@ -63,6 +62,8 @@ namespace improved_minimax_eval_engine
                     bestMove = move;
                 }
             }
+
+            
 
             computationTime.Set(getCurrentTime() - startTime);
             clearCounters();
@@ -147,6 +148,18 @@ namespace improved_minimax_eval_engine
             else
             {
                 return mini(board, depth, alpha, beta);
+            }
+        }
+
+        private class MovePair
+        {
+            public Move move;
+            public float eval;
+
+            public MovePair(Move move, float eval)
+            {
+                this.move = move;
+                this.eval = eval;
             }
         }
     }

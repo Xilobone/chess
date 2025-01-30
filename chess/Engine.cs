@@ -8,9 +8,14 @@ namespace chess
         public bool displayStats { get; set; }
         public List<ICounter> counters { get; set; }
 
-        public Engine()
+        protected IEvaluator evaluator;
+
+        public Engine(bool isWhite, IEvaluator evaluator)
         {
             counters = new List<ICounter>();
+
+            this.isWhite = isWhite;
+            this.evaluator = evaluator;
         }
         public abstract Move makeMove(Board board);
         public abstract Move makeMove(Board board, float maxTime);

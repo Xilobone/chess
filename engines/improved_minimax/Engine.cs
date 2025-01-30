@@ -14,17 +14,14 @@ namespace improved_minimax_engine
         public Counter<long> evaluationTime { get; private set; }
         public Counter<long> generationTime { get; private set; }
 
-        private Evaluator evaluator;
-
         private float remainingTime;
 
         public Engine() : this(true, MAX_DEPTH) { }
 
         public Engine(bool isWhite) : this(isWhite, MAX_DEPTH) { }
 
-        public Engine(bool isWhite, int depth)
+        public Engine(bool isWhite, int depth) : base(isWhite, new Evaluator())
         {
-            this.isWhite = isWhite;
             this.depth = depth;
 
             evaluatedBoards = new Counter<int>("Evaluated boards");
@@ -32,8 +29,6 @@ namespace improved_minimax_engine
             evaluationTime = new Counter<long>("Evaluation time", "ms");
             generationTime = new Counter<long>("Generation time", "ms");
             counters.AddRange(evaluatedBoards, computationTime, evaluationTime, generationTime);
-
-            evaluator = new Evaluator();
         }
 
         public override Move makeMove(Board board)
