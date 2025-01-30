@@ -5,6 +5,7 @@ using chessTesting;
 using converter;
 using counters;
 using gui;
+using parser;
 
 public class Program
 {
@@ -59,55 +60,29 @@ public class Program
 
     private static void test()
     {
-        Board board = Board.fromFen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
-        board.display();
+        GamesParser parser = new GamesParser("./lib/chess_games.pgn", [new improved_minimax_eval_engine.Evaluator()], 0);
+        List<Board> boards = parser.parse(10000, 1000, 10);
 
-        // ChessGUI.Create().OnChange(null, new ChessEventArgs(board));
+        int tableSize = 300_243;
+        bool[] table = new bool[tableSize];
 
-        Counter<long> counter = new Counter<long>("Move generation", "ms");
-
-        for (int i = 0; i < 10; i++)
+        int nCollisions = 0;
+        foreach(Board board in boards)
         {
-            long startTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            int hash = Zobrist.hash(board);
 
-            MoveGenerator.perft(board, 4, false);
+            hash = hash % tableSize;
 
-            counter.Set(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startTime);
-            counter.Reset();
+            if(table[hash])
+            {
+                nCollisions++;
+            }
 
-            Console.WriteLine($"done {i + 1}/10");
+            table[hash] = true;
         }
 
-        counter.DisplayOverview(true);
-    }
+        double sizeMb = (double) (sizeof(int) * tableSize) / (1024 * 1024);
 
-    private static void test2()
-    {
-        Board board = Board.fromFen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
-        Move move = new Move(NotationConverter.toIndex("a1"), NotationConverter.toIndex("b1"));
-        board = board.makeMove(move);
-
-        move = new Move(NotationConverter.toIndex("e8"), NotationConverter.toIndex("g8"), 1);
-        board = board.makeMove(move);
-
-        // move = new Move(NotationConverter.toIndex("h6"), NotationConverter.toIndex("g8"));
-        // board = board.makeMove(move);
-
-        board.display();
-        ChessGUI.Create().OnChange(null, new ChessEventArgs(board));
-
-        MoveGenerator.perft(board, 2, true);
-
-    }
-
-    private static void test3()
-    {
-        int[] KNIGHT_OFFSETS2 = new int[] { -17, -15, -10, -6, 6, 10, 15, 17 };
-
-        foreach (int offset in KNIGHT_OFFSETS2)
-        {
-            Position pos = Position.toPosition(offset);
-            Console.WriteLine($"{offset}: {pos.x}, {pos.y}");
-        }
+        Console.WriteLine($"Number of collisions: {nCollisions}/1000, size:{sizeMb:F2}mb");
     }
 }

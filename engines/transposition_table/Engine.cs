@@ -1,7 +1,7 @@
 using chess;
 using counters;
 
-namespace iterative_deepening
+namespace transposition_table
 {
     public class Engine : chess.Engine
     {

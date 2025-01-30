@@ -133,11 +133,6 @@ namespace converter
             
             //get correct move
             List<Move> moves = MoveGenerator.generateAllMoves(board);
-            if (move.Equals("Rxb8"))
-            {
-                board.display();
-                Console.WriteLine($"to:{to}, {NotationConverter.toCoordinates(to)}");
-            }
             
             foreach(Move mv in moves)
             {

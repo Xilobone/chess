@@ -1,6 +1,6 @@
 using chess;
 
-namespace iterative_deepening
+namespace transposition_table
 {
     public class Evaluator : IEvaluator
     {

@@ -410,7 +410,7 @@ namespace chess
             Console.WriteLine();
 
             Console.WriteLine(toFen());
-            Console.WriteLine($"previous boards:{previousBoards.Count}");
+            Console.WriteLine($"Hash: {Zobrist.hash(this)}");
             if (isInCheck()) Console.WriteLine("Check!");
             if (isInMate())
             {
