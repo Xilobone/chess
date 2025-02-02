@@ -1,3 +1,4 @@
+using System.DirectoryServices.ActiveDirectory;
 using System.Reflection.Emit;
 using chess;
 using counters;
@@ -14,7 +15,7 @@ namespace transposition_table
 
         private float remainingTime;
 
-        private TranspositionItem[] transpositionTable;
+        private SearchResult[] transpositionTable;
 
         public Engine() : this(true) { }
 
@@ -27,7 +28,7 @@ namespace transposition_table
             generationTime = new Counter<long>("Generation time", "ms");
             counters.AddRange(evaluatedBoards, computationTime, evaluationTime, generationTime);
 
-            transpositionTable = new TranspositionItem[config.transpositionTableSize];
+            transpositionTable = new SearchResult[config.transpositionTableSize];
         }
 
         public override Move makeMove(Board board)
@@ -40,34 +41,37 @@ namespace transposition_table
             long startTime = getCurrentTime();
             remainingTime = maxTime;
 
-            Move? bestMove = null;
-            float bestValue = board.whiteToMove ? float.MinValue : float.MaxValue;
+            SearchResult bestResult = new SearchResult(board.whiteToMove ? float.MinValue : float.MaxValue, -1);
+            // Move? bestMove = null;
+            // float bestValue = board.whiteToMove ? float.MinValue : float.MaxValue;
 
             List<Move> moves = MoveGenerator.generateAllMoves(board);
 
             foreach (Move move in moves)
             {
-                float eval = Minimax(board.makeMove(move), config.maxDepth - 1, float.MinValue, float.MaxValue, !board.whiteToMove);
-                if (board.whiteToMove && eval > bestValue)
+                SearchResult result = Minimax(board.makeMove(move), config.maxDepth - 1, float.MinValue, float.MaxValue, !board.whiteToMove);
+                if (board.whiteToMove && result.evaluation > bestResult.evaluation)
                 {
-                    bestValue = eval;
-                    bestMove = move;
+                    bestResult = result;
                 }
-                else if (!board.whiteToMove && eval < bestValue)
+                else if (!board.whiteToMove && result.evaluation < bestResult.evaluation)
                 {
-                    bestValue = eval;
-                    bestMove = move;
+                    bestResult = result;
                 }
+
+                //add board to transposition table
+                int index = Zobrist.hash(board) & config.transpositionTableSize;
+                transpositionTable[index] = bestResult;
             }
 
             
 
             computationTime.Set(getCurrentTime() - startTime);
             clearCounters();
-            return bestMove!;
+            return bestResult.move!;
         }
 
-        public float maxi(Board board, int depth, float alpha, float beta)
+        public SearchResult maxi(Board board, int depth, float alpha, float beta)
         {
             float maxEval = float.MinValue;
             long startTime = getCurrentTime();
@@ -75,15 +79,27 @@ namespace transposition_table
             generationTime.Increment(getCurrentTime() - startTime);
             remainingTime -= getCurrentTime() - startTime;
 
+            Move? bestMove = null;
+
             foreach (Move move in moves)
             {
                 startTime = getCurrentTime();
                 Board resultingBoard = board.makeMove(move);
                 remainingTime -= getCurrentTime() - startTime;
 
-                float eval = Minimax(resultingBoard, depth - 1, alpha, beta, false);
-                maxEval = Math.Max(maxEval, eval);
-                alpha = Math.Max(alpha, eval);
+                SearchResult result = Minimax(resultingBoard, depth - 1, alpha, beta, false);
+
+                //add result to transposition table
+                int index = Zobrist.hash(resultingBoard) & config.transpositionTableSize;
+                transpositionTable[index] = result;
+
+                if (result.evaluation > maxEval)
+                {
+                    maxEval = result.evaluation;
+                    bestMove = result.move;
+                }
+
+                alpha = Math.Max(alpha, result.evaluation);
 
                 if (beta <= alpha)
                 {
@@ -91,10 +107,10 @@ namespace transposition_table
                 }
             }
 
-            return maxEval;
+            return new SearchResult(maxEval, depth, bestMove!);
         }
 
-        public float mini(Board board, int depth, float alpha, float beta)
+        public SearchResult mini(Board board, int depth, float alpha, float beta)
         {
             float minEval = float.MaxValue;
             long startTime = getCurrentTime();
@@ -102,26 +118,38 @@ namespace transposition_table
             generationTime.Increment(getCurrentTime() - startTime);
             remainingTime -= getCurrentTime() - startTime;
 
+            Move? bestMove = null;
+
             foreach (Move move in moves)
             {
                 startTime = getCurrentTime();
                 Board resultingBoard = board.makeMove(move);
                 remainingTime -= getCurrentTime() - startTime;
 
-                float eval = Minimax(resultingBoard, depth - 1, alpha, beta, true);
+                SearchResult result = Minimax(resultingBoard, depth - 1, alpha, beta, true);
 
-                minEval = Math.Min(minEval, eval);
-                beta = Math.Min(beta, eval);
+                //add result to transposition table
+                int index = Zobrist.hash(resultingBoard) & config.transpositionTableSize;
+                transpositionTable[index] = result;
+
+                if (result.evaluation < minEval)
+                {
+                    minEval = result.evaluation;
+                    bestMove = move;
+                }
+
+                beta = Math.Min(beta, result.evaluation);
 
                 if (beta <= alpha)
                 {
                     break;
                 }
             }
-            return minEval;
+
+            return new SearchResult(minEval, depth, bestMove!);
         }
 
-        public float Minimax(Board board, int depth, float alpha, float beta, bool isMaximizingPlayer)
+        public SearchResult Minimax(Board board, int depth, float alpha, float beta, bool isMaximizingPlayer)
         {
             long startTime;
 
@@ -133,9 +161,15 @@ namespace transposition_table
                 float eval = evaluator.evaluate(board);
                 evaluationTime.Increment(getCurrentTime() - startTime);
 
+                SearchResult result = new SearchResult(eval, 0);
+
+                //add board to transposition table
+                int index = Zobrist.hash(board) % config.transpositionTableSize;
+                transpositionTable[index] = result;
+
                 remainingTime -= getCurrentTime() - startTime;
 
-                return eval;
+                return result;
             }
 
             if (isMaximizingPlayer)
@@ -146,21 +180,6 @@ namespace transposition_table
             {
                 return mini(board, depth, alpha, beta);
             }
-        }
-
-        private class TranspositionItem
-        {
-            public Move bestMove { get; private set; }
-            public float evaluation { get; private set; }
-            public int searchedDepth { get; private set;  }
-
-            public TranspositionItem(Move bestMove, float evaluation, int searchedDepth)
-            {
-                this.bestMove = bestMove;
-                this.evaluation = evaluation;
-                this.searchedDepth = searchedDepth;
-            }
-
         }
     }
 }

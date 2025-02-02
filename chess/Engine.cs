@@ -25,10 +25,9 @@ namespace chess
             {
                 string configJson = File.ReadAllText($"./config/engines/{GetType().Namespace}.json");
                 config = JsonSerializer.Deserialize<EngineConfig>(configJson)!;
-
             } catch (IOException)
             {
-                config = new EngineConfig();
+                config = new EngineConfig(0,0);
             }
 
         // Deserialize JSON into a C# object
@@ -50,12 +49,21 @@ namespace chess
         public class SearchResult
         {
             public float evaluation;
+
+            public int searchedDepth;
             public Move? move;
 
-            public SearchResult(float evaluation, Move? move)
+            public SearchResult(float evaluation, int searchedDepth, Move move)
             {
                 this.evaluation = evaluation;
+                this.searchedDepth = searchedDepth;
                 this.move = move;
+            }
+
+            public SearchResult(float evaluation, int searchedDepth)
+            {
+                this.evaluation = evaluation;
+                this.searchedDepth = searchedDepth;
             }
         }
 
@@ -64,7 +72,11 @@ namespace chess
             public int maxDepth { get; private set; }
             public int transpositionTableSize { get; private set; }
 
-
+            public EngineConfig(int maxDepth, int transpositionTableSize)
+            {
+                this.maxDepth = maxDepth;
+                this.transpositionTableSize = transpositionTableSize;
+            }
         }
     }
 }
