@@ -15,7 +15,8 @@ namespace transposition_table
 
         private float remainingTime;
 
-        private SearchResult[] transpositionTable;
+        public SearchResult[] transpositionTable { get; private set; }
+        public int overwrittenSearchResults { get; private set; }
 
         public Engine() : this(true) { }
 
@@ -29,6 +30,7 @@ namespace transposition_table
             counters.AddRange(evaluatedBoards, computationTime, evaluationTime, generationTime);
 
             transpositionTable = new SearchResult[config.transpositionTableSize];
+            overwrittenSearchResults = 0;
         }
 
         public override Move makeMove(Board board)
@@ -60,7 +62,8 @@ namespace transposition_table
                 }
 
                 //add board to transposition table
-                int index = Zobrist.hash(board) & config.transpositionTableSize;
+                int index = Zobrist.hash(board) % config.transpositionTableSize;
+                if (transpositionTable[index] != null) overwrittenSearchResults++;
                 transpositionTable[index] = bestResult;
             }
 
@@ -90,7 +93,8 @@ namespace transposition_table
                 SearchResult result = Minimax(resultingBoard, depth - 1, alpha, beta, false);
 
                 //add result to transposition table
-                int index = Zobrist.hash(resultingBoard) & config.transpositionTableSize;
+                int index = Zobrist.hash(resultingBoard) % config.transpositionTableSize;
+                if (transpositionTable[index] != null) overwrittenSearchResults++;
                 transpositionTable[index] = result;
 
                 if (result.evaluation > maxEval)
@@ -129,7 +133,8 @@ namespace transposition_table
                 SearchResult result = Minimax(resultingBoard, depth - 1, alpha, beta, true);
 
                 //add result to transposition table
-                int index = Zobrist.hash(resultingBoard) & config.transpositionTableSize;
+                int index = Zobrist.hash(resultingBoard) % config.transpositionTableSize;
+                if (transpositionTable[index] != null) overwrittenSearchResults++;
                 transpositionTable[index] = result;
 
                 if (result.evaluation < minEval)
@@ -165,6 +170,7 @@ namespace transposition_table
 
                 //add board to transposition table
                 int index = Zobrist.hash(board) % config.transpositionTableSize;
+                if (transpositionTable[index] != null) overwrittenSearchResults++;
                 transpositionTable[index] = result;
 
                 remainingTime -= getCurrentTime() - startTime;

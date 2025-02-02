@@ -71,7 +71,7 @@ namespace minimax_engine
                 evaluationTime += getCurrentTime() - startTime;
 
                 remainingTime -= getCurrentTime() - startTime;
-                return new SearchResult(eval, null);
+                return new SearchResult(eval, 0);
             }
 
             float max = float.MinValue;
@@ -105,13 +105,13 @@ namespace minimax_engine
                 if (result.evaluation >= beta)
                 {
                     prunedBranches += moves.Count() - moves.IndexOf(move) - 1;
-                    return new SearchResult(result.evaluation, bestMove);
+                    return new SearchResult(result.evaluation, depth, bestMove!);
                 }
             }
 
 
             //Console.WriteLine("returning at end of maxi, move:" + bestMove);
-            return new SearchResult(max, bestMove);
+            return new SearchResult(max, depth, bestMove!);
         }
 
         private SearchResult mini(Board board, float alpha, float beta, int depth)
@@ -127,7 +127,7 @@ namespace minimax_engine
                 evaluationTime += getCurrentTime() - startTime;
 
                 remainingTime -= getCurrentTime() - startTime;
-                return new SearchResult(eval, null);
+                return new SearchResult(eval, 0);
             }
 
             float min = float.MaxValue;
@@ -160,11 +160,11 @@ namespace minimax_engine
                 if (result.evaluation <= alpha)
                 {
                     prunedBranches += moves.Count() - moves.IndexOf(move) - 1;
-                    return new SearchResult(result.evaluation, bestMove);
+                    return new SearchResult(result.evaluation, depth, bestMove!);
                 }
             }
 
-            return new SearchResult(min, bestMove);
+            return new SearchResult(min, depth, bestMove!);
         }
 
         private void displayOverview()

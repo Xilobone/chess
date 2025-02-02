@@ -70,7 +70,7 @@ namespace improved_minimax_engine
                 evaluationTime.Increment(getCurrentTime() - startTime);
 
                 remainingTime -= getCurrentTime() - startTime;
-                return new SearchResult(eval, null);
+                return new SearchResult(eval, 0);
             }
 
             float max = float.MinValue;
@@ -102,11 +102,11 @@ namespace improved_minimax_engine
 
                 if (result.evaluation >= beta)
                 {
-                    return new SearchResult(result.evaluation, bestMove);
+                    return new SearchResult(result.evaluation, depth, bestMove!);
                 }
             }
 
-            return new SearchResult(max, bestMove);
+            return new SearchResult(max, depth, bestMove!);
         }
 
         private SearchResult mini(Board board, float alpha, float beta, int depth)
@@ -122,7 +122,7 @@ namespace improved_minimax_engine
                 evaluationTime.Increment(getCurrentTime() - startTime);
 
                 remainingTime -= getCurrentTime() - startTime;
-                return new SearchResult(eval, null);
+                return new SearchResult(eval, 0);
             }
 
             float min = float.MaxValue;
@@ -154,11 +154,11 @@ namespace improved_minimax_engine
 
                 if (result.evaluation <= alpha)
                 {
-                    return new SearchResult(result.evaluation, bestMove);
+                    return new SearchResult(result.evaluation, depth, bestMove!);
                 }
             }
 
-            return new SearchResult(min, bestMove);
+            return new SearchResult(min, depth, bestMove!);
         }
     }
 }
