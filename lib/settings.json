@@ -1,1 +1,1 @@
-{"limitedTurns":false,"maxTurns":0,"limitedTime":false,"maxTime":0,"limitedTurnTime":true,"maxTurnTime":10000,"displayBoards":true,"requireInputAfterEachTurn":false}
+{"limitedTurns":false,"maxTurns":0,"limitedTime":false,"maxTime":0,"limitedTurnTime":true,"maxTurnTime":2500,"displayBoards":false,"requireInputAfterEachTurn":false}

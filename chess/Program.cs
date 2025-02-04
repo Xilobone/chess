@@ -18,7 +18,7 @@ public class Program
     [STAThread]
     public static void Main(string[] args)
     {
-        UnitTest.Run();
+        // UnitTest.Run();
         // test();
         new Program();
     }

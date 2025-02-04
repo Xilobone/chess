@@ -1,5 +1,3 @@
-using System.DirectoryServices.ActiveDirectory;
-using System.Reflection.Emit;
 using chess;
 using counters;
 
@@ -44,6 +42,7 @@ namespace transposition_table
             remainingTime = maxTime;
 
             SearchResult bestResult = new SearchResult(board.whiteToMove ? float.MinValue : float.MaxValue, -1);
+            Move bestMove = null;
 
             List<Move> moves = MoveGenerator.generateAllMoves(board);
 
@@ -53,10 +52,12 @@ namespace transposition_table
                 if (board.whiteToMove && result.evaluation > bestResult.evaluation)
                 {
                     bestResult = result;
+                    bestMove = move;
                 }
                 else if (!board.whiteToMove && result.evaluation < bestResult.evaluation)
                 {
                     bestResult = result;
+                    bestMove = move;
                 }
 
                 //add board to transposition table
@@ -69,7 +70,7 @@ namespace transposition_table
 
             computationTime.Set(getCurrentTime() - startTime);
             clearCounters();
-            return bestResult.move!;
+            return bestMove!;
         }
 
         public SearchResult maxi(Board board, int depth, float alpha, float beta)
@@ -155,6 +156,16 @@ namespace transposition_table
         public SearchResult Minimax(Board board, int depth, float alpha, float beta, bool isMaximizingPlayer)
         {
             long startTime;
+
+            // check if this board has been stored in the transposition table
+            // int index = Zobrist.hash(board) % config.transpositionTableSize;
+            // if (transpositionTable[index] != null)
+            // {
+            //     SearchResult storedResult = transpositionTable[index];
+
+            //     //return stored result if it has been searched to at least the desired depth
+            //     if(storedResult.searchedDepth >= depth) return storedResult;
+            // }
 
             if (depth == 0 || board.isInMate() || remainingTime <= 0)
             {
