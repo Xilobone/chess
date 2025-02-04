@@ -44,8 +44,6 @@ namespace transposition_table
             remainingTime = maxTime;
 
             SearchResult bestResult = new SearchResult(board.whiteToMove ? float.MinValue : float.MaxValue, -1);
-            // Move? bestMove = null;
-            // float bestValue = board.whiteToMove ? float.MinValue : float.MaxValue;
 
             List<Move> moves = MoveGenerator.generateAllMoves(board);
 
@@ -167,11 +165,6 @@ namespace transposition_table
                 evaluationTime.Increment(getCurrentTime() - startTime);
 
                 SearchResult result = new SearchResult(eval, 0);
-
-                //add board to transposition table
-                int index = Zobrist.hash(board) % config.transpositionTableSize;
-                if (transpositionTable[index] != null) overwrittenSearchResults++;
-                transpositionTable[index] = result;
 
                 remainingTime -= getCurrentTime() - startTime;
 
