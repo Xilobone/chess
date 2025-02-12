@@ -2,9 +2,6 @@ using System.Text.RegularExpressions;
 using chess;
 using chessPlayer;
 using chessTesting;
-using converter;
-using counters;
-using gui;
 using parser;
 
 public class Program
@@ -29,8 +26,7 @@ public class Program
         Console.WriteLine("0:   Run chess player");
         Console.WriteLine("1:   Run engine comparer");
         Console.WriteLine("2:   Run engine for a single position");
-        Console.WriteLine("3:   Launch the gui");
-        Console.Write("Type 0, 1, 2 or 3:");
+        Console.Write("Type 0, 1, or 2:");
 
         string? input = Console.ReadLine();
 
@@ -53,7 +49,6 @@ public class Program
             case 0: player.PlayFromUserInput(); break;
             case 1: EngineComparer.CompareFromUserInput(); break;
             case 2: EngineTester.testSinglePosition(); break;
-            case 3: ChessGUI.Create(player); selectSetup(); break;
             default: break;
         }
     }

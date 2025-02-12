@@ -1,5 +1,4 @@
 using chess;
-using gui;
 
 namespace chessPlayer
 {
