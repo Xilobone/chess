@@ -1,4 +1,5 @@
 using System.Text.Json;
+using chessPlayer;
 using counters;
 
 namespace chess
@@ -21,23 +22,26 @@ namespace chess
             this.evaluator = evaluator;
 
             //try to read config file
+            string configPath = $"{ChessPlayerSettings.DEFAULT_SETTINGS.configPath}\\engines\\{GetType().Namespace}.json";
             try
             {
-                string configJson = File.ReadAllText($"./config/engines/{GetType().Namespace}.json");
+                string configJson = File.ReadAllText(configPath);
                 config = JsonSerializer.Deserialize<EngineConfig>(configJson)!;
-            } catch (IOException)
+            }
+            catch (IOException)
             {
-                config = new EngineConfig(0,0);
+         
+                config = new EngineConfig(1, 1);
             }
 
-        // Deserialize JSON into a C# object
+            // Deserialize JSON into a C# object
         }
         public abstract Move makeMove(Board board);
         public abstract Move makeMove(Board board, float maxTime);
 
         protected void clearCounters()
         {
-            foreach(ICounter counter in counters)
+            foreach (ICounter counter in counters)
             {
                 counter.Reset();
             }

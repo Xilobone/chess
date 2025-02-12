@@ -42,7 +42,7 @@ namespace transposition_table
             remainingTime = maxTime;
 
             SearchResult bestResult = new SearchResult(board.whiteToMove ? float.MinValue : float.MaxValue, -1);
-            Move bestMove = null;
+            Move? bestMove = null;
 
             List<Move> moves = MoveGenerator.generateAllMoves(board);
 

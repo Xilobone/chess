@@ -23,6 +23,8 @@ namespace chessPlayer
 
         public bool requireInputAfterEachTurn { get; set; }
 
+        public string configPath { get; set; }
+
         /// <summary>
         /// Creates a new chess player settings object with the default values,
         /// values can be changed afterwards
@@ -32,6 +34,7 @@ namespace chessPlayer
             limitedTurns = maxTurns > 0;
             limitedTime = maxTime > 0;
             limitedTurnTime = maxTurnTime > 0;
+            configPath = "";
         }
 
         private static ChessPlayerSettings GetDefaultSettings()
@@ -104,6 +107,7 @@ namespace chessPlayer
             settings.limitedTime = settings.maxTime > 0;
             settings.limitedTurnTime = settings.maxTurnTime > 0;
 
+            settings.configPath = DEFAULT_SETTINGS.configPath;
             settings.DisplaySettings();
 
             //ask if the user wants to make the altered settings the new default
