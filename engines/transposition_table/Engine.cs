@@ -10,8 +10,7 @@ namespace transposition_table
         public Counter<long> evaluationTime { get; private set; }
         public Counter<long> generationTime { get; private set; }
 
-
-        private float remainingTime;
+        private long moveEndTime;
 
         public SearchResult[] transpositionTable { get; private set; }
         public int overwrittenSearchResults { get; private set; }
@@ -39,8 +38,7 @@ namespace transposition_table
         public override Move makeMove(Board board, float maxTime)
         {
             long startTime = getCurrentTime();
-            remainingTime = maxTime;
-
+            moveEndTime = getCurrentTime() + (long) maxTime;
             SearchResult bestResult = new SearchResult(board.whiteToMove ? float.MinValue : float.MaxValue, -1);
             Move? bestMove = null;
 
@@ -66,7 +64,7 @@ namespace transposition_table
                 transpositionTable[index] = bestResult;
             }
 
-            
+
 
             computationTime.Set(getCurrentTime() - startTime);
             clearCounters();
@@ -79,7 +77,6 @@ namespace transposition_table
             long startTime = getCurrentTime();
             List<Move> moves = MoveGenerator.generateAllMoves(board);
             generationTime.Increment(getCurrentTime() - startTime);
-            remainingTime -= getCurrentTime() - startTime;
 
             Move? bestMove = null;
 
@@ -87,7 +84,6 @@ namespace transposition_table
             {
                 startTime = getCurrentTime();
                 Board resultingBoard = board.makeMove(move);
-                remainingTime -= getCurrentTime() - startTime;
 
                 SearchResult result = Minimax(resultingBoard, depth - 1, alpha, beta, false);
 
@@ -119,7 +115,6 @@ namespace transposition_table
             long startTime = getCurrentTime();
             List<Move> moves = MoveGenerator.generateAllMoves(board);
             generationTime.Increment(getCurrentTime() - startTime);
-            remainingTime -= getCurrentTime() - startTime;
 
             Move? bestMove = null;
 
@@ -127,7 +122,6 @@ namespace transposition_table
             {
                 startTime = getCurrentTime();
                 Board resultingBoard = board.makeMove(move);
-                remainingTime -= getCurrentTime() - startTime;
 
                 SearchResult result = Minimax(resultingBoard, depth - 1, alpha, beta, true);
 
@@ -167,8 +161,14 @@ namespace transposition_table
             //     if(storedResult.searchedDepth >= depth) return storedResult;
             // }
 
-            if (depth == 0 || board.isInMate() || remainingTime <= 0)
+            if (depth == 0 || board.isInMate() || getCurrentTime() >= moveEndTime)
             {
+                string cause = "";
+                if (depth == 0) cause = "depth 0";
+                if (board.isInMate()) cause = "mate";
+                if (getCurrentTime() >= moveEndTime) cause = "out of time";
+                Console.WriteLine($"Reached end of node cause: {cause}, remaining time:{moveEndTime - getCurrentTime()}");
+
                 evaluatedBoards.Increment();
 
                 startTime = getCurrentTime();
@@ -176,8 +176,6 @@ namespace transposition_table
                 evaluationTime.Increment(getCurrentTime() - startTime);
 
                 SearchResult result = new SearchResult(eval, 0);
-
-                remainingTime -= getCurrentTime() - startTime;
 
                 return result;
             }

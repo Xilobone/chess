@@ -1,11 +1,1 @@
-{
-    "limitedTurns": false,
-    "maxTurns": 0,
-    "limitedTime": false,
-    "maxTime": 0,
-    "limitedTurnTime": true,
-    "maxTurnTime": 2500,
-    "displayBoards": false,
-    "requireInputAfterEachTurn": false,
-    "configPath": "C:\\Users\\milan\\csharp\\chess\\config"
-}
+{"limitedTurns":false,"maxTurns":0,"limitedTime":false,"maxTime":0,"limitedTurnTime":true,"maxTurnTime":2500,"displayBoards":true,"requireInputAfterEachTurn":true,"configPath":"C:\\Users\\milan\\csharp\\chess\\config"}

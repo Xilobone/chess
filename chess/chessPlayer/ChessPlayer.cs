@@ -74,6 +74,7 @@ namespace chessPlayer
                 }
                 Move move;
 
+                long moveStartTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                 //select correct player to make a move
                 switch ((board.whiteToMove, settings.limitedTurnTime))
                 {
@@ -84,7 +85,7 @@ namespace chessPlayer
                 }
 
                 if (settings.displayBoards) Console.WriteLine($"move: {move}");
-                
+                Console.WriteLine($"elapsed time: {DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - moveStartTime}ms");
                 board = board.makeMove(move);
 
                 onChange?.Invoke(this, new ChessEventArgs(board));
