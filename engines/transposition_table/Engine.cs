@@ -46,7 +46,7 @@ namespace transposition_table
             long startTime = getCurrentTime();
             moveEndTime = maxTime == float.MaxValue ? long.MaxValue : getCurrentTime() + (long)maxTime;
 
-            SearchResult bestResult = new SearchResult(board.whiteToMove ? float.MinValue : float.MaxValue, -1, board);
+            SearchResult bestResult = new SearchResult(board.whiteToMove ? float.MinValue : float.MaxValue, -1);
             Move? bestMove = null;
 
             List<Move> moves = MoveGenerator.generateAllMoves(board);
@@ -55,9 +55,6 @@ namespace transposition_table
                 Board resultingBoard = board.makeMove(move);
 
                 SearchResult result = Minimax(resultingBoard, config.maxDepth - 1, float.MinValue, float.MaxValue, !board.whiteToMove);
-
-
-                // Console.WriteLine($"move:{move}, eval:{result.evaluation}");
 
                 if (board.whiteToMove && result.evaluation > bestResult.evaluation)
                 {
@@ -72,17 +69,11 @@ namespace transposition_table
             }
 
             //add board to transposition table
-            addToTranspositionTable(board, new SearchResult(bestResult.evaluation, config.maxDepth, bestMove!, board));
+            addToTranspositionTable(board, new SearchResult(bestResult.evaluation, config.maxDepth, bestMove!));
 
             computationTime.Set(getCurrentTime() - startTime);
             clearCounters();
 
-            for (int i = 0; i < transpositionTable.Length; i++)
-            {
-                if (transpositionTable[i] == null) continue;
-
-                // Console.WriteLine($"index:{i}, {transpositionTable[i]}");
-            }
             return bestMove!;
         }
 
@@ -93,7 +84,6 @@ namespace transposition_table
             List<Move> moves = MoveGenerator.generateAllMoves(board);
             generationTime.Increment(getCurrentTime() - startTime);
 
-            SearchResult? bestResult = null;
             Move? bestMove = null;
 
             foreach (Move move in moves)
@@ -102,15 +92,11 @@ namespace transposition_table
                 Board resultingBoard = board.makeMove(move);
 
                 SearchResult result = Minimax(resultingBoard, depth - 1, alpha, beta, false);
-                // if (print) Console.WriteLine($"  move:{move}, eval:{result.evaluation}");
-                //add result to transposition table
-                // addToTranspositionTable(resultingBoard, result);
 
                 if (result.evaluation > maxEval)
                 {
                     maxEval = result.evaluation;
                     bestMove = result.move;
-                    bestResult = result;
                 }
 
                 alpha = Math.Max(alpha, result.evaluation);
@@ -121,7 +107,7 @@ namespace transposition_table
                 }
             }
 
-            SearchResult best = new SearchResult(maxEval, depth, bestMove!, board);
+            SearchResult best = new SearchResult(maxEval, depth, bestMove!);
             addToTranspositionTable(board, best);
             return best;
         }
@@ -133,7 +119,6 @@ namespace transposition_table
             List<Move> moves = MoveGenerator.generateAllMoves(board);
             generationTime.Increment(getCurrentTime() - startTime);
 
-            SearchResult? bestResult = null;
             Move? bestMove = null;
 
             foreach (Move move in moves)
@@ -142,16 +127,11 @@ namespace transposition_table
                 Board resultingBoard = board.makeMove(move);
 
                 SearchResult result = Minimax(resultingBoard, depth - 1, alpha, beta, true);
-                // if (print) Console.WriteLine($"move:{move}, eval:{result.evaluation}");
-
-                //add result to transposition table
-                // addToTranspositionTable(resultingBoard, result);
 
                 if (result.evaluation < minEval)
                 {
                     minEval = result.evaluation;
                     bestMove = move;
-                    bestResult = result;
                 }
 
                 beta = Math.Min(beta, result.evaluation);
@@ -162,7 +142,7 @@ namespace transposition_table
                 }
             }
 
-            SearchResult best = new SearchResult(minEval, depth, bestMove!, board);
+            SearchResult best = new SearchResult(minEval, depth, bestMove!);
             addToTranspositionTable(board, best);
             return best;
         }
@@ -182,7 +162,6 @@ namespace transposition_table
                 if (storedResult.searchedDepth >= depth)
                 {
                     // Console.WriteLine($"Found already computed result: {storedResult}, hash:{index}, board:");
-                    // board.display();
 
                     return storedResult;
                 }
@@ -190,19 +169,13 @@ namespace transposition_table
 
             if (depth == 0 || board.isInMate() || getCurrentTime() >= moveEndTime)
             {
-                // string cause = "";
-                // if (depth == 0) cause = "depth 0";
-                // if (board.isInMate()) cause = "mate";
-                // if (getCurrentTime() >= moveEndTime) cause = "out of time";
-                // Console.WriteLine($"Reached end of node cause: {cause}, remaining time:{moveEndTime - getCurrentTime()}");
-
                 evaluatedBoards.Increment();
 
                 startTime = getCurrentTime();
                 float eval = evaluator.evaluate(board);
                 evaluationTime.Increment(getCurrentTime() - startTime);
 
-                SearchResult result = new SearchResult(eval, 0, board);
+                SearchResult result = new SearchResult(eval, 0);
                 addToTranspositionTable(board, result);
                 return result;
             }
@@ -224,25 +197,13 @@ namespace transposition_table
             result.hash = hash;
             //there is already a result stored at the given index
             if (transpositionTable[index] != null)
-            {
-                //hash is the same but boards are different
-                if (!transpositionTable[index].board!.Equals(result.board) && transpositionTable[index].hash == result.hash)
-                {
-                    Console.WriteLine("HASH COLLISION:");
-                    hashCollisions.Increment();
-                    transpositionTable[index].board!.display();
-                    result.board!.display();
-                }
+            {   
+                //hash collision
+                if (transpositionTable[index].hash != result.hash) hashCollisions.Increment();
+
                 //the stored result has a greater depth than the new result, do not overrwide result
                 //if depth is equal prefer newer result
-                if (transpositionTable[index].searchedDepth > result.searchedDepth)
-                {
-                    return;
-                }
-                else //stored result has a lower depth than the new result, do override result
-                {
-                    overwrittenSearchResults++;
-                }
+                if (transpositionTable[index].searchedDepth > result.searchedDepth) return;
             }
 
             transpositionTableBoards.Increment();

@@ -57,7 +57,6 @@ namespace chess
             public int searchedDepth;
             public ulong hash;
             public Move? move;
-            public Board? board;
 
             public SearchResult(float evaluation, int searchedDepth, Move move)
             {
@@ -66,25 +65,10 @@ namespace chess
                 this.move = move;
             }
 
-            public SearchResult(float evaluation, int searchedDepth, Move move, Board board)
-            {
-                this.evaluation = evaluation;
-                this.searchedDepth = searchedDepth;
-                this.move = move;
-                this.board = board;
-            }
-
             public SearchResult(float evaluation, int searchedDepth)
             {
                 this.evaluation = evaluation;
                 this.searchedDepth = searchedDepth;
-            }
-
-            public SearchResult(float evaluation, int searchedDepth, Board board)
-            {
-                this.evaluation = evaluation;
-                this.searchedDepth = searchedDepth;
-                this.board = board;
             }
 
             public override string ToString()

@@ -43,21 +43,6 @@ namespace chessTesting
                 // counter.write();
                 counter.DisplayOverview(true);
             }
-
-            //show transposition table info
-            if (player.engine is transposition_table.Engine)
-            {
-                transposition_table.Engine engine = (transposition_table.Engine)player.engine;
-
-                int transpositionTableSize = 0;
-                foreach(Engine.SearchResult item in engine.transpositionTable)
-                {
-                    if (item != null) transpositionTableSize++;
-                }
-
-                Console.WriteLine($"transposition table: {transpositionTableSize}/{engine.transpositionTable.Length} used indexes ({(float) 100 * transpositionTableSize/engine.transpositionTable.Length:F2}%)");
-                Console.WriteLine($"{engine.overwrittenSearchResults} results are overwritten");
-            }
         }
 
         private static int getRepetitions()
