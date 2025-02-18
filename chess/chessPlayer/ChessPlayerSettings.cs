@@ -15,9 +15,9 @@ namespace chessPlayer
         public int maxTurns { get; set; }
 
         public bool limitedTime { get; set; }
-        public float maxTime { get; set; }
+        public int maxTime { get; set; }
         public bool limitedTurnTime { get; set; }
-        public float maxTurnTime { get; set; }
+        public int maxTurnTime { get; set; }
 
         public bool displayBoards { get; set; }
 
@@ -121,13 +121,15 @@ namespace chessPlayer
                 if (input == null) input = "";
             }
 
-            if (input.Equals("y"))
-            {
-                string json = JsonSerializer.Serialize(settings);
+            if (input.Equals("y")) writeAsDefault(settings);
 
-                File.WriteAllLines("lib/settings.json", [json]);
-            }
             return settings;
+        }
+
+        public static void writeAsDefault(ChessPlayerSettings settings)
+        {
+            string json = JsonSerializer.Serialize(settings);
+            File.WriteAllLines("lib/settings.json", [json]);
         }
 
         private static int AskUserForSetting(string setting)
