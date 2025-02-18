@@ -5,10 +5,6 @@ namespace improved_minimax_eval_engine
 {
     public class Engine : chess.Engine
     {
-        private const int MAX_DEPTH = 4;
-
-        private int depth;
-
         public Counter<int> evaluatedBoards { get; private set; }
         public Counter<long> computationTime { get; private set; }
         public Counter<long> evaluationTime { get; private set; }
@@ -17,14 +13,10 @@ namespace improved_minimax_eval_engine
 
         private float remainingTime;
 
-        public Engine() : this(true, MAX_DEPTH) { }
+        public Engine() : this(true) { }
 
-        public Engine(bool isWhite) : this(isWhite, MAX_DEPTH) { }
-
-        public Engine(bool isWhite, int depth) : base(isWhite, new Evaluator())
+        public Engine(bool isWhite) : base(isWhite, new Evaluator())
         {
-            this.depth = depth;
-
             evaluatedBoards = new Counter<int>("Evaluated boards");
             computationTime = new Counter<long>("Computation time", "ms");
             evaluationTime = new Counter<long>("Evaluation time", "ms");
@@ -39,6 +31,7 @@ namespace improved_minimax_eval_engine
 
         public override Move makeMove(Board board, float maxTime)
         {
+            Console.WriteLine(config.maxDepth);
             long startTime = getCurrentTime();
             remainingTime = maxTime;
 
@@ -47,7 +40,7 @@ namespace improved_minimax_eval_engine
 
             foreach (Move move in MoveGenerator.generateAllMoves(board))
             {
-                float eval = Minimax(board.makeMove(move), depth - 1, float.MinValue, float.MaxValue, !board.whiteToMove);
+                float eval = Minimax(board.makeMove(move), config.maxDepth - 1, float.MinValue, float.MaxValue, !board.whiteToMove);
                 if (board.whiteToMove && eval > bestValue)
                 {
                     bestValue = eval;

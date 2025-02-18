@@ -55,7 +55,9 @@ namespace chess
             public float evaluation;
 
             public int searchedDepth;
+            public ulong hash;
             public Move? move;
+            public Board? board;
 
             public SearchResult(float evaluation, int searchedDepth, Move move)
             {
@@ -64,19 +66,39 @@ namespace chess
                 this.move = move;
             }
 
+            public SearchResult(float evaluation, int searchedDepth, Move move, Board board)
+            {
+                this.evaluation = evaluation;
+                this.searchedDepth = searchedDepth;
+                this.move = move;
+                this.board = board;
+            }
+
             public SearchResult(float evaluation, int searchedDepth)
             {
                 this.evaluation = evaluation;
                 this.searchedDepth = searchedDepth;
+            }
+
+            public SearchResult(float evaluation, int searchedDepth, Board board)
+            {
+                this.evaluation = evaluation;
+                this.searchedDepth = searchedDepth;
+                this.board = board;
+            }
+
+            public override string ToString()
+            {
+                return $"evaluation:{evaluation}, depth:{searchedDepth}, best move:{move}";
             }
         }
 
         protected class EngineConfig
         {
             public int maxDepth { get; private set; }
-            public int transpositionTableSize { get; private set; }
+            public ulong transpositionTableSize { get; private set; }
 
-            public EngineConfig(int maxDepth, int transpositionTableSize)
+            public EngineConfig(int maxDepth, ulong transpositionTableSize)
             {
                 this.maxDepth = maxDepth;
                 this.transpositionTableSize = transpositionTableSize;

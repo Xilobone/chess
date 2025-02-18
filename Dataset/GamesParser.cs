@@ -57,18 +57,24 @@ namespace parser
 
             //select random boards
             List<Board> allBoards = boards.ToList();
-            List<Board> selectedBoards = new List<Board>();
+            // List<Board> selectedBoards = new List<Board>();
 
-            while (selectedBoards.Count < amount)
-            {
-                int index = random.Next(allBoards.Count);
-                Board board = allBoards[index];
+            // while (selectedBoards.Count < amount)
+            // {
+            //     int index = random.Next(allBoards.Count);
+            //     Board board = allBoards[index];
 
-                selectedBoards.Add(board);
-                allBoards.Remove(board);
-            }
+            //     selectedBoards.Add(board);
+            //     allBoards.Remove(board);
 
-            return selectedBoards;
+            //     if (selectedBoards.Count % 500 == 0)
+            //     {
+            //         Console.WriteLine($"populating list ({(float)100 * selectedBoards.Count / amount:F2}%)");
+            //     }
+            // }
+
+            // return selectedBoards;
+            return allBoards;
         }
 
         public List<Board> getAllPositions(string line, float range)

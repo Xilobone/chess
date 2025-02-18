@@ -24,9 +24,15 @@ namespace chessTesting
             board.display();
 
             Move? move = null;
-            for(int i = 0; i < repetitions; i++)
+            for (int i = 0; i < repetitions; i++)
             {
                 move = player.engine.makeMove(board);
+
+                if (player.engine is transposition_table.Engine)
+                {
+                    transposition_table.Engine engine = (transposition_table.Engine)player.engine;
+                    engine.clearTranspositionTable();
+                }
             }
 
             Console.WriteLine($"Selected move: {move}");
@@ -49,7 +55,7 @@ namespace chessTesting
                     if (item != null) transpositionTableSize++;
                 }
 
-                Console.WriteLine($"transposition table: {transpositionTableSize}/{engine.transpositionTable.Length} used indexes");
+                Console.WriteLine($"transposition table: {transpositionTableSize}/{engine.transpositionTable.Length} used indexes ({(float) 100 * transpositionTableSize/engine.transpositionTable.Length:F2}%)");
                 Console.WriteLine($"{engine.overwrittenSearchResults} results are overwritten");
             }
         }

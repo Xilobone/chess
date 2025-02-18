@@ -1,4 +1,5 @@
 using chess;
+using counters;
 
 namespace chessPlayer
 {
@@ -85,8 +86,16 @@ namespace chessPlayer
                 }
 
                 if (settings.displayBoards) Console.WriteLine($"move: {move}");
-                Console.WriteLine($"elapsed time: {DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - moveStartTime}ms");
+                // Console.WriteLine($"elapsed time: {DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - moveStartTime}ms");
                 board = board.makeMove(move);
+
+                if (!board.whiteToMove)
+                {
+                    foreach (ICounter c in white.engine.counters)
+                    {
+                        // c.DisplayOverview();
+                    }
+                }
 
                 onChange?.Invoke(this, new ChessEventArgs(board));
 
@@ -96,6 +105,7 @@ namespace chessPlayer
             board.display();
             Console.WriteLine("White's evaluation: " + white.evaluator.evaluate(board));
             Console.WriteLine("Black's evaluation: " + black.evaluator.evaluate(board));
+
 
             long time = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startTime;
             if (settings.displayBoards) Console.WriteLine($"total elapsed time: {time}ms");

@@ -118,9 +118,9 @@ namespace counters
             if (count > T.One)
             {
                 foreach (T v in history)
-                {   
-                    float dev = (float) Convert.ChangeType((v - avg),typeof(float));
-                    float num = (float) Convert.ChangeType(count,typeof(float)) - 1;
+                {
+                    float dev = (float)Convert.ChangeType((v - avg), typeof(float));
+                    float num = (float)Convert.ChangeType(count, typeof(float)) - 1;
                     stdDevSum += (dev * dev) / num;
                 }
             }
@@ -128,7 +128,7 @@ namespace counters
 
             stdDev = 0;
 
-            if (count > T.One) stdDev = (float) Math.Sqrt((double) stdDevSum);
+            if (count > T.One) stdDev = (float)Math.Sqrt((double)stdDevSum);
         }
 
         /// <summary>
@@ -222,19 +222,28 @@ namespace counters
         public static Counter<S> read<S>(string name) where S : struct, INumber<S>
         {
             string path = $"{BASE_FILE_PATH}{name}.cntr";
-            string[] lines = File.ReadAllLines(path);
-
             Counter<S> counter = new Counter<S>(name);
 
-            foreach (string line in lines)
+            try
             {
-                S value = S.Parse(line, null);
+                string[] lines = File.ReadAllLines(path);
 
-                counter.Set(value);
-                counter.Reset();
+
+                foreach (string line in lines)
+                {
+                    S value = S.Parse(line, null);
+
+                    counter.Set(value);
+                    counter.Reset();
+                }
+
+                return counter;
+            }
+            catch (IOException)
+            {
+                return counter;
             }
 
-            return counter;
         }
 
         /// <summary>

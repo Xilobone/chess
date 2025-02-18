@@ -16,7 +16,7 @@ namespace chessTesting
             //get list of boards to play
             IEvaluator[] evaluators = new IEvaluator[] { new deep_minimax_engine.Evaluator() };
             GamesParser parser = new GamesParser("./lib/chess_games.pgn", evaluators, 1);
-            List<Board> boards = parser.parse(300, 20, 0.1f);
+            List<Board> boards = parser.parse(300, 10, 0.1f);
 
             int winsWhite = 0;
             int winsBlack = 0;

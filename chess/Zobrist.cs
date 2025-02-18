@@ -2,23 +2,26 @@ namespace chess
 {
     public static class Zobrist
     {
-        private static int[,] pieceHash = new int[64,12];
-        private static int[] conditionsHash = new int[13];
+        private static ulong[,] pieceHash = new ulong[64, 12];
+        private static ulong[] conditionsHash = new ulong[13];
 
         static Zobrist()
         {
-            Random random = new Random(0);
-            for(int pos = 0; pos < 64; pos++)
+            Random random = new Random(2);
+            for (int pos = 0; pos < 64; pos++)
             {
                 for (int piece = 0; piece < 12; piece++)
                 {
-                    pieceHash[pos, piece] = random.Next();
+                    pieceHash[pos, piece] = (ulong)random.NextInt64();
+                    // Console.WriteLine($"hashing value ({pos},{piece}):{pieceHash[pos, piece]}");
                 }
             }
 
-            for(int condition = 0; condition < 13; condition++)
+            for (int condition = 0; condition < 13; condition++)
             {
-                conditionsHash[condition] = random.Next();
+                conditionsHash[condition] = (ulong)random.NextInt64();
+                // Console.WriteLine($"hashing value ({condition}):{conditionsHash[condition]}");
+                
             }
         }
 
@@ -27,11 +30,11 @@ namespace chess
         /// </summary>
         /// <param name="board">The board to hash</param>
         /// <returns>a hash of the board</returns>
-        public static int hash(Board board)
+        public static ulong hash(Board board)
         {
-            int hash = 0;
+            ulong hash = 0;
 
-            for(int index = 0; index < 64; index++)
+            for (int index = 0; index < 64; index++)
             {
                 int piece = board.getPiece(index);
 
@@ -46,7 +49,7 @@ namespace chess
                 hash ^= conditionsHash[0];
             }
 
-            for(int i = 0; i < board.castlingOptions.Length; i++)
+            for (int i = 0; i < board.castlingOptions.Length; i++)
             {
                 if (board.castlingOptions[i])
                 {
