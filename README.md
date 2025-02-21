@@ -6,16 +6,17 @@ algorithm with alpa beta pruning to play. After the deadline for this project pa
 to make an engine that will outplay me (not that I'm that good of a chess player, about 1100 elo on chess.com).
 
 One of the first things that got changed after the initial project was the switch from Python to C#. This change alone doubled the efficiency of the program. The program has also been expanded with other features, such as a gui and testing environment for engine comparisons
-and engine efficiency testing. The most recent version of the engine uses a minimax algorithm with alpha-beta pruning with a max search depth of 3 ply.
+and engine efficiency testing. The most recent version of the engine uses a minimax algorithm with alpha-beta pruning with a max search depth of 4 ply and makes use of a transposition table.
 
 # Program features
 - Console application
-- Graphical user interface (gui), currently view-only
 - Ability to play player-to-player, player-to-engine or engine-to-engine
 - Application to compare two engines to each other, by means of playing X games from positions played on lichess.com
 - Application to test the efficiency of an engine for a single test position
+- Graphical user interface (gui), seperated in a different project: [chessgui repo](https://github.com/Xilobone/chessgui)
 
 # Features
 - Minimax algorithm
 - Alpha-beta pruning
 - Bitboards
+- Transposition table
