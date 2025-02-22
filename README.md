@@ -19,4 +19,11 @@ and engine efficiency testing. The most recent version of the engine uses a mini
 - Minimax algorithm
 - Alpha-beta pruning
 - Bitboards
-- Transposition table
+- Transposition table with Zobrist hashing
+
+# Planned features
+- Move ordering
+- Iterative deepening
+
+# Not planned features (for the time being)
+- Pondering, would require a complete rework of the chess player, requiring each engine to run on its own thread. It is also ambiguous how to divide resources.
