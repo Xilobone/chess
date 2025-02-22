@@ -202,8 +202,7 @@ namespace transposition_table
                 if (transpositionTable[index].hash != result.hash) hashCollisions.Increment();
 
                 //the stored result has a greater depth than the new result, do not overrwide result
-                //if depth is equal prefer newer result
-                if (transpositionTable[index].searchedDepth > result.searchedDepth) return;
+                if (transpositionTable[index].searchedDepth < result.searchedDepth) return;
             }
 
             transpositionTableBoards.Increment();

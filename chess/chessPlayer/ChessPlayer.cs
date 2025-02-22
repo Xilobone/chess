@@ -18,6 +18,8 @@ namespace chessPlayer
 
         public EventHandler<ChessEventArgs>? onChange;
 
+        private bool isRunning;
+
         public ChessPlayer()
         {
 
@@ -36,6 +38,8 @@ namespace chessPlayer
             this.white.engine.isWhite = true;
             this.black.engine.isWhite = false;
 
+            isRunning = false;
+
         }
 
         public GameResult Play()
@@ -51,6 +55,7 @@ namespace chessPlayer
                 return new GameResult(0, 0);
             }
 
+            isRunning = true;
             board = Board.fromFen(fen);
             onChange?.Invoke(this, new ChessEventArgs(board));
 
@@ -86,7 +91,6 @@ namespace chessPlayer
                 }
 
                 if (settings.displayBoards) Console.WriteLine($"move: {move}");
-                // Console.WriteLine($"elapsed time: {DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - moveStartTime}ms");
                 board = board.makeMove(move);
 
                 if (!board.whiteToMove)
@@ -120,6 +124,11 @@ namespace chessPlayer
                 return false;
             }
 
+            if (!isRunning)
+            {
+                return true;
+            }
+
             if (board.isInMate() || board.isInDraw())
             {
                 return true;
@@ -151,6 +160,11 @@ namespace chessPlayer
             if (string.IsNullOrEmpty(fen)) Play();
             else Play(fen);
 
+        }
+
+        public void Stop()
+        {
+            isRunning = false;
         }
     }
 

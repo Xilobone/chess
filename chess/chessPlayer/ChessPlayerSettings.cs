@@ -41,7 +41,8 @@ namespace chessPlayer
         {
             if (_DEFAULT_SETTINGS != null) return _DEFAULT_SETTINGS;
 
-            string[] str = File.ReadAllLines("lib/settings.json");
+            string basePath = $"{AppDomain.CurrentDomain.BaseDirectory}/../../..";
+            string[] str = File.ReadAllLines($"{basePath}/lib/settings.json");
 
             string json = "";
 
