@@ -5,10 +5,6 @@ namespace improved_minimax_engine
 {
     public class Engine : chess.Engine
     {
-        private const int MAX_DEPTH = 4;
-
-        private int depth;
-
         public Counter<int> evaluatedBoards { get; private set; }
         public Counter<long> computationTime { get; private set; }
         public Counter<long> evaluationTime { get; private set; }
@@ -16,13 +12,12 @@ namespace improved_minimax_engine
 
         private float remainingTime;
 
-        public Engine() : this(true, MAX_DEPTH) { }
+        public Engine() : this(true) { }
 
-        public Engine(bool isWhite) : this(isWhite, MAX_DEPTH) { }
 
-        public Engine(bool isWhite, int depth) : base(isWhite, new Evaluator())
+        public Engine(bool isWhite) : base(isWhite, new Evaluator())
         {
-            this.depth = depth;
+            // this.depth = depth;
 
             evaluatedBoards = new Counter<int>("Evaluated boards");
             computationTime = new Counter<long>("Computation time", "ms");
@@ -44,11 +39,11 @@ namespace improved_minimax_engine
             SearchResult result;
             if (isWhite)
             {
-                result = maxi(board, float.MinValue, float.MaxValue, depth);
+                result = maxi(board, float.MinValue, float.MaxValue, config.maxDepth);
             }
             else
             {
-                result = mini(board, float.MinValue, float.MaxValue, depth);
+                result = mini(board, float.MinValue, float.MaxValue, config.maxDepth);
             }
 
             computationTime.Set(getCurrentTime() - startTime);

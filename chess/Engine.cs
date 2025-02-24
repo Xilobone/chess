@@ -1,6 +1,8 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using chessPlayer;
 using counters;
+
 
 namespace chess
 {
@@ -22,20 +24,35 @@ namespace chess
             this.evaluator = evaluator;
 
             //try to read config file
-            string configPath = $"{ChessPlayerSettings.DEFAULT_SETTINGS.configPath}\\engines\\{GetType().Namespace}.json";
+            string configPath = $"{ChessPlayerSettings.DEFAULT_SETTINGS.configPath}\\engines\\";
+
+            JsonNode? defaultConfig = JsonNode.Parse(File.ReadAllText($"{configPath}engine.json"));
+            JsonNode? engineConfig = null;
             try
             {
-                string configJson = File.ReadAllText(configPath);
-                config = JsonSerializer.Deserialize<EngineConfig>(configJson)!;
+                engineConfig = JsonNode.Parse(File.ReadAllText($"{configPath}{GetType().Namespace}.json"));
             }
-            catch (IOException)
+            catch (IOException) { }
+
+            JsonNode mergedJson = MergeJson(defaultConfig, engineConfig);
+            config = JsonSerializer.Deserialize<EngineConfig>(mergedJson)!;
+        }
+
+        static JsonNode MergeJson(JsonNode? main, JsonNode? implementation)
+        {
+            if (main is not JsonObject mainObj || implementation is not JsonObject implObj)
+                return main ?? implementation ?? new JsonObject();
+
+            JsonObject result = JsonSerializer.Deserialize<JsonObject>(mainObj.ToJsonString())!;
+
+            foreach (var prop in implObj)
             {
-         
-                config = new EngineConfig(1, 1);
+                result[prop.Key] = prop.Value?.DeepClone();
             }
 
-            // Deserialize JSON into a C# object
+            return result;
         }
+
         public abstract Move makeMove(Board board);
         public abstract Move makeMove(Board board, float maxTime);
 
@@ -80,11 +97,13 @@ namespace chess
         protected class EngineConfig
         {
             public int maxDepth { get; private set; }
+            public bool hasTranspositionTable { get; private set; }
             public ulong transpositionTableSize { get; private set; }
 
-            public EngineConfig(int maxDepth, ulong transpositionTableSize)
+            public EngineConfig(int maxDepth, bool hasTranspositionTable, ulong transpositionTableSize)
             {
                 this.maxDepth = maxDepth;
+                this.hasTranspositionTable = hasTranspositionTable;
                 this.transpositionTableSize = transpositionTableSize;
             }
         }

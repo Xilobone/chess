@@ -5,9 +5,6 @@ namespace deep_minimax_engine
 {
     public class Engine : chess.Engine
     {
-        private const int MAX_DEPTH = 3;
-
-        private int depth;
         private int evaluatedBoards;
         private long computationTime;
         private long evaluationTime;
@@ -15,14 +12,11 @@ namespace deep_minimax_engine
         private int prunedBranches;
         private float remainingTime;
 
-        public Engine() : this(true, MAX_DEPTH) { }
+        public Engine() : this(true) { }
 
-        public Engine(bool isWhite) : this(isWhite, MAX_DEPTH) { }
 
-        public Engine(bool isWhite, int depth) : base(isWhite, new Evaluator())
+        public Engine(bool isWhite) : base(isWhite, new Evaluator())
         {
-            this.depth = depth;
-
             evaluatedBoards = 0;
             computationTime = 0;
             evaluationTime = 0;
@@ -43,11 +37,11 @@ namespace deep_minimax_engine
             if (isWhite)
             {
                 //Console.WriteLine("running maxi");
-                result = maxi(board, float.MinValue, float.MaxValue, depth);
+                result = maxi(board, float.MinValue, float.MaxValue, config.maxDepth);
             }
             else
             {
-                result = mini(board, float.MinValue, float.MaxValue, depth);
+                result = mini(board, float.MinValue, float.MaxValue, config.maxDepth);
             }
 
             computationTime = getCurrentTime() - startTime;
@@ -58,7 +52,6 @@ namespace deep_minimax_engine
                 clearIntCounters();
             }
 
-            //Console.WriteLine(result.move);
             return result.move!;
         }
 

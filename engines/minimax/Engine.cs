@@ -5,8 +5,7 @@ namespace minimax_engine
     public class Engine : chess.Engine
     {
 
-        private const int MAX_DEPTH = 2;
-        private int depth;
+        // private const int MAX_DEPTH = 2;
         private int evaluatedBoards;
         private long computationTime;
         private long evaluationTime;
@@ -14,14 +13,10 @@ namespace minimax_engine
         private int prunedBranches;
 
         private float remainingTime;        
-        public Engine() : this(true, MAX_DEPTH) { }
+        public Engine() : this(true) { }
 
-        public Engine(bool isWhite) : this(isWhite, MAX_DEPTH) { }
-
-        public Engine(bool isWhite, int depth) : base(isWhite, new Evaluator())
+        public Engine(bool isWhite) : base(isWhite, new Evaluator())
         {
-            this.depth = depth;
-
             evaluatedBoards = 0;
             computationTime = 0;
             evaluationTime = 0;
@@ -41,11 +36,11 @@ namespace minimax_engine
             SearchResult result;
             if (isWhite)
             {
-                result = maxi(board, float.MinValue, float.MaxValue, depth);
+                result = maxi(board, float.MinValue, float.MaxValue, config.maxDepth);
             }
             else
             {
-                result = mini(board, float.MinValue, float.MaxValue, depth);
+                result = mini(board, float.MinValue, float.MaxValue, config.maxDepth);
             }
 
             computationTime = getCurrentTime() - startTime;
@@ -109,8 +104,6 @@ namespace minimax_engine
                 }
             }
 
-
-            //Console.WriteLine("returning at end of maxi, move:" + bestMove);
             return new SearchResult(max, depth, bestMove!);
         }
 
