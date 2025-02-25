@@ -23,34 +23,13 @@ namespace chess
             this.isWhite = isWhite;
             this.evaluator = evaluator;
 
-            //try to read config file
+            //read config file
             string configPath = $"{ChessPlayerSettings.DEFAULT_SETTINGS.configPath}\\engines\\";
+            string engineConfig = $"{configPath}{GetType().Namespace}.json";
 
-            JsonNode? defaultConfig = JsonNode.Parse(File.ReadAllText($"{configPath}engine.json"));
-            JsonNode? engineConfig = null;
-            try
-            {
-                engineConfig = JsonNode.Parse(File.ReadAllText($"{configPath}{GetType().Namespace}.json"));
-            }
-            catch (IOException) { }
+            string json = File.Exists(engineConfig) ? File.ReadAllText(engineConfig) : File.ReadAllText($"{configPath}default.json");
 
-            JsonNode mergedJson = MergeJson(defaultConfig, engineConfig);
-            config = JsonSerializer.Deserialize<EngineConfig>(mergedJson)!;
-        }
-
-        static JsonNode MergeJson(JsonNode? main, JsonNode? implementation)
-        {
-            if (main is not JsonObject mainObj || implementation is not JsonObject implObj)
-                return main ?? implementation ?? new JsonObject();
-
-            JsonObject result = JsonSerializer.Deserialize<JsonObject>(mainObj.ToJsonString())!;
-
-            foreach (var prop in implObj)
-            {
-                result[prop.Key] = prop.Value?.DeepClone();
-            }
-
-            return result;
+            config = JsonSerializer.Deserialize<EngineConfig>(json)!;
         }
 
         public abstract Move makeMove(Board board);

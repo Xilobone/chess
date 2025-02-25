@@ -1,5 +1,5 @@
 {
-    "maxDepth": 4,
+    "maxDepth": 1,
     "hasTranspositionTable": false,
     "transpositionTableSize": 0
 }
