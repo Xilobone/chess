@@ -2,7 +2,7 @@ using chess;
 
 namespace minimax_engine
 {
-    public class Engine : chess.Engine
+    public class Engine : chess.engine.Engine
     {
 
         // private const int MAX_DEPTH = 2;

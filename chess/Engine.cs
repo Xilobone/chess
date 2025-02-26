@@ -4,7 +4,7 @@ using chessPlayer;
 using counters;
 
 
-namespace chess
+namespace chess.engine
 {
     public abstract class Engine
     {
@@ -35,6 +35,9 @@ namespace chess
         public abstract Move makeMove(Board board);
         public abstract Move makeMove(Board board, float maxTime);
 
+        /// <summary>
+        /// Clears the value of all counters of the engine
+        /// </summary>
         protected void clearCounters()
         {
             foreach (ICounter counter in counters)
@@ -42,6 +45,11 @@ namespace chess
                 counter.Reset();
             }
         }
+
+        /// <summary>
+        /// Gets the current time (in ms)
+        /// </summary>
+        /// <returns>A long indicating the current time from the Epoch</returns>
         protected long getCurrentTime()
         {
             return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();

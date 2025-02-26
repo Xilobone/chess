@@ -2,7 +2,7 @@ using chess;
 
 namespace player
 {
-    public class Player : Engine
+    public class Player : chess.engine.Engine
     {
         public Player() : base(true, new Evaluator()) { }
 

@@ -1,5 +1,6 @@
 namespace chess
 {
+    using engine;
     public class Player
     {
         public string name { get; private set; }

@@ -3,7 +3,7 @@ using counters;
 
 namespace improved_minimax_engine
 {
-    public class Engine : chess.Engine
+    public class Engine : chess.engine.Engine
     {
         public Counter<int> evaluatedBoards { get; private set; }
         public Counter<long> computationTime { get; private set; }
@@ -17,7 +17,6 @@ namespace improved_minimax_engine
 
         public Engine(bool isWhite) : base(isWhite, new Evaluator())
         {
-            // this.depth = depth;
 
             evaluatedBoards = new Counter<int>("Evaluated boards");
             computationTime = new Counter<long>("Computation time", "ms");

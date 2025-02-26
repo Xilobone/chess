@@ -3,7 +3,7 @@ using counters;
 
 namespace improved_minimax_eval_engine
 {
-    public class Engine : chess.Engine
+    public class Engine : chess.engine.Engine
     {
         public Counter<int> evaluatedBoards { get; private set; }
         public Counter<long> computationTime { get; private set; }

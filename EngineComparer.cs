@@ -14,7 +14,7 @@ namespace chessTesting
 
             ChessPlayerSettings settings = ChessPlayerSettings.AskUserForSettings();
             //get list of boards to play
-            IEvaluator[] evaluators = new IEvaluator[] { new deep_minimax_engine.Evaluator() };
+            IEvaluator[] evaluators = new IEvaluator[] { new minimax_engine.Evaluator() };
             GamesParser parser = new GamesParser("./lib/chess_games.pgn", evaluators, 1);
             List<Board> boards = parser.parse(300, 10, 0.1f);
 
@@ -25,10 +25,8 @@ namespace chessTesting
             //swap players each turn to eliminate white's base advantage
             //currently not implemented, lead to bugs, lookat another time
             // bool swapped = false;
-
             foreach(Board board in boards)
             {
-
                 ChessPlayer chessPlayer = new ChessPlayer(white, black, settings);
                 
                 GameResult gameResult = chessPlayer.Play(board.toFen());
