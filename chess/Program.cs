@@ -1,4 +1,3 @@
-using System.CodeDom.Compiler;
 using System.Text.RegularExpressions;
 using chess;
 using chessPlayer;
@@ -16,7 +15,7 @@ public class Program
     [STAThread]
     public static void Main(string[] args)
     {
-        UnitTest.Run();
+        // UnitTest.Run();
         // test();
         new Program();
     }
