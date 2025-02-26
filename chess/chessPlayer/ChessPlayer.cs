@@ -1,3 +1,4 @@
+using System.Security.Cryptography.X509Certificates;
 using chess;
 using counters;
 
@@ -63,6 +64,7 @@ namespace chessPlayer
             whiteStarted = board.whiteToMove;
             runningTime = 0;
             long startTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            List<Move> playedMoves = new List<Move>();
             //runs the game
             while (!stopConditionMet())
             {
@@ -92,20 +94,14 @@ namespace chessPlayer
 
                 if (settings.displayBoards) Console.WriteLine($"move: {move}");
                 board = board.makeMove(move);
-
-                if (!board.whiteToMove)
-                {
-                    foreach (ICounter c in white.engine.counters)
-                    {
-                        // c.DisplayOverview();
-                    }
-                }
+                playedMoves.Add(move);
 
                 onChange?.Invoke(this, new ChessEventArgs(board));
 
                 runningTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startTime;
             }
 
+            //game has finished
             board.display();
             Console.WriteLine("White's evaluation: " + white.evaluator.evaluate(board));
             Console.WriteLine("Black's evaluation: " + black.evaluator.evaluate(board));
@@ -114,7 +110,9 @@ namespace chessPlayer
             long time = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startTime;
             if (settings.displayBoards) Console.WriteLine($"total elapsed time: {time}ms");
 
-            return GameResult.GetResult(board, white, black);
+            GameResult result = GameResult.GetResult(board, white, black);
+            Logger.LogGame(white, black, fen, result, playedMoves);
+            return result;
         }
 
         private bool stopConditionMet()
