@@ -4,17 +4,42 @@ using counters;
 
 namespace transposition_table
 {
+    /// <summary>
+    /// Engine that makes use of a minimax algorithm and a transposition table in order to find the best
+    /// moves on a given board
+    /// </summary>
     public class Engine : TTEngine
     {
+        /// <summary>
+        /// Counter that stores the amount of boards that are evaluated for each move
+        /// </summary>
         public Counter<int> evaluatedBoards { get; private set; }
+
+        /// <summary>
+        /// Counter that stores the computation time (in ms) for each move
+        /// </summary>
         public Counter<long> computationTime { get; private set; }
+
+        /// <summary>
+        /// Counter that stores the time (in ms) spent evaluating for each move
+        /// </summary>
         public Counter<long> evaluationTime { get; private set; }
+
+        /// <summary>
+        /// Counter that stored the time (in ms) spent generating moves for each move
+        /// </summary>
         public Counter<long> generationTime { get; private set; }
         private long moveEndTime;
 
+        /// <summary>
+        /// Creates a new transposition table engine that optimizes moves for the white player
+        /// </summary>
         public Engine() : this(true) { }
 
-
+        /// <summary>
+        /// Createst a new transposition table engine that optimizes for the selected player
+        /// </summary>
+        /// <param name="isWhite">true if optimizing for white, false for black</param>
         public Engine(bool isWhite) : base(isWhite, new Evaluator())
         {
             evaluatedBoards = new Counter<int>("Evaluated boards");
@@ -24,11 +49,22 @@ namespace transposition_table
             counters.AddRange(evaluatedBoards, computationTime, evaluationTime, generationTime);
         }
 
+        /// <summary>
+        /// Computes the best move to make for the given board
+        /// </summary>
+        /// <param name="board">The board to compute the best possible move for</param>
+        /// <returns>The best possible move on the board</returns>
         public override Move makeMove(Board board)
         {
             return makeMove(board, float.MaxValue);
         }
 
+        /// <summary>
+        /// Computes the best move to make for the current board, spends at most maxTime time computing
+        /// </summary>
+        /// <param name="board">The board to compute the best possible move for</param>
+        /// <param name="maxTime">The maximum amount of allowed computation time (in ms)</param>
+        /// <returns>The best found move</returns>
         public override Move makeMove(Board board, float maxTime)
         {
             long startTime = getCurrentTime();
@@ -65,7 +101,7 @@ namespace transposition_table
             return bestMove!;
         }
 
-        public SearchResult maxi(Board board, int depth, float alpha, float beta)
+        private SearchResult maxi(Board board, int depth, float alpha, float beta)
         {
             float maxEval = float.MinValue;
             long startTime = getCurrentTime();
@@ -100,7 +136,7 @@ namespace transposition_table
             return best;
         }
 
-        public SearchResult mini(Board board, int depth, float alpha, float beta)
+        private SearchResult mini(Board board, int depth, float alpha, float beta)
         {
             float minEval = float.MaxValue;
             long startTime = getCurrentTime();
@@ -135,7 +171,7 @@ namespace transposition_table
             return best;
         }
 
-        public SearchResult Minimax(Board board, int depth, float alpha, float beta, bool isMaximizingPlayer)
+        private SearchResult Minimax(Board board, int depth, float alpha, float beta, bool isMaximizingPlayer)
         {
             long startTime;
 

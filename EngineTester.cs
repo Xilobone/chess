@@ -3,9 +3,15 @@ using chess;
 using counters;
 
 namespace chessTesting 
-{
-    public class EngineTester
+{   
+    /// <summary>
+    /// Class used for testing the performance of a standalone engine
+    /// </summary>
+    public static class EngineTester
     {   
+        /// <summary>
+        /// Tests the performance of a engine for one position, writes the engines counters to the console
+        /// </summary>
         public static void testSinglePosition()
         {
             Player player = PlayerList.selectPlayer(true);
@@ -37,7 +43,7 @@ namespace chessTesting
             Console.WriteLine($"Selected move: {move}");
 
             //show counter with differences from baseline
-            foreach(ICounter counter in player.engine.counters)
+            foreach (ICounter counter in player.engine.counters)
             {
                 // counter.write();
                 counter.DisplayOverview(true);

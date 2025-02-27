@@ -4,14 +4,26 @@ using chessPlayer;
 using chessTesting;
 using parser;
 
+/// <summary>
+/// The program reads user input from the console and runs the corresponding functionallity
+/// </summary>
 public class Program
 {
     private ChessPlayer player;
+
+    /// <summary>
+    /// Creates a new program
+    /// </summary>
     public Program()
     {
         player = new ChessPlayer();
         selectSetup();
     }
+
+    /// <summary>
+    /// Entrypoint of the application
+    /// </summary>
+    /// <param name="args">Arguments to run the application with, can be used to skip parts of the questionnaire</param>
     [STAThread]
     public static void Main(string[] args)
     {
