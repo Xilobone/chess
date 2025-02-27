@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+using chess.engine;
 using chessPlayer;
 
 namespace chess
@@ -17,13 +19,35 @@ namespace chess
         /// <param name="startFen">The starting position of the game</param>
         /// <param name="result">The result of the game</param>
         /// <param name="playedMoves">The series of moves played in the game</param>
-        public static void LogGame(Player white, Player black, string startFen, GameResult result, List<Move> playedMoves)
+        /// <param name="settings">The chess player settings the game was played with</param>
+        public static void LogGame(Player white, Player black, string startFen, GameResult result, List<Move> playedMoves, ChessPlayerSettings settings)
         {
             string timestamp = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}]";
 
             StreamWriter writer = File.AppendText(filePath);
-            writer.Write($"{timestamp} players: {white.GetType().Namespace}, {black.GetType().Namespace}");
-            writer.Write($"{timestamp} starting position: {startFen}");
+
+            //log the players
+            string whiteName = white.engine.GetType().Namespace!;
+            string blackName = black.engine.GetType().Namespace!;
+            writer.WriteLine($"{timestamp} players: {whiteName}, {blackName}");
+
+            //log the settings
+            writer.WriteLine($"{timestamp} settings: {settings}");
+
+            //log the player configs
+            writer.WriteLine($"{timestamp} white config: ({white.engine.config})");
+            writer.WriteLine($"{timestamp} white config: ({black.engine.config})");
+
+            writer.WriteLine($"{timestamp} starting position: {startFen}");
+
+            string moves = "";
+            foreach (Move move in playedMoves)
+            {
+                moves += $"{move} ";
+            }
+
+            writer.WriteLine($"{timestamp} moves: {moves}");
+            writer.WriteLine($"{timestamp} result: {result}");
             writer.Close();
         }
     }

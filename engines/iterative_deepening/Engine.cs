@@ -33,9 +33,6 @@ namespace iterative_deepening
             long startTime = getCurrentTime();
             moveEndTime = maxTime == float.MaxValue ? long.MaxValue : getCurrentTime() + (long)maxTime;
 
-            // SearchResult bestResult = new SearchResult(board.whiteToMove ? float.MinValue : float.MaxValue, -1);
-            // Move? bestMove = null;
-
             SearchResult result1 = Minimax(board, config.maxDepth, float.MinValue, float.MaxValue, board.whiteToMove);
             addToTranspositionTable(board, result1);
 

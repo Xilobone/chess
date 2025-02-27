@@ -14,7 +14,7 @@ namespace chess.engine
 
         protected IEvaluator evaluator;
 
-        protected EngineConfig config;
+        public EngineConfig config { get; private set; }
 
         public Engine(bool isWhite, IEvaluator evaluator)
         {
@@ -23,13 +23,7 @@ namespace chess.engine
             this.isWhite = isWhite;
             this.evaluator = evaluator;
 
-            //read config file
-            string configPath = $"{ChessPlayerSettings.DEFAULT_SETTINGS.configPath}\\engines\\";
-            string engineConfig = $"{configPath}{GetType().Namespace}.json";
-
-            string json = File.Exists(engineConfig) ? File.ReadAllText(engineConfig) : File.ReadAllText($"{configPath}default.json");
-
-            config = JsonSerializer.Deserialize<EngineConfig>(json)!;
+            config = EngineConfig.GetConfig(GetType().Namespace!);
         }
 
         public abstract Move makeMove(Board board);
@@ -78,20 +72,6 @@ namespace chess.engine
             public override string ToString()
             {
                 return $"evaluation:{evaluation}, depth:{searchedDepth}, best move:{move}";
-            }
-        }
-
-        protected class EngineConfig
-        {
-            public int maxDepth { get; private set; }
-            public bool hasTranspositionTable { get; private set; }
-            public ulong transpositionTableSize { get; private set; }
-
-            public EngineConfig(int maxDepth, bool hasTranspositionTable, ulong transpositionTableSize)
-            {
-                this.maxDepth = maxDepth;
-                this.hasTranspositionTable = hasTranspositionTable;
-                this.transpositionTableSize = transpositionTableSize;
             }
         }
     }

@@ -53,7 +53,7 @@ namespace chessPlayer
             if (white == null || black == null || settings == null)
             {
                 Console.WriteLine("Not all players or settings have been set, game will not be played");
-                return new GameResult(0, 0);
+                return new GameResult(0, 0,0);
             }
 
             isRunning = true;
@@ -111,7 +111,7 @@ namespace chessPlayer
             if (settings.displayBoards) Console.WriteLine($"total elapsed time: {time}ms");
 
             GameResult result = GameResult.GetResult(board, white, black);
-            Logger.LogGame(white, black, fen, result, playedMoves);
+            Logger.LogGame(white, black, fen, result, playedMoves, settings);
             return result;
         }
 

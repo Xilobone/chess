@@ -164,5 +164,10 @@ namespace chessPlayer
 
             return input.Equals("y");
         }
+
+        public override string ToString()
+        {
+            return JsonSerializer.Serialize(this);
+        }
     }
 }
