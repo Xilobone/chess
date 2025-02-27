@@ -8,7 +8,10 @@ namespace chess
     /// Writes logs to the ./logs/games.log file
     /// </summary>
     public static class Logger
-    {
+    {   
+        /// <summary>
+        /// The path of the file to log the game to
+        /// </summary>
         private static string filePath = "./lib/games.log";
         
         /// <summary>
@@ -38,15 +41,18 @@ namespace chess
             writer.WriteLine($"{timestamp} white config: ({white.engine.config})");
             writer.WriteLine($"{timestamp} white config: ({black.engine.config})");
 
+            //log the start position
             writer.WriteLine($"{timestamp} starting position: {startFen}");
 
+            //log each move
             string moves = "";
             foreach (Move move in playedMoves)
             {
                 moves += $"{move} ";
             }
-
             writer.WriteLine($"{timestamp} moves: {moves}");
+
+            //log the game result
             writer.WriteLine($"{timestamp} result: {result}");
             writer.Close();
         }

@@ -9,7 +9,6 @@ namespace chess.engine
     public abstract class Engine
     {
         public bool isWhite { get; set; }
-        public bool displayStats { get; set; }
         public List<ICounter> counters { get; set; }
 
         protected IEvaluator evaluator;

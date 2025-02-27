@@ -33,9 +33,6 @@ namespace chessPlayer
             this.black = black;
             this.settings = settings;
 
-            this.white.engine.displayStats = settings.displayBoards;
-            this.black.engine.displayStats = settings.displayBoards;
-
             this.white.engine.isWhite = true;
             this.black.engine.isWhite = false;
 

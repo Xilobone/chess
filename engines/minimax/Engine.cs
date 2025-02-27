@@ -45,12 +45,6 @@ namespace minimax_engine
 
             computationTime = getCurrentTime() - startTime;
 
-            if (displayStats)
-            {
-                displayOverview();
-                clearIntCounters();
-            }
-
             return result.move!;
         }
 

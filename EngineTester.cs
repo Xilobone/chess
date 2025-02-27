@@ -19,7 +19,6 @@ namespace chessTesting
             else board = Board.fromFen(fen);
 
             player.engine.isWhite = board.whiteToMove;
-            player.engine.displayStats = true;
 
             board.display();
 
