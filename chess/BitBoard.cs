@@ -80,11 +80,11 @@ namespace chess
             for (int bit = 0; bit < 64; bit++)
             {
                 if (board.pieces[bit] != piece)
-                    {
-                        continue;
-                    }
+                {
+                    continue;
+                }
 
-                    bitboard = bitboard | (1uL << bit);
+                bitboard = bitboard | (1uL << bit);
             }
 
             return bitboard;
@@ -260,15 +260,16 @@ namespace chess
         {
             if (forWhite)
             {
-                return  board.bitboardsWhite[PAWN] |
+                return board.bitboardsWhite[PAWN] |
                         board.bitboardsWhite[KNIGHT] |
                         board.bitboardsWhite[BISHOP] |
                         board.bitboardsWhite[ROOK] |
                         board.bitboardsWhite[QUEEN] |
                         board.bitboardsWhite[KING];
-            } else
+            }
+            else
             {
-                return  board.bitboardsBlack[PAWN] |
+                return board.bitboardsBlack[PAWN] |
                         board.bitboardsBlack[KNIGHT] |
                         board.bitboardsBlack[BISHOP] |
                         board.bitboardsBlack[ROOK] |
@@ -286,15 +287,16 @@ namespace chess
         {
             if (forWhite)
             {
-                return  board.bitboardsWhiteAttack[PAWN] |
+                return board.bitboardsWhiteAttack[PAWN] |
                         board.bitboardsWhiteAttack[KNIGHT] |
                         board.bitboardsWhiteAttack[BISHOP] |
                         board.bitboardsWhiteAttack[ROOK] |
                         board.bitboardsWhiteAttack[QUEEN] |
                         board.bitboardsWhiteAttack[KING];
-            } else
+            }
+            else
             {
-                return  board.bitboardsBlackAttack[PAWN] |
+                return board.bitboardsBlackAttack[PAWN] |
                         board.bitboardsBlackAttack[KNIGHT] |
                         board.bitboardsBlackAttack[BISHOP] |
                         board.bitboardsBlackAttack[ROOK] |

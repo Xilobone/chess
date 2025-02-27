@@ -5,7 +5,6 @@ namespace minimax_engine
     public class Engine : chess.engine.Engine
     {
 
-        // private const int MAX_DEPTH = 2;
         private int evaluatedBoards;
         private long computationTime;
         private long evaluationTime;
@@ -71,7 +70,6 @@ namespace minimax_engine
             generationTime += getCurrentTime() - startTime;
 
             remainingTime -= getCurrentTime() - startTime;
-
 
             foreach (Move move in moves)
             {

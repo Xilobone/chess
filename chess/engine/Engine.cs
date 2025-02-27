@@ -1,8 +1,4 @@
-using System.Text.Json;
-using System.Text.Json.Nodes;
-using chessPlayer;
 using counters;
-
 
 namespace chess.engine
 {
@@ -47,6 +43,7 @@ namespace chess.engine
         {
             return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         }
+
         public class SearchResult
         {
             public float evaluation;
