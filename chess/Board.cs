@@ -13,7 +13,7 @@ namespace chess
         public int halfMoves { get; private set; }
         public int fullMoves { get; private set; }
 
-        private List<Board> previousBoards = new List<Board>();
+        private List<ulong> previousBoards = new List<ulong>();
 
         private bool checkKnown;
         private bool inCheck;
@@ -22,7 +22,6 @@ namespace chess
 
         //bitmaps should be read from the least significant bit to the most,
         //they represent board positions from the top left to the bottom right
-        public long attackMapWhite;
 
         public ulong[] bitboardsWhite = new ulong[6];
         public ulong[] bitboardsWhiteAttack = new ulong[6];
@@ -33,7 +32,7 @@ namespace chess
         public Board makeMove(Move move)
         {
             Board result = getCopy();
-            result.previousBoards.Add(this);
+            result.previousBoards.Add(Zobrist.hash(this));
 
             int piece = getPiece(move.frIndex);
             int frRank = Index.GetRank(move.frIndex);
@@ -373,10 +372,11 @@ namespace chess
         public bool isInDraw()
         {
             int sameBoards = 0;
+            ulong hash = Zobrist.hash(this);
+            foreach (ulong h in previousBoards)
+            {   
 
-            foreach (Board board in previousBoards)
-            {
-                if (this.Equals(board)) sameBoards++;
+                if (hash == h) sameBoards++;
             }
 
             //a draw occurs if it is the third time this position occurs,
@@ -602,7 +602,7 @@ namespace chess
             copy.halfMoves = halfMoves;
             copy.fullMoves = fullMoves;
 
-            copy.previousBoards = new List<Board>(previousBoards);
+            copy.previousBoards = new List<ulong>(previousBoards);
 
             for (int i = 0; i < bitboardsWhite.Length; i++)
             {
