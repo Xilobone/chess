@@ -149,17 +149,17 @@ namespace converter
             {
                 if (move.Equals("Rxb8")) Console.WriteLine(mv);
 
-                if (mv.toIndex != to)
+                if (mv.to != to)
                 {
                     continue;
                 }
-                if (board.getPiece(mv.frIndex) != piece)
+                if (board.getPiece(mv.fr) != piece)
                 {
                     continue;
                 }
 
-                int frFile = chess.Index.GetFile(mv.frIndex);
-                int frRank = chess.Index.GetRank(mv.frIndex);
+                int frFile = chess.Index.GetFile(mv.fr);
+                int frRank = chess.Index.GetRank(mv.fr);
 
                 if ((fileSpecified || bothSpecified) && frFile != file)
                 {

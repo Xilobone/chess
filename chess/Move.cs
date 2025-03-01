@@ -31,14 +31,14 @@ namespace chess
 
         public int flag { get; set; }
 
-        public int frIndex {get; private set; }
-        public int toIndex {get; private set; }
+        public int fr {get; private set; }
+        public int to {get; private set; }
 
         public Move(int fr, int to) : this(fr, to, FLAG_NONE) {}
         public Move(int fr, int to, int flag)
         {
-            this.frIndex = fr;
-            this.toIndex = to;
+            this.fr = fr;
+            this.to = to;
 
             this.flag = flag;
         }
@@ -60,9 +60,14 @@ namespace chess
             return Regex.IsMatch(move[0], "^[A-Za-z][1-8]$") && Regex.IsMatch(move[1], "^[A-Za-z][1-8]$");
         }
 
-        public static Move getMove(string move_str)
+        /// <summary>
+        /// Gets the move from a string
+        /// </summary>
+        /// <param name="moveStr">A string containing the move, (eg. a2 a4)</param>
+        /// <returns></returns>
+        public static Move getMove(string moveStr)
         {
-            string[] move = move_str.Split(' ');
+            string[] move = moveStr.Split(' ');
 
             int fr = NotationConverter.toIndex(move[0]);
             int to = NotationConverter.toIndex(move[1]);
@@ -79,17 +84,17 @@ namespace chess
 
             Move other = (Move)obj;
 
-            return frIndex == other.frIndex && toIndex == other.toIndex;
+            return fr == other.fr && to == other.to;
         }
 
         public override int GetHashCode()
         {
-            return frIndex * 100 + toIndex;
+            return fr * 100 + to;
         }
 
         public override string ToString()
         {
-            return $"(From:{NotationConverter.toCoordinates(frIndex)}, To:{NotationConverter.toCoordinates(toIndex)} {((flag != 0) ? $" Flag:{flag}" : "")})";
+            return $"(From:{NotationConverter.toCoordinates(fr)}, To:{NotationConverter.toCoordinates(to)} {((flag != 0) ? $" Flag:{flag}" : "")})";
         } 
     }
 }

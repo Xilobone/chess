@@ -55,11 +55,11 @@ namespace chess
             Board result = getCopy();
             result.previousBoards.Add(Zobrist.hash(this));
 
-            int piece = getPiece(move.frIndex);
-            int frRank = Index.GetRank(move.frIndex);
-            int toRank = Index.GetRank(move.toIndex);
+            int piece = getPiece(move.fr);
+            int frRank = Index.GetRank(move.fr);
+            int toRank = Index.GetRank(move.to);
 
-            if (piece == Piece.WHITE_PAWN || piece == Piece.BLACK_PAWN || getPiece(move.toIndex) != Piece.EMPTY)
+            if (piece == Piece.WHITE_PAWN || piece == Piece.BLACK_PAWN || getPiece(move.to) != Piece.EMPTY)
             {
                 result.halfMoves = 0;
             }
@@ -70,28 +70,28 @@ namespace chess
 
             bool wasEnpassant = false;
             //move was en passant
-            if ((piece == Piece.WHITE_PAWN || piece == Piece.BLACK_PAWN) && move.toIndex == enpassantIndex)
+            if ((piece == Piece.WHITE_PAWN || piece == Piece.BLACK_PAWN) && move.to == enpassantIndex)
             {
                 wasEnpassant = true;
                 if (toRank == 2)
                 {
-                    result.pieces[move.toIndex + 8] = Piece.EMPTY;
+                    result.pieces[move.to + 8] = Piece.EMPTY;
                 }
                 if (toRank == 5)
                 {
-                    result.pieces[move.toIndex - 8] = Piece.EMPTY;
+                    result.pieces[move.to - 8] = Piece.EMPTY;
                 }
             }
 
             //check if move creates an en passant option for black
             if (piece == Piece.WHITE_PAWN && frRank == 1 && toRank == 3)
             {
-                result.enpassantIndex = move.frIndex + 8;
+                result.enpassantIndex = move.fr + 8;
                 //check if move creates an en passant option for white
             }
             else if (piece == Piece.BLACK_PAWN && frRank == 6 && toRank == 4)
             {
-                result.enpassantIndex = move.frIndex - 8;
+                result.enpassantIndex = move.fr - 8;
             }
             else
             {
@@ -106,8 +106,8 @@ namespace chess
             }
 
             //move pieces around
-            result.pieces[move.toIndex] = pieces[move.frIndex];
-            result.pieces[move.frIndex] = Piece.EMPTY;
+            result.pieces[move.to] = pieces[move.fr];
+            result.pieces[move.fr] = Piece.EMPTY;
 
             if (Move.FLAG_PROMOTIONS.Contains(move.flag))
             {
@@ -138,7 +138,7 @@ namespace chess
                 case Piece.BLACK_KING: result.bitboardsBlack[BitBoard.KING] = BitBoard.Compute(result, BitBoard.KING, false); break;
             }
 
-            int capturedPiece = getPiece(move.toIndex);
+            int capturedPiece = getPiece(move.to);
             switch (capturedPiece)
             {
                 case Piece.WHITE_PAWN: result.bitboardsWhite[BitBoard.PAWN] = BitBoard.Compute(result, BitBoard.PAWN, true); break;
@@ -198,7 +198,7 @@ namespace chess
 
         private void checkCastlingOptions(Move move)
         {
-            int piece = getPiece(move.frIndex);
+            int piece = getPiece(move.fr);
 
             //check if king has moved
             if (piece == Piece.WHITE_KING)
@@ -216,41 +216,41 @@ namespace chess
             //check if rook has moved
             if (piece == Piece.WHITE_ROOK)
             {
-                if (move.frIndex == 0) castlingOptions[Move.CASTLE_WHITE_QUEENSIDE] = false;
-                if (move.frIndex == 7) castlingOptions[Move.CASTLE_WHITE_KINGSIDE] = false;
+                if (move.fr == 0) castlingOptions[Move.CASTLE_WHITE_QUEENSIDE] = false;
+                if (move.fr == 7) castlingOptions[Move.CASTLE_WHITE_KINGSIDE] = false;
             }
 
             if (piece == Piece.BLACK_ROOK)
             {
-                if (move.frIndex == 56) castlingOptions[Move.CASTLE_BLACK_QUEENSIDE] = false;
-                if (move.frIndex == 63) castlingOptions[Move.CASTLE_BLACK_KINGSIDE] = false;
+                if (move.fr == 56) castlingOptions[Move.CASTLE_BLACK_QUEENSIDE] = false;
+                if (move.fr == 63) castlingOptions[Move.CASTLE_BLACK_KINGSIDE] = false;
             }
 
             //check if rook has been captured
-            if (move.toIndex == 0) castlingOptions[Move.CASTLE_WHITE_QUEENSIDE] = false;
-            if (move.toIndex == 7) castlingOptions[Move.CASTLE_WHITE_KINGSIDE] = false;
-            if (move.toIndex == 56) castlingOptions[Move.CASTLE_BLACK_QUEENSIDE] = false;
-            if (move.toIndex == 63) castlingOptions[Move.CASTLE_BLACK_KINGSIDE] = false;
+            if (move.to == 0) castlingOptions[Move.CASTLE_WHITE_QUEENSIDE] = false;
+            if (move.to == 7) castlingOptions[Move.CASTLE_WHITE_KINGSIDE] = false;
+            if (move.to == 56) castlingOptions[Move.CASTLE_BLACK_QUEENSIDE] = false;
+            if (move.to == 63) castlingOptions[Move.CASTLE_BLACK_KINGSIDE] = false;
         }
 
         private void castle(Move move)
         {
-            if (move.toIndex == 2)
+            if (move.to == 2)
             {
                 pieces[3] = pieces[0];
                 pieces[0] = Piece.EMPTY;
             }
-            else if (move.toIndex == 6)
+            else if (move.to == 6)
             {
                 pieces[5] = pieces[7];
                 pieces[7] = Piece.EMPTY;
             }
-            else if (move.toIndex == 58)
+            else if (move.to == 58)
             {
                 pieces[59] = pieces[56];
                 pieces[56] = Piece.EMPTY;
             }
-            else if (move.toIndex == 62)
+            else if (move.to == 62)
             {
                 pieces[61] = pieces[63];
                 pieces[63] = Piece.EMPTY;
@@ -259,7 +259,7 @@ namespace chess
 
         private void promote(Move move)
         {
-            int piece = getPiece(move.frIndex);
+            int piece = getPiece(move.fr);
 
             int promotedPiece = -1;
             if (Piece.isWhite(piece))
@@ -283,7 +283,7 @@ namespace chess
                 }
             }
 
-            pieces[move.toIndex] = promotedPiece;
+            pieces[move.to] = promotedPiece;
         }
 
         // public int getPiece(Position position)
