@@ -405,7 +405,7 @@ namespace chess
                 Console.Write((y + 1) + " |");
                 for (int x = 0; x < 8; x++)
                 {
-                    int index = new Position(x, y).toIndex();
+                    int index = x + 8*y;
                     Console.Write(" " + Piece.DISPLAY[pieces[index]] + " |");
                 }
                 Console.WriteLine();
@@ -464,7 +464,7 @@ namespace chess
 
                 for (int x = 0; x < 8; x++)
                 {
-                    int index = new Position(x, y).toIndex();
+                    int index = x + 8*y;
                     if (pieces[index] == Piece.EMPTY)
                     {
                         emptySquares++;
@@ -541,7 +541,7 @@ namespace chess
 
                 if (Piece.VALUES.Keys.Contains(i))
                 {
-                    int index = new Position(x, y).toIndex();
+                    int index = x + 8*y;
                     board.pieces[index] = Piece.VALUES[i];
                     x++;
                 }

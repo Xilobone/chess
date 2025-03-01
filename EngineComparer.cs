@@ -23,7 +23,7 @@ namespace chessTesting
             //get list of boards to play
             Evaluator[] evaluators = new Evaluator[] { new minimax_engine.Evaluator() };
             GamesParser parser = new GamesParser("./lib/chess_games.pgn", evaluators, 1);
-            List<Board> boards = parser.parse(300, 10, 0.1f);
+            List<Board> boards = parser.parse(5000, 10, 0.1f);
 
             int winsWhite = 0;
             int winsBlack = 0;

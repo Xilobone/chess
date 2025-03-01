@@ -56,23 +56,22 @@ namespace converter
             //get last two characters from pos
             string toString = pos.Substring(pos.Length - 2, 2);
             // Console.WriteLine($"toString:{toString}");
-            Position to = toPosition(toString);
-
+            int to = toIndex(toString);
             // Console.WriteLine($"to:{to}");
 
 
-            Position fr;
+            int fr;
 
             //no information about from was provided
             if (move.Length == 4)
             {
-                fr = board.whiteToMove ? to + new Position(0, -1) : to + new Position(0, 1);
+                fr = board.whiteToMove ? to - 8 : to + 8;
             }
             else
             {
                 string file = move[0].ToString();
                 string rank = board.whiteToMove ? "7" : "2";
-                fr = toPosition(file + rank);
+                fr = toIndex(file + rank);
             }
 
             int flag = Move.PROMOTION_VALUES[promotion];
@@ -99,12 +98,14 @@ namespace converter
 
         private static Move toMovePawnCapture(string move, Board board)
         {
-            Position to = toPosition(move.Substring(move.Length - 2, 2));
+            int to = toIndex(move.Substring(move.Length - 2, 2));
+
             string file = move[0].ToString();
 
-            int rank = board.whiteToMove ? to.y : to.y + 2;
+            int toRank = chess.Index.GetRank(to);
+            int rank = board.whiteToMove ? toRank : toRank + 2;
 
-            Position fr = toPosition(file + rank.ToString());
+            int fr = toIndex(file + rank.ToString());
 
             return new Move(fr, to);
         }
@@ -179,36 +180,15 @@ namespace converter
         }
 
         /// <summary>
-        /// Converts a coordinate (eg. b2) to a position object
-        /// </summary>
-        /// <param name="coordinates">The coordinate to convert</param>
-        /// <returns>The converted position</returns>
-        public static Position toPosition(string coordinates)
-        {
-            int x = coordinates[0] - 'a';
-            int y = int.Parse(coordinates[1].ToString()) - 1;
-
-            return new Position(x, y);
-        }
-
-        /// <summary>
         /// Converts a coordinate (eg. b2) to an index
         /// </summary>
         /// <param name="coordinates">The coordinates to convert</param>
         /// <returns>The index of the coordinates</returns>
         public static int toIndex(string coordinates)
-        {
-            return toPosition(coordinates).toIndex();
-        }
-
-        /// <summary>
-        /// Converts a position to a coordinate (eg. b2)
-        /// </summary>
-        /// <param name="position">The position to convert</param>
-        /// <returns>The converted position</returns>
-        public static string toCoordinates(Position position)
-        {
-            return (char)(position.x + 'a') + (position.y + 1).ToString();
+        {   
+            int rank = coordinates[0] - 'a';
+            int file = int.Parse(coordinates[1].ToString()) - 1;
+            return rank + 8 * file;
         }
 
         /// <summary>
@@ -218,7 +198,7 @@ namespace converter
         /// <returns>The converted index</returns>
         public static string toCoordinates(int index)
         {
-            return toCoordinates(Position.toPosition(index));
+            return (char)(chess.Index.GetFile(index) + 'a') + (chess.Index.GetRank(index) + 1).ToString();
         }
     }
 }

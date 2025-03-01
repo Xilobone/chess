@@ -4,7 +4,6 @@ using converter;
 
 namespace chess
 {
-
     public class Move
     {
         public const int CASTLE_WHITE_KINGSIDE = 0;
@@ -34,10 +33,6 @@ namespace chess
 
         public int frIndex {get; private set; }
         public int toIndex {get; private set; }
-
-        public Move(Position fr, Position to) : this(fr, to, FLAG_NONE) { }
-
-        public Move(Position fr, Position to, int flag) : this(fr.toIndex(), to.toIndex(), flag) { }
 
         public Move(int fr, int to) : this(fr, to, FLAG_NONE) {}
         public Move(int fr, int to, int flag)
@@ -69,8 +64,8 @@ namespace chess
         {
             string[] move = move_str.Split(' ');
 
-            Position fr = NotationConverter.toPosition(move[0]);
-            Position to = NotationConverter.toPosition(move[1]);
+            int fr = NotationConverter.toIndex(move[0]);
+            int to = NotationConverter.toIndex(move[1]);
 
             return new Move(fr, to);
         }

@@ -33,6 +33,11 @@ namespace chess
         0b0001110000000000000000000000000000000000000000000000000000000000,
     ];
 
+        /// <summary>
+        /// Generates a list of all possible legal moves on a given board
+        /// </summary>
+        /// <param name="board">The board to generate the moves for</param>
+        /// <returns>A list containing all moves that can be made on the board</returns>
         public static List<Move> generateAllMoves(Board board)
         {
             List<Move> moves = new List<Move>();
