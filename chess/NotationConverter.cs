@@ -81,15 +81,16 @@ namespace converter
 
         private static Move toMovePawn(string move, Board board)
         {
-            Position to = toPosition(move);
+            int to = toIndex(move);
 
-            Position offset = board.whiteToMove ? new Position(0, -1) : new Position(0, 1);
-            Position doublePushOffset = board.whiteToMove ? new Position(0, -2) : new Position(0, 2);
+            int offset = board.whiteToMove ? -8 : 8;
+            int doublePushOffset = board.whiteToMove ? -16 : 16;
             if (Piece.isItsTurn(board.getPiece(to + offset), board.whiteToMove)) return new Move(to + offset, to);
 
-            if (to.y == 3 || to.y == 4)
+            int toRank = chess.Index.GetRank(to);
+            if (toRank == 3 || toRank == 4)
             {
-                Position fr = to + doublePushOffset;
+                int fr = to + doublePushOffset;
                 if (Piece.isItsTurn(board.getPiece(fr), board.whiteToMove)) return new Move(fr, to);
             }
 

@@ -2,9 +2,9 @@ using chess;
 
 namespace player
 {
-    public class Evaluator : IEvaluator
+    public class Evaluator : chess.Evaluator
     {
-        public float evaluate(Board board)
+        public override float evaluate(Board board)
         {
             return 0;
         }

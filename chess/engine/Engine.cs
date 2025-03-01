@@ -1,17 +1,20 @@
 using counters;
 
 namespace chess.engine
-{
+{   
+    /// <summary>
+    /// Base class for all engines
+    /// </summary>
     public abstract class Engine
     {
         public bool isWhite { get; set; }
         public List<ICounter> counters { get; set; }
 
-        protected IEvaluator evaluator;
+        protected Evaluator evaluator;
 
         public EngineConfig config { get; private set; }
 
-        public Engine(bool isWhite, IEvaluator evaluator)
+        public Engine(bool isWhite, Evaluator evaluator)
         {
             counters = new List<ICounter>();
 

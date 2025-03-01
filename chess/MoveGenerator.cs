@@ -1,7 +1,10 @@
 using counters;
 
 namespace chess
-{
+{   
+    /// <summary>
+    /// Class used for generating legal moves for boards
+    /// </summary>
     public static class MoveGenerator
     {
         private static int[] KNIGHT_OFFSETS = new int[] { -17, -15, -10, -6, 6, 10, 15, 17 };
@@ -287,30 +290,6 @@ namespace chess
                 if (shift != 8 && shift != -8 && ((pos & BitBoard.aFile) != 0 || (pos & BitBoard.hFile) != 0)) break;
             }
 
-            return moves;
-        }
-
-        private static List<Move> searchOffset(Board board, Position pos, Position offset, bool allowCheck)
-        {
-            List<Move> moves = new List<Move>();
-            int piece = board.getPiece(pos);
-
-            Position newPos = pos + offset;
-
-            //do not do anything if newpos is outside of the board
-            if (newPos.x < 0 || newPos.x > 7 || newPos.y < 0 || newPos.y > 7)
-            {
-                return moves;
-            }
-
-            int occupiedPiece = board.getPiece(newPos);
-
-            if (Piece.isSameColor(piece, occupiedPiece))
-            {
-                return moves;
-            }
-
-            appendMove(moves, board, pos.toIndex(), newPos.toIndex(), allowCheck);
             return moves;
         }
 

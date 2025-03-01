@@ -1,7 +1,10 @@
 using counters;
 
 namespace chess.engine
-{
+{   
+    /// <summary>
+    /// Base class for all engines with a transposition table
+    /// </summary>
     public abstract class TTEngine : Engine
     {
         private SearchResult[] transpositionTable;
@@ -9,7 +12,7 @@ namespace chess.engine
         public Counter<int> assignedTranspositionTableIndexes { get; private set; }
         public Counter<int> hashCollisions { get; private set; }
 
-        protected TTEngine(bool isWhite, IEvaluator evaluator) : base(isWhite, evaluator)
+        protected TTEngine(bool isWhite, Evaluator evaluator) : base(isWhite, evaluator)
         {
             //create counters
             assignedTranspositionTableIndexes = new Counter<int>("items added to transpositiontable");

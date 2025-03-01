@@ -1,4 +1,3 @@
-using System.IO;
 using chess;
 using converter;
 
@@ -7,9 +6,16 @@ namespace parser
     public class GamesParser
     {
         private string filePath;
-        private IEvaluator[] evaluators;
+        private Evaluator[] evaluators;
         private Random random;
-        public GamesParser(string filePath, IEvaluator[] evaluators, int seed)
+
+        /// <summary>
+        /// Creates a new games parser object
+        /// </summary>
+        /// <param name="filePath">The path of the pgn file to read</param>
+        /// <param name="evaluators">Array of evaluators to use to determine which boards are considered equal</param>
+        /// <param name="seed">The random seed used to select boards</param>
+        public GamesParser(string filePath, Evaluator[] evaluators, int seed)
         {
             this.filePath = filePath;
             this.evaluators = evaluators;
@@ -57,27 +63,26 @@ namespace parser
 
             //select random boards
             List<Board> allBoards = boards.ToList();
-            // List<Board> selectedBoards = new List<Board>();
+            List<Board> selectedBoards = new List<Board>();
 
-            // while (selectedBoards.Count < amount)
-            // {
-            //     int index = random.Next(allBoards.Count);
-            //     Board board = allBoards[index];
+            while (selectedBoards.Count < amount)
+            {
+                int index = random.Next(allBoards.Count);
+                Board board = allBoards[index];
 
-            //     selectedBoards.Add(board);
-            //     allBoards.Remove(board);
+                selectedBoards.Add(board);
+                allBoards.Remove(board);
 
-            //     if (selectedBoards.Count % 500 == 0)
-            //     {
-            //         Console.WriteLine($"populating list ({(float)100 * selectedBoards.Count / amount:F2}%)");
-            //     }
-            // }
+                if (selectedBoards.Count % 500 == 0)
+                {
+                    Console.WriteLine($"populating list ({(float)100 * selectedBoards.Count / amount:F2}%)");
+                }
+            }
 
-            // return selectedBoards;
-            return allBoards;
+            return selectedBoards;
         }
 
-        public List<Board> getAllPositions(string line, float range)
+        private List<Board> getAllPositions(string line, float range)
         {
             List<Board> boards = new List<Board>();
             Board board = Board.startPosition();
@@ -112,7 +117,7 @@ namespace parser
         {
             float eval = 0;
 
-            foreach (IEvaluator evaluator in evaluators)
+            foreach (Evaluator evaluator in evaluators)
             {
                 eval += evaluator.evaluate(board);
             }

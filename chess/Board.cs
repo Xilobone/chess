@@ -1,14 +1,35 @@
 using converter;
 
 namespace chess
-{
+{   
+    /// <summary>
+    /// Class that represents a state of the chess board, boards are immutable
+    /// </summary>
     public class Board
-    {
+    {   
+        /// <summary>
+        /// The fen string of the regular start position of a game of chess
+        /// </summary>
         public const string START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
+        /// <summary>
+        /// The array of pieces on the board
+        /// </summary>
         public int[] pieces { get; private set; } = new int[64];
+
+        /// <summary>
+        /// True if the next player to move is white, false if the next player to move is black
+        /// </summary>
         public bool whiteToMove { get; set; }
+
+        /// <summary>
+        /// The index on which en passant can be played, or -1 if en passant cannot be played
+        /// </summary>
         public int enpassantIndex { get; private set; }
+
+        /// <summary>
+        /// Array indicating which castling options are still possible in order KQkq
+        /// </summary>
         public bool[] castlingOptions { get; private set; } = new bool[4];
         public int halfMoves { get; private set; }
         public int fullMoves { get; private set; }
@@ -100,14 +121,7 @@ namespace chess
                 result.fullMoves++;
             }
 
-            /*TODO: only the affected pieces bitboards have to be updated, this includes
-                - bitboard of the moved piece
-                - if capture, bitboard of the captured piece
-                - if castling, botboard of the rooks
-                - if promoted, bitboard of the promoted to piece
-                - if en passant, bitboard of the opposing pawns
-            */
-
+            //updates affected bitboards
             switch (piece)
             {
                 case Piece.WHITE_PAWN: result.bitboardsWhite[BitBoard.PAWN] = BitBoard.Compute(result, BitBoard.PAWN, true); break;
@@ -174,10 +188,6 @@ namespace chess
                 if (Piece.isWhite(piece)) result.bitboardsBlack[BitBoard.PAWN] = BitBoard.Compute(result, BitBoard.PAWN, false);
                 else result.bitboardsWhite[BitBoard.PAWN] = BitBoard.Compute(result, BitBoard.PAWN, true);
             }
-
-            //update bitboards
-            // result.bitboardsWhite = BitBoard.ComputeAll(result, true);
-            // result.bitboardsBlack = BitBoard.ComputeAll(result, false);
 
             result.bitboardsWhiteAttack = BitBoard.ComputeAllAttack(result, true);
             result.bitboardsBlackAttack = BitBoard.ComputeAllAttack(result, false);
@@ -276,10 +286,10 @@ namespace chess
             pieces[move.toIndex] = promotedPiece;
         }
 
-        public int getPiece(Position position)
-        {
-            return pieces[position.toIndex()];
-        }
+        // public int getPiece(Position position)
+        // {
+        //     return pieces[position.toIndex()];
+        // }
 
         /// <summary>
         /// Gets the piece that is at the given index, board is indexed left to right, top to bottom
@@ -341,7 +351,7 @@ namespace chess
 
             int index = 0;
             while (allFriendlyPieces != 0)
-            {   
+            {
                 //if last bit is zero, shift and continue
                 if ((allFriendlyPieces & 1) == 0)
                 {
@@ -374,7 +384,7 @@ namespace chess
             int sameBoards = 0;
             ulong hash = Zobrist.hash(this);
             foreach (ulong h in previousBoards)
-            {   
+            {
 
                 if (hash == h) sameBoards++;
             }
