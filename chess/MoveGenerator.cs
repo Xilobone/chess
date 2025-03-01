@@ -49,10 +49,25 @@ namespace chess
 
             return moves;
         }
+
+        /// <summary>
+        /// Generates a list of all moves that are legal on the given board starting from a specified index
+        /// </summary>
+        /// <param name="board">The board to generate moves of</param>
+        /// <param name="index">The index the moves should originate from</param>
+        /// <returns>A list of all moves from the specified index</returns>
         public static List<Move> generateMoves(Board board, int index)
         {
             return generateMoves(board, index, false);
         }
+
+        /// <summary>
+        /// Generates a list of all moves that are legal on the given board starting from a specified index
+        /// </summary>
+        /// <param name="board">The board to generate moves of</param>
+        /// <param name="index">The index the moves should originate from</param>
+        /// <param name="allowCheck">True if allowed psuedolegal moves that would result in a possible king capture</param>
+        /// <returns></returns>
         public static List<Move> generateMoves(Board board, int index, bool allowCheck)
         {
             List<Move> moves = new List<Move>();

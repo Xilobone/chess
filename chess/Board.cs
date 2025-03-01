@@ -31,7 +31,15 @@ namespace chess
         /// Array indicating which castling options are still possible in order KQkq
         /// </summary>
         public bool[] castlingOptions { get; private set; } = new bool[4];
+
+        /// <summary>
+        /// Number of half moves since last capture or pawn advance
+        /// </summary>
         public int halfMoves { get; private set; }
+
+        /// <summary>
+        /// Number of full moves
+        /// </summary>
         public int fullMoves { get; private set; }
 
         private List<ulong> previousBoards = new List<ulong>();

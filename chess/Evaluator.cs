@@ -51,18 +51,17 @@ namespace chess
             for (int i = 0; i < 64; i++)
             {
                 int piece = board.getPiece(i);
-                int rank = chess.Index.GetRank(i);
+                int file = Index.GetFile(i);
 
                 if (piece == Piece.WHITE_PAWN)
                 {
-                    if (rank != 0 && board.getPiece(i - 9) == Piece.WHITE_PAWN) value++;
-                    if (rank != 7 && board.getPiece(i - 7) == Piece.WHITE_PAWN) value++;
+                    if (file != 0 && board.getPiece(i - 9) == Piece.WHITE_PAWN) value++;
+                    if (file != 7 && board.getPiece(i - 7) == Piece.WHITE_PAWN) value++;
                 }
                 else if (piece == Piece.BLACK_PAWN)
                 {
-                    if (rank != 0 && board.getPiece(i + 7) == Piece.BLACK_PAWN) value--;
-                    if (rank != 7 && board.getPiece(i + 9) == Piece.BLACK_PAWN) value--;
-
+                    if (file != 0 && board.getPiece(i + 7) == Piece.BLACK_PAWN) value--;
+                    if (file != 7 && board.getPiece(i + 9) == Piece.BLACK_PAWN) value--;
                 }
             }
 

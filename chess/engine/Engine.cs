@@ -10,14 +10,40 @@ namespace chess.engine
         public bool isWhite { get; set; }
         public List<ICounter> counters { get; set; }
 
+        /// <summary>
+        /// Counter that stores the amount of boards that are evaluated for each move
+        /// </summary>
+        protected Counter<int> evaluatedBoards { get; private set; }
+
+        /// <summary>
+        /// Counter that stores the computation time (in ms) for each move
+        /// </summary>
+        protected Counter<long> computationTime { get; private set; }
+
+        /// <summary>
+        /// Counter that stores the time (in ms) spent evaluating for each move
+        /// </summary>
+        protected Counter<long> evaluationTime { get; private set; }
+
+        /// <summary>
+        /// Counter that stores the amount of boards that are evaluated for each move
+        /// </summary>
+        protected Counter<long> generationTime { get; private set; }
+
         protected Evaluator evaluator;
 
         public EngineConfig config { get; private set; }
 
         public Engine(bool isWhite, Evaluator evaluator)
-        {
+        {   
+            //add all default counters
             counters = new List<ICounter>();
-
+            evaluatedBoards = new Counter<int>("Evaluated boards");
+            computationTime = new Counter<long>("Computation time", "ms");
+            evaluationTime = new Counter<long>("Evaluation time", "ms");
+            generationTime = new Counter<long>("Generation time", "ms");
+            counters.AddRange(evaluatedBoards, computationTime, evaluationTime, generationTime);
+            
             this.isWhite = isWhite;
             this.evaluator = evaluator;
 

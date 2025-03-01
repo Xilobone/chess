@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using chess;
 using chessPlayer;
 using chessTesting;
+using converter;
 using parser;
 
 /// <summary>
@@ -28,8 +29,8 @@ public class Program
     public static void Main(string[] args)
     {
         // UnitTest.Run();
-        // test();
-        new Program();
+        test();
+        // new Program();
     }
 
     private void selectSetup()
@@ -67,35 +68,13 @@ public class Program
 
     private static void test()
     {
-        GamesParser parser = new GamesParser("./lib/chess_games.pgn", [new improved_minimax_eval_engine.Evaluator()], 0);
-        List<Board> boards = parser.parse(50000, 6000, 9999999999);
+        Board board = Board.startPosition();
+        Move move = new Move(NotationConverter.toIndex("h2"), NotationConverter.toIndex("h4"));
+        board = board.makeMove(move);
 
-        // HashSet<Board> boards = GetBoards(Board.startPosition(), 3);
-        ulong tableSize = 32_000_000;
-        Board[] table = new Board[tableSize];
-        long startTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        int nCollisions = 0;
-        foreach (Board board in boards)
-        {
-            ulong hash = Zobrist.hash(board);
-
-            ulong index = hash % tableSize;
-
-            if (table[index] != null && Zobrist.hash(table[index]) == hash)
-            {
-                nCollisions++;
-                Console.WriteLine("------------------\nCollision\n--------------------------");
-                table[index].display();
-                board.display();
-            }
-
-            table[index] = board;
-        }
-
-        double sizeMb = (double)(sizeof(int) * tableSize) / (1024 * 1024);
-
-        Console.WriteLine($"Number of collisions: {nCollisions}/{boards.Count}, size:{sizeMb:F2}mb");
-        Console.WriteLine($"Average hashing time:{(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startTime) / boards.Count}ms");
+        board.display();
+        Evaluator evaluator = new iterative_deepening.Evaluator();
+        Console.WriteLine(evaluator.evaluate(board));
     }
 
     private static HashSet<Board> GetBoards(Board board, int depth)

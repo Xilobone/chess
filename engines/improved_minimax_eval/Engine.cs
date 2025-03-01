@@ -5,24 +5,12 @@ namespace improved_minimax_eval_engine
 {
     public class Engine : chess.engine.Engine
     {
-        public Counter<int> evaluatedBoards { get; private set; }
-        public Counter<long> computationTime { get; private set; }
-        public Counter<long> evaluationTime { get; private set; }
-        public Counter<long> generationTime { get; private set; }
-
 
         private float remainingTime;
 
         public Engine() : this(true) { }
 
-        public Engine(bool isWhite) : base(isWhite, new Evaluator())
-        {
-            evaluatedBoards = new Counter<int>("Evaluated boards");
-            computationTime = new Counter<long>("Computation time", "ms");
-            evaluationTime = new Counter<long>("Evaluation time", "ms");
-            generationTime = new Counter<long>("Generation time", "ms");
-            counters.AddRange(evaluatedBoards, computationTime, evaluationTime, generationTime);
-        }
+        public Engine(bool isWhite) : base(isWhite, new Evaluator()) { }
 
         public override Move makeMove(Board board)
         {
