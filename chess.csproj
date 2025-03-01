@@ -9,9 +9,4 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
-<!-- cleaning before build ensures missing xml warnings are shown -->
-<Target Name="CleanBeforeBuild" BeforeTargets="Build">
-  <Exec Command="dotnet clean" />
-</Target>
-
 </Project>

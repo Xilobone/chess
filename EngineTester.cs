@@ -40,6 +40,7 @@ namespace chessTesting
                 }
             }
 
+
             Console.WriteLine($"Selected move: {move}");
 
             //show counter with differences from baseline

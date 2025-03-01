@@ -1,10 +1,18 @@
-using System.Collections.Frozen;
 using chess;
 
 namespace converter
 {
+    /// <summary>
+    /// Class used to convert different types of thess notations
+    /// </summary>
     public static class NotationConverter
-    {
+    {   
+        /// <summary>
+        /// Converts algebraic notation to a move object
+        /// </summary>
+        /// <param name="move">The string containing the move</param>
+        /// <param name="board">The board on which the move was made</param>
+        /// <returns></returns>
         public static Move toMove(string move, Board board)
         {
             move = move.Replace("#", "");
@@ -59,7 +67,8 @@ namespace converter
             if (move.Length == 4)
             {
                 fr = board.whiteToMove ? to + new Position(0, -1) : to + new Position(0, 1);
-            } else 
+            }
+            else
             {
                 string file = move[0].ToString();
                 string rank = board.whiteToMove ? "7" : "2";
@@ -86,7 +95,7 @@ namespace converter
 
             throw new Exception($"notation invalid! ({move})");
         }
-        
+
         private static Move toMovePawnCapture(string move, Board board)
         {
             Position to = toPosition(move.Substring(move.Length - 2, 2));
@@ -130,11 +139,11 @@ namespace converter
                 file = move[1] - 'a';
                 rank = int.Parse(move[2].ToString()) - 1;
             }
-            
+
             //get correct move
             List<Move> moves = MoveGenerator.generateAllMoves(board);
-            
-            foreach(Move mv in moves)
+
+            foreach (Move mv in moves)
             {
                 if (move.Equals("Rxb8")) Console.WriteLine(mv);
 
@@ -143,7 +152,7 @@ namespace converter
                     continue;
                 }
                 if (board.getPiece(mv.frIndex) != piece)
-                {   
+                {
                     continue;
                 }
 
@@ -181,6 +190,11 @@ namespace converter
             return new Position(x, y);
         }
 
+        /// <summary>
+        /// Converts a coordinate (eg. b2) to an index
+        /// </summary>
+        /// <param name="coordinates">The coordinates to convert</param>
+        /// <returns>The index of the coordinates</returns>
         public static int toIndex(string coordinates)
         {
             return toPosition(coordinates).toIndex();
@@ -194,7 +208,7 @@ namespace converter
         public static string toCoordinates(Position position)
         {
             return (char)(position.x + 'a') + (position.y + 1).ToString();
-        }  
+        }
 
         /// <summary>
         /// Converts an index to a coordinate (eg. b2)
