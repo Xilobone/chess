@@ -49,7 +49,12 @@ namespace chess
         public ulong[] bitboardsBlack = new ulong[6];
         public ulong[] bitboardsBlackAttack = new ulong[6];
 
-
+        /// <summary>
+        /// Makes the move on the board and returns a new board with the updated state, does
+        /// not alter the original board
+        /// </summary>
+        /// <param name="move">The move to make on the board</param>
+        /// <returns>A new board with the updated state</returns>
         public Board makeMove(Move move)
         {
             Board result = getCopy();
@@ -315,6 +320,10 @@ namespace chess
             return 0;
         }
 
+        /// <summary>
+        /// Checks if this board is in check
+        /// </summary>
+        /// <returns>True if this board is in check, false otherwise</returns>
         public bool isInCheck()
         {
             if (checkKnown) return inCheck;
@@ -331,6 +340,10 @@ namespace chess
                 (bitboardsBlack[BitBoard.KING] & BitBoard.GetAnyAttack(this, true)) != 0;
         }
 
+        /// <summary>
+        /// Checks if this board is in mate
+        /// </summary>
+        /// <returns>True if the board is in mate, false otherwise</returns>
         public bool isInMate()
         {
             if (mateKnown) return inMate;
@@ -453,6 +466,10 @@ namespace chess
             return fromFen(START_FEN);
         }
 
+        /// <summary>
+        /// Creates a fen string from this board
+        /// </summary>
+        /// <returns>The fen string of this board</returns>
         public string toFen()
         {
             string fen = "";
@@ -464,7 +481,7 @@ namespace chess
 
                 for (int x = 0; x < 8; x++)
                 {
-                    int index = x + 8*y;
+                    int index = x + 8 * y;
                     if (pieces[index] == Piece.EMPTY)
                     {
                         emptySquares++;
@@ -523,6 +540,11 @@ namespace chess
             return fen;
         }
 
+        /// <summary>
+        /// Creates a board from a fen string
+        /// </summary>
+        /// <param name="fenString">The fen string to create a board from</param>
+        /// <returns>The board fro mthe fen string</returns>
         public static Board fromFen(string fenString)
         {
             string[] fen = fenString.Split(' ');
@@ -541,7 +563,7 @@ namespace chess
 
                 if (Piece.VALUES.Keys.Contains(i))
                 {
-                    int index = x + 8*y;
+                    int index = x + 8 * y;
                     board.pieces[index] = Piece.VALUES[i];
                     x++;
                 }
@@ -587,7 +609,7 @@ namespace chess
             return board;
         }
 
-        public Board getCopy()
+        private Board getCopy()
         {
             Board copy = new Board();
 
@@ -623,62 +645,6 @@ namespace chess
                 copy.bitboardsBlackAttack[i] = bitboardsBlackAttack[i];
             }
             return copy;
-        }
-
-        public override bool Equals(object? obj)
-        {
-            if (obj == null) return false;
-
-            if (ReferenceEquals(this, obj)) return true;
-
-            if (obj is not Board) return false;
-
-            Board other = (Board)obj;
-
-            //check if pieces are the same
-            for (int i = 0; i < 64; i++)
-            {
-                if (pieces[i] != other.pieces[i]) return false;
-            }
-
-            //check white to move
-            if (whiteToMove != other.whiteToMove) return false;
-
-            //check en passant
-            if (enpassantIndex != other.enpassantIndex) return false;
-
-            //check castling options
-            for (int i = 0; i < castlingOptions.Length; i++)
-            {
-                if (castlingOptions[i] != other.castlingOptions[i]) return false;
-            }
-
-            return true;
-        }
-
-        public override int GetHashCode()
-        {
-            int hash = 0;
-
-            for (int i = 0; i < 8; i++)
-            {
-                hash += (17 * pieces[i]) + (19 * i);
-            }
-
-
-            if (whiteToMove) hash += 29;
-
-            if (enpassantIndex != -1)
-            {
-                hash += 31 * enpassantIndex;
-            }
-
-            for (int i = 0; i < castlingOptions.Length; i++)
-            {
-                if (castlingOptions[i]) hash += 987;
-            }
-
-            return hash;
         }
     }
 }

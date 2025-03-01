@@ -75,23 +75,6 @@ namespace chess
             return new Move(fr, to);
         }
 
-        public override bool Equals(object? obj)
-        {
-            if (obj == null || GetType() != obj.GetType())
-            {
-                return false;
-            }
-
-            Move other = (Move)obj;
-
-            return fr == other.fr && to == other.to;
-        }
-
-        public override int GetHashCode()
-        {
-            return fr * 100 + to;
-        }
-
         public override string ToString()
         {
             return $"(From:{NotationConverter.toCoordinates(fr)}, To:{NotationConverter.toCoordinates(to)} {((flag != 0) ? $" Flag:{flag}" : "")})";
