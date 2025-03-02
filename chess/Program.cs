@@ -29,8 +29,8 @@ public class Program
     public static void Main(string[] args)
     {
         // UnitTest.Run();
-        test();
-        // new Program();
+        // test();
+        new Program();
     }
 
     private void selectSetup()

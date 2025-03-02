@@ -11,6 +11,7 @@ namespace iterative_deepening
     {
         private long moveEndTime;
 
+        private Counter<float> sortTime;
         /// <summary>
         /// Creates a new transposition table engine that optimizes moves for the white player
         /// </summary>
@@ -20,14 +21,18 @@ namespace iterative_deepening
         /// Createst a new transposition table engine that optimizes for the selected player
         /// </summary>
         /// <param name="isWhite">true if optimizing for white, false for black</param>
-        public Engine(bool isWhite) : base(isWhite, new Evaluator()) { }
+        public Engine(bool isWhite) : base(isWhite, new Evaluator())
+        {
+            sortTime = new Counter<float>("Sorting time", "ms");
+            counters.Add(sortTime);
+        }
 
         /// <summary>
         /// Computes the best move to make for the given board
         /// </summary>
         /// <param name="board">The board to compute the best possible move for</param>
         /// <returns>The best possible move on the board</returns>
-       public override Move makeMove(Board board)
+        public override Move makeMove(Board board)
         {
             return makeMove(board, float.MaxValue);
         }
@@ -42,14 +47,21 @@ namespace iterative_deepening
         {
             long startTime = getCurrentTime();
             moveEndTime = maxTime == float.MaxValue ? long.MaxValue : getCurrentTime() + (long)maxTime;
+            SearchResult? result = null;
+            for (int depth = 1; depth <= config.maxDepth; depth++)
+            {
+                result = Minimax(board, depth, float.MinValue, float.MaxValue, board.whiteToMove);
+                addToTranspositionTable(board, result);
+            }
 
-            SearchResult result = Minimax(board, 1, float.MinValue, float.MaxValue, board.whiteToMove);
-            addToTranspositionTable(board, result);
+            // result = Minimax(board, config.maxDepth, float.MinValue, float.MaxValue, board.whiteToMove);
+            // addToTranspositionTable(board, result);
+
 
             computationTime.Set(getCurrentTime() - startTime);
             clearCounters();
 
-            return result.move!;
+            return result!.move!;
         }
 
         private SearchResult Minimax(Board board, int depth, float alpha, float beta, bool isMaximizingPlayer)
@@ -92,17 +104,34 @@ namespace iterative_deepening
             List<Move> moves = MoveGenerator.generateAllMoves(board);
             generationTime.Increment(getCurrentTime() - startTime);
 
-            IEnumerable<Move> sortedMoves = moves.OrderByDescending(move => getMovePriority(move, board));
+            startTime = getCurrentTime();
+            IEnumerable<Move> sorted = moves.OrderByDescending((move) => getMovePriority(move, board));
+            sortTime.Increment(getCurrentTime() - startTime);
+            // List<SortedItem> sortedMoves = new List<SortedItem>();
             Move? bestMove = null;
 
-            foreach (Move move in sortedMoves)
+            foreach (Move move in sorted)
             {
 
                 Board resultingBoard = board.makeMove(move);
 
                 SearchResult result = Minimax(resultingBoard, depth - 1, alpha, beta, false);
-                Console.WriteLine($"searching move {move}, result: {result}");
 
+                //add move to sorted list
+                // if (sortedMoves.Count == 0) sortedMoves.Add(new SortedItem(move, result));
+                // else
+                // {
+                //     for (int i = 0; i < sortedMoves.Count; i++)
+                //     {
+                //         //insert this move before first move with lower eval, or append to end of list if reached the end
+                //         if (sortedMoves[i].result.evaluation <= result.evaluation || i == sortedMoves.Count - 1)
+                //         {
+                //             sortedMoves.Insert(i, new SortedItem(move, result));
+                //             break;
+                //         }
+
+                //     }
+                // }
                 if (result.evaluation > maxEval)
                 {
                     maxEval = result.evaluation;
@@ -118,6 +147,11 @@ namespace iterative_deepening
             }
 
             SearchResult best = new SearchResult(maxEval, depth, bestMove!);
+            // foreach (SortedItem item in sortedMoves)
+            // {
+            //     Console.WriteLine($"searching move {item.move}, result: {item.result}");
+
+            // }
             addToTranspositionTable(board, best);
             return best;
         }
@@ -129,12 +163,16 @@ namespace iterative_deepening
             List<Move> moves = MoveGenerator.generateAllMoves(board);
             generationTime.Increment(getCurrentTime() - startTime);
 
-            IEnumerable<Move> sortedMoves = moves.OrderByDescending(move => getMovePriority(move, board));
+            startTime = getCurrentTime();
+            IEnumerable<Move> sorted = moves.OrderByDescending((move) => getMovePriority(move, board));
+            sortTime.Increment(getCurrentTime() - startTime);
+
             Move? bestMove = null;
 
-            foreach (Move move in sortedMoves)
+            foreach (Move move in sorted)
             {
                 // Console.WriteLine($"searching move {move}");
+
 
                 Board resultingBoard = board.makeMove(move);
 
@@ -161,7 +199,24 @@ namespace iterative_deepening
 
         private double getMovePriority(Move move, Board board)
         {
-            return 0;
+            SearchResult? result = getFromTranspositionTable(board.makeMove(move));
+
+            if (result == null) return float.MinValue;
+
+            return result.evaluation;
+
+        }
+
+        private class SortedItem
+        {
+            public Move move;
+            public SearchResult result;
+
+            public SortedItem(Move move, SearchResult result)
+            {
+                this.move = move;
+                this.result = result;
+            }
         }
 
     }

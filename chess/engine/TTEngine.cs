@@ -1,7 +1,7 @@
 using counters;
 
 namespace chess.engine
-{   
+{
     /// <summary>
     /// Base class for all engines with a transposition table
     /// </summary>
@@ -12,12 +12,18 @@ namespace chess.engine
         public Counter<int> assignedTranspositionTableIndexes { get; private set; }
         public Counter<int> hashCollisions { get; private set; }
 
+        /// <summary>
+        /// Amount of time spend writing to the transposition table
+        /// </summary>
+        protected Counter<float> ttWriteTime { get; private set; }
+
         protected TTEngine(bool isWhite, Evaluator evaluator) : base(isWhite, evaluator)
         {
             //create counters
             assignedTranspositionTableIndexes = new Counter<int>("items added to transpositiontable");
             hashCollisions = new Counter<int>("hash collisions");
-            counters.AddRange(assignedTranspositionTableIndexes, hashCollisions);
+            ttWriteTime = new Counter<float>("Transposition table write time", "ms");
+            counters.AddRange(assignedTranspositionTableIndexes, hashCollisions, ttWriteTime);
 
             //create transpositiontable
             transpositionTable = new SearchResult[config.transpositionTableSize];
@@ -31,6 +37,8 @@ namespace chess.engine
         /// <param name="result">The search result to store in the transposition table</param>
         protected void addToTranspositionTable(Board board, SearchResult result)
         {
+            long startTime = getCurrentTime();
+
             ulong hash = Zobrist.hash(board);
             ulong index = hash % config.transpositionTableSize;
             result.hash = hash;
@@ -41,11 +49,17 @@ namespace chess.engine
                 if (transpositionTable[index].hash != result.hash) hashCollisions.Increment();
 
                 //the stored result has a greater depth than the new result, do not overrwide result
-                if (transpositionTable[index].searchedDepth < result.searchedDepth) return;
+                if (transpositionTable[index].searchedDepth < result.searchedDepth)
+                {
+                    ttWriteTime.Increment(getCurrentTime() - startTime);
+                    return;
+                }
             }
 
             assignedTranspositionTableIndexes.Increment();
             transpositionTable[index] = result;
+            ttWriteTime.Increment(getCurrentTime() - startTime);
+
         }
 
         /// <summary>

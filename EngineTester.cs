@@ -33,9 +33,9 @@ namespace chessTesting
             {
                 move = player.engine.makeMove(board);
 
-                if (player.engine is transposition_table.Engine)
+                if (player.engine is chess.engine.TTEngine)
                 {
-                    transposition_table.Engine engine = (transposition_table.Engine)player.engine;
+                    chess.engine.TTEngine engine = (chess.engine.TTEngine)player.engine;
                     engine.clearTranspositionTable();
                 }
             }

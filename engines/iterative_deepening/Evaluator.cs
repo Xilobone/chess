@@ -17,7 +17,6 @@ namespace iterative_deepening
             eval += 0.5f * getCheck(board);
             eval += 100000 * getMate(board);
 
-            Console.WriteLine($"pawn chain: {getPawnChain(board)}");
             return eval;
         }
 

@@ -43,7 +43,7 @@ namespace chess.engine
             evaluationTime = new Counter<long>("Evaluation time", "ms");
             generationTime = new Counter<long>("Generation time", "ms");
             counters.AddRange(evaluatedBoards, computationTime, evaluationTime, generationTime);
-            
+
             this.isWhite = isWhite;
             this.evaluator = evaluator;
 
@@ -71,33 +71,6 @@ namespace chess.engine
         protected long getCurrentTime()
         {
             return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        }
-
-        public class SearchResult
-        {
-            public float evaluation;
-
-            public int searchedDepth;
-            public ulong hash;
-            public Move? move;
-
-            public SearchResult(float evaluation, int searchedDepth, Move move)
-            {
-                this.evaluation = evaluation;
-                this.searchedDepth = searchedDepth;
-                this.move = move;
-            }
-
-            public SearchResult(float evaluation, int searchedDepth)
-            {
-                this.evaluation = evaluation;
-                this.searchedDepth = searchedDepth;
-            }
-
-            public override string ToString()
-            {
-                return $"evaluation:{evaluation}, depth:{searchedDepth}, best move:{move}";
-            }
         }
     }
 }

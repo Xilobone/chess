@@ -1,4 +1,5 @@
 using chess;
+using chess.engine;
 using counters;
 
 namespace transposition_table
@@ -7,7 +8,7 @@ namespace transposition_table
     /// Engine that makes use of a minimax algorithm and a transposition table in order to find the best
     /// moves on a given board
     /// </summary>
-    public class Engine : chess.engine.TTEngine
+    public class Engine : TTEngine
     {
         private long moveEndTime;
 
