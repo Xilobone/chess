@@ -1,9 +1,16 @@
 namespace chess
 {
+    /// <summary>
+    /// Class used for testing that all components of the program work as expected
+    /// </summary>
     public static class UnitTest
-    {
+    {   
+        /// <summary>
+        /// Runs the tests
+        /// </summary>
+        /// <returns></returns>
         public static bool Run()
-        {   
+        {
             bool allPass = true;
 
             allPass = allPass & TestMoveGeneration("Movegeneration start position", "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 4, 197281);
@@ -12,7 +19,7 @@ namespace chess
             allPass = allPass & TestMoveGeneration("Movegeneration endgame position", "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1", 4, 43238);
             allPass = allPass & TestMoveGeneration("Movegeneration promotion", "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1", 4, 422333);
 
-            
+
             DisplayResult("All tests passed?", allPass, true);
             return allPass;
         }

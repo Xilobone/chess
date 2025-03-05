@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using chess;
+using chess.engine;
 using chessPlayer;
 using chessTesting;
 using converter;
@@ -68,13 +69,8 @@ public class Program
 
     private static void test()
     {
-        Board board = Board.startPosition();
-        Move move = new Move(NotationConverter.toIndex("h2"), NotationConverter.toIndex("h4"));
-        board = board.makeMove(move);
-
-        board.display();
-        Evaluator evaluator = new iterative_deepening.Evaluator();
-        Console.WriteLine(evaluator.evaluate(board));
+        SearchResult result = new SearchResult(111, 5, new Move(32, 30));
+        Console.WriteLine(result);
     }
 
     private static HashSet<Board> GetBoards(Board board, int depth)

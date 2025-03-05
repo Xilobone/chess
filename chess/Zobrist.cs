@@ -1,5 +1,8 @@
 namespace chess
-{
+{   
+    /// <summary>
+    /// Class used to creates hashes from boards using the zobrist method
+    /// </summary>
     public static class Zobrist
     {
         private static ulong[,] pieceHash = new ulong[64, 12];
@@ -21,7 +24,7 @@ namespace chess
             {
                 conditionsHash[condition] = (ulong)random.NextInt64();
                 // Console.WriteLine($"hashing value ({condition}):{conditionsHash[condition]}");
-                
+
             }
         }
 
