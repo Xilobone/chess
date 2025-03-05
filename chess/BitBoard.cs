@@ -1,19 +1,63 @@
 namespace chess
 {
+    /// <summary>
+    /// Class used to perform bitboard calculations
+    /// </summary>
     public static class BitBoard
     {
+        /// <summary>
+        /// Index for the pawn bitboard
+        /// </summary>
         public const int PAWN = 0;
+
+        /// <summary>
+        /// Index for the knight bitboard
+        /// </summary>
         public const int KNIGHT = 1;
+
+        /// <summary>
+        /// Index for the bishop bitboard
+        /// </summary>
         public const int BISHOP = 2;
+
+        /// <summary>
+        /// Index for the rook bitboard
+        /// </summary>
         public const int ROOK = 3;
+
+        /// <summary>
+        /// Index for the queen bitboard
+        /// </summary>
         public const int QUEEN = 4;
+
+        /// <summary>
+        /// Index for the king bitboard
+        /// </summary>
         public const int KING = 5;
 
+        /// <summary>
+        /// Bitboard of the h file
+        /// </summary>
         public static ulong hFile = 0b1000000010000000100000001000000010000000100000001000000010000000;
+        /// <summary>
+        /// Bitboard of the g and h file
+        /// </summary>
         public static ulong ghFile = 0b1100000011000000110000001100000011000000110000001100000011000000;
+        /// <summary>
+        /// Bitboard of the a and b file
+        /// </summary>
         public static ulong abFile = 0b0000001100000011000000110000001100000011000000110000001100000011;
+        /// <summary>
+        /// Bitboard of the a file
+        /// </summary>
         public static ulong aFile = 0b0000000100000001000000010000000100000001000000010000000100000001;
 
+        /// <summary>
+        /// Computes all piece bitboards for the specified color
+        /// </summary>
+        /// <param name="board">The board to compute the bitboards of</param>
+        /// <param name="forWhite">Whether to compute the white or black bitboards</param>
+        /// <returns>The piece bitboards</returns>
         public static ulong[] ComputeAll(Board board, bool forWhite)
         {
             ulong[] bitboards = new ulong[6];
@@ -28,6 +72,12 @@ namespace chess
             return bitboards;
         }
 
+        /// <summary>
+        /// Computes all attacking bitboards for the specified color
+        /// </summary>
+        /// <param name="board">The board to compute the bitboards of</param>
+        /// <param name="forWhite">Whether to compute the white or black bitboards</param>
+        /// <returns>The attacking bitboards</returns>
         public static ulong[] ComputeAllAttack(Board board, bool forWhite)
         {
 
@@ -251,11 +301,22 @@ namespace chess
             return result;
         }
 
+        /// <summary>
+        /// Gets the bitboard of any piece on the board
+        /// </summary>
+        /// <param name="board">The board to get the bitboard of</param>
+        /// <returns>The bitboard of any piece</returns>
         public static ulong GetAny(Board board)
         {
             return GetAny(board, true) | GetAny(board, false);
         }
 
+        /// <summary>
+        /// Gets the bitboard of any piece of a color on the board
+        /// </summary>
+        /// <param name="board">The board to get the bitboard of</param>
+        /// <param name="forWhite">Whether to get the white or black pieces</param>
+        /// <returns>The bitboard of any piece or a color</returns>
         public static ulong GetAny(Board board, bool forWhite)
         {
             if (forWhite)
@@ -278,11 +339,23 @@ namespace chess
             }
         }
 
+
+        /// <summary>
+        /// Gets the attacking bitboard of any piece on the board
+        /// </summary>
+        /// <param name="board">The board to get the bitboard of</param>
+        /// <returns>The attacking bitboard of any piece</returns>
         public static ulong GetAnyAttack(Board board)
         {
             return GetAnyAttack(board, true) | GetAnyAttack(board, false);
         }
 
+        /// <summary>
+        /// Gets the attacking bitboard of any piece of a color on the board
+        /// </summary>
+        /// <param name="board">The board to get the attacking bitboard of</param>
+        /// <param name="forWhite">Whether to get the white or black pieces</param>
+        /// <returns>The attacking bitboard of any piece or a color</returns>
         public static ulong GetAnyAttack(Board board, bool forWhite)
         {
             if (forWhite)
