@@ -1,7 +1,13 @@
 namespace chess
-{
+{   
+    /// <summary>
+    /// Class used to evaluate boards
+    /// </summary>
     public abstract class Evaluator
     {
+        /// <summary>
+        /// The value each piece has
+        /// </summary>
         protected static Dictionary<int, int> PIECE_VALUES = new Dictionary<int, int>
     {
         { Piece.WHITE_PAWN, 1 },
@@ -19,6 +25,9 @@ namespace chess
         { Piece.EMPTY, 0}
     };
 
+        /// <summary>
+        /// The indexes of the center squares
+        /// </summary>
         protected static int[] CENTER_SQUARES = { 27, 28, 35, 36 };
 
         /// <summary>
@@ -29,6 +38,11 @@ namespace chess
         /// lower values indicate black has the advantage</returns>
         public abstract float evaluate(Board board);
 
+        /// <summary>
+        /// Gets the difference in piece value of pieces on the board between white and black
+        /// </summary>
+        /// <param name="board">The board to get the piece value difference of</param>
+        /// <returns>The amount of value white has more than black</returns>
         protected static float getPieceValue(Board board)
         {
             float value = 0;
@@ -44,6 +58,11 @@ namespace chess
             return value;
         }
 
+        /// <summary>
+        /// Gets the difference in pawn structure on the board between white and black
+        /// </summary>
+        /// <param name="board">The board to get the pawn structure difference of</param>
+        /// <returns>The difference in pawn structure white has over black</returns>
         protected static float getPawnChain(Board board)
         {
             float value = 0;
@@ -68,6 +87,11 @@ namespace chess
             return value;
         }
 
+        /// <summary>
+        /// Gets the difference in center control on the board between white and black
+        /// </summary>
+        /// <param name="board">The board to get the center control difference of</param>
+        /// <returns>The amount of center control white has more than black</returns>
         protected static float getCenterControl(Board board)
         {
             float value = 0;

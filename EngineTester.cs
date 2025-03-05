@@ -31,13 +31,14 @@ namespace chessTesting
             Move? move = null;
             for (int i = 0; i < repetitions; i++)
             {
-                move = player.engine.makeMove(board);
 
                 if (player.engine is chess.engine.TTEngine)
                 {
                     chess.engine.TTEngine engine = (chess.engine.TTEngine)player.engine;
-                    // engine.clearTranspositionTable();
+                    engine.clearTranspositionTable();
                 }
+
+                move = player.engine.makeMove(board);
             }
 
 
@@ -47,7 +48,7 @@ namespace chessTesting
             foreach (ICounter counter in player.engine.counters)
             {
                 // counter.write();
-                counter.DisplayOverview(false);
+                counter.DisplayOverview(true);
             }
 
             if (player.engine is chess.engine.TTEngine)

@@ -50,6 +50,9 @@ namespace chess
         private bool mateKnown;
         private bool inMate;
 
+        private bool drawKnown;
+        private GameResult.Result drawState;
+
         //bitmaps should be read from the least significant bit to the most,
         //they represent board positions from the top left to the bottom right
 
@@ -426,9 +429,16 @@ namespace chess
         /// </summary>
         /// <returns>The result of the game</returns>
         public GameResult.Result isADraw()
-        {   
+        {
+            if (drawKnown) return drawState;
+            drawKnown = true;
+
             //check for 50 move rule
-            if (halfMoves >= 100) return GameResult.Result.DrawFiftyMove;
+            if (halfMoves >= 100)
+            {
+                drawState = GameResult.Result.DrawFiftyMove;
+                return GameResult.Result.DrawFiftyMove;
+            }
 
             //check for the same board in the history
             int sameBoards = 0;
@@ -441,18 +451,33 @@ namespace chess
 
             //a draw occurs if it is the third time this position occurs,
             //the current board is not included in previousBoards but counts as 1
-            if (sameBoards >= 2) return GameResult.Result.DrawRepitition;
+            if (sameBoards >= 2)
+            {
+                drawState = GameResult.Result.DrawRepitition;
+                return GameResult.Result.DrawRepitition;
+
+            }
 
             //check if it is not a check or mate
-            if (isInCheck() || isInMate()) return GameResult.Result.Ongoing;
+            if (isInCheck() || isInMate())
+            {
+                drawState = GameResult.Result.Ongoing;
+                return GameResult.Result.Ongoing;
+            }
+
             //check for stalemate
             //do not use generateAllMoves as finding just a single legal move is enough to
             //determine it is not stalemate
             for (int i = 0; i < 64; i++)
             {
-                if (MoveGenerator.generateMoves(this, i).Count != 0) return GameResult.Result.Ongoing;
+                if (MoveGenerator.generateMoves(this, i).Count != 0)
+                {
+                    drawState = GameResult.Result.Ongoing;
+                    return GameResult.Result.Ongoing;
+                }
             }
 
+            drawState = GameResult.Result.DrawStalemate;
             return GameResult.Result.DrawStalemate;
 
 
@@ -695,6 +720,14 @@ namespace chess
                 copy.bitboardsWhiteAttack[i] = bitboardsWhiteAttack[i];
                 copy.bitboardsBlackAttack[i] = bitboardsBlackAttack[i];
             }
+
+            copy.checkKnown = checkKnown;
+            copy.mateKnown = mateKnown;
+            copy.drawKnown = drawKnown;
+
+            copy.inCheck = inCheck;
+            copy.inMate = inMate;
+            copy.drawState = drawState;
             return copy;
         }
     }

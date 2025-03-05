@@ -38,11 +38,11 @@ namespace chessTesting
 
                 GameResult gameResult = chessPlayer.Play(board.toFen());
 
-                if (gameResult.result == 1 || gameResult.finalEval > 0.5f)
+                if (gameResult.result == GameResult.Result.WinWhite || gameResult.finalEval > 0.5f)
                 {
                     winsWhite++;
                 }
-                else if (gameResult.result == -1 || gameResult.finalEval < -0.5f)
+                else if (gameResult.result == GameResult.Result.WinBlack || gameResult.finalEval < -0.5f)
                 {
                     winsBlack++;
                 }
