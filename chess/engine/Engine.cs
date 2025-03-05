@@ -1,13 +1,20 @@
 using counters;
 
 namespace chess.engine
-{   
+{
     /// <summary>
     /// Base class for all engines
     /// </summary>
     public abstract class Engine
     {
+        /// <summary>
+        /// Determines whether the engine is optimizing for white or for black
+        /// </summary>
         public bool isWhite { get; set; }
+
+        /// <summary>
+        /// A list of all counters that the engine uses for debugging and statistics
+        /// </summary>
         public List<ICounter> counters { get; set; }
 
         /// <summary>
@@ -30,12 +37,23 @@ namespace chess.engine
         /// </summary>
         protected Counter<long> generationTime { get; private set; }
 
-        protected Evaluator evaluator;
+        /// <summary>
+        /// The evaluator to use for evaluating positions
+        /// </summary>
+        public Evaluator evaluator { get; protected set; }
 
+        /// <summary>
+        /// The configuration the engine is using
+        /// </summary>
         public EngineConfig config { get; private set; }
 
+        /// <summary>
+        /// Creates a new engine object
+        /// </summary>
+        /// <param name="isWhite">Whether the engine is optimizing for white or not</param>
+        /// <param name="evaluator">The evaluator to use for evaluating positions</param>
         public Engine(bool isWhite, Evaluator evaluator)
-        {   
+        {
             //add all default counters
             counters = new List<ICounter>();
             evaluatedBoards = new Counter<int>("Evaluated boards");
@@ -50,7 +68,19 @@ namespace chess.engine
             config = EngineConfig.GetConfig(GetType().Namespace!);
         }
 
+        /// <summary>
+        /// Computes the best move to make on the given board
+        /// </summary>
+        /// <param name="board">The board to make a move on</param>
+        /// <returns>The best move to make on the board</returns>
         public abstract Move makeMove(Board board);
+
+        /// <summary>
+        /// Computes the best move to make on the given board within the time limit
+        /// </summary>
+        /// <param name="board">The board to make a move on</param>
+        /// <param name="maxTime">The maximum allowed time to compute for</param>
+        /// <returns>The best move to make on the board</returns>
         public abstract Move makeMove(Board board, float maxTime);
 
         /// <summary>

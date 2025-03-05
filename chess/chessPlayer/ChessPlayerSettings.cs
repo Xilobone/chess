@@ -1,28 +1,64 @@
-using System.Drawing.Text;
-using System.Reflection.Metadata.Ecma335;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace chessPlayer
-{
+{   
+    /// <summary>
+    /// Holds the settings for the chess player
+    /// </summary>
     public class ChessPlayerSettings
-    {
+    {   
+        /// <summary>
+        /// The loaded in settings
+        /// </summary>
         public static ChessPlayerSettings DEFAULT_SETTINGS { get => GetDefaultSettings(); private set => DEFAULT_SETTINGS = value; }
         private static ChessPlayerSettings? _DEFAULT_SETTINGS;
 
+        /// <summary>
+        /// Wheter the game has a limited number of turns or not
+        /// </summary>
         public bool limitedTurns { get; set; }
+
+        /// <summary>
+        /// The maximum number of turns in the game
+        /// </summary>
         public int maxTurns { get; set; }
 
+        /// <summary>
+        /// Whether the game has a limited running time or not
+        /// </summary>
         public bool limitedTime { get; set; }
+
+        /// <summary>
+        /// The maximum time the game is allowed to go on for
+        /// </summary>
         public int maxTime { get; set; }
+
+        /// <summary>
+        /// Whether the game has a limited allowed time per turn
+        /// </summary>
         public bool limitedTurnTime { get; set; }
+
+        /// <summary>
+        /// The maximum allowed time per turn
+        /// </summary>
         public int maxTurnTime { get; set; }
+
+        /// <summary>
+        /// Whether the board is written to the console after each turn or not
+        /// </summary>
 
         public bool displayBoards { get; set; }
 
+        /// <summary>
+        /// Whether an input is required before continuing to the next move
+        /// </summary>
+
         public bool requireInputAfterEachTurn { get; set; }
 
+        /// <summary>
+        /// The path where all the config files for the engines can be found
+        /// </summary>
         public string configPath { get; set; }
 
         /// <summary>
@@ -127,6 +163,10 @@ namespace chessPlayer
             return settings;
         }
 
+        /// <summary>
+        /// Writes the provided settings to be the default settings
+        /// </summary>
+        /// <param name="settings">The settings to make the default</param>
         public static void writeAsDefault(ChessPlayerSettings settings)
         {
             string json = JsonSerializer.Serialize(settings);
@@ -165,6 +205,10 @@ namespace chessPlayer
             return input.Equals("y");
         }
 
+        /// <summary>
+        /// Creates a string representation of the chess player settings
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             return JsonSerializer.Serialize(this);

@@ -200,7 +200,9 @@ namespace counters
 
         }
 
-        //writes the history of the counter to a .cntr file
+        /// <summary>
+        /// writes the history of the counter to a .cntr file
+        /// </summary>
         public void write()
         {
             string path = $"{BASE_FILE_PATH}{name}.cntr";

@@ -2,7 +2,10 @@ using chess;
 using converter;
 
 namespace parser
-{
+{   
+    /// <summary>
+    /// Class used to parse games from a pgn file into a list of boards
+    /// </summary>
     public class GamesParser
     {
         private string filePath;
