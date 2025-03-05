@@ -3,20 +3,41 @@ using counters;
 
 namespace improved_minimax_eval_engine
 {
+    /// <summary>
+    /// Engine that makes use of a minimax algorithm with alpha beta pruning, with an improved evaluation function
+    /// </summary>
     public class Engine : chess.engine.Engine
     {
 
         private float remainingTime;
 
+        /// <summary>
+        /// Creates a new engine
+        /// </summary>
         public Engine() : this(true) { }
 
+        /// <summary>
+        /// Creates a new engine
+        /// </summary>
+        /// <param name="isWhite">Whether the engine is optimizing for white or not</param>
         public Engine(bool isWhite) : base(isWhite, new Evaluator()) { }
 
+        /// <summary>
+        /// Computes the best move to make on the given board
+        /// </summary>
+        /// <param name="board">The board to make a move on</param>
+        /// <returns>The best move to make on the board</returns>
         public override Move makeMove(Board board)
         {
             return makeMove(board, float.MaxValue);
         }
 
+        /// <summary>
+        /// Computes the best move to make on the given board within the time limit
+        /// </summary>
+        /// <param name="board">The board to make a move on</param>
+        /// <param name="maxTime">The maximum allowed time to compute for</param>
+        /// <returns>The best move to make on the board</returns>
         public override Move makeMove(Board board, float maxTime)
         {
             Console.WriteLine(config.maxDepth);
@@ -46,7 +67,7 @@ namespace improved_minimax_eval_engine
             return bestMove!;
         }
 
-        public float maxi(Board board, int depth, float alpha, float beta)
+        private float maxi(Board board, int depth, float alpha, float beta)
         {
             float maxEval = float.MinValue;
             long startTime = getCurrentTime();
@@ -73,7 +94,7 @@ namespace improved_minimax_eval_engine
             return maxEval;
         }
 
-        public float mini(Board board, int depth, float alpha, float beta)
+        private float mini(Board board, int depth, float alpha, float beta)
         {
             float minEval = float.MaxValue;
             long startTime = getCurrentTime();
@@ -100,7 +121,7 @@ namespace improved_minimax_eval_engine
             return minEval;
         }
 
-        public float Minimax(Board board, int depth, float alpha, float beta, bool isMaximizingPlayer)
+        private float Minimax(Board board, int depth, float alpha, float beta, bool isMaximizingPlayer)
         {
             long startTime;
 

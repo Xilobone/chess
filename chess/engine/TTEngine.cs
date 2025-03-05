@@ -9,21 +9,26 @@ namespace chess.engine
     {
         private SearchResult[] transpositionTable;
 
-        public Counter<int> assignedTranspositionTableIndexes { get; private set; }
-        public Counter<int> hashCollisions { get; private set; }
+        private Counter<int> assignedTranspositionTableIndexes;
+
+        private Counter<int> hashCollisions;
+
+        private Counter<float> ttWriteTime;
+        private Counter<float> ttReadTime;
 
         /// <summary>
-        /// Amount of time spend writing to the transposition table
+        /// Creates a new transposition table engine
         /// </summary>
-        protected Counter<float> ttWriteTime { get; private set; }
-
+        /// <param name="isWhite">Whether the engine is optimizing for white or not</param>
+        /// <param name="evaluator">The evaluator the engine will use</param>
         protected TTEngine(bool isWhite, Evaluator evaluator) : base(isWhite, evaluator)
         {
             //create counters
             assignedTranspositionTableIndexes = new Counter<int>("items added to transpositiontable");
             hashCollisions = new Counter<int>("hash collisions");
             ttWriteTime = new Counter<float>("Transposition table write time", "ms");
-            counters.AddRange(assignedTranspositionTableIndexes, hashCollisions, ttWriteTime);
+            ttReadTime = new Counter<float>("Transposition table read time", "ms");
+            counters.AddRange(assignedTranspositionTableIndexes, hashCollisions, ttWriteTime, ttReadTime);
 
             //create transpositiontable
             transpositionTable = new SearchResult[config.transpositionTableSize];
@@ -42,6 +47,7 @@ namespace chess.engine
             ulong hash = Zobrist.hash(board);
             ulong index = hash % config.transpositionTableSize;
             result.hash = hash;
+
             //there is already a result stored at the given index
             if (transpositionTable[index] != null)
             {
@@ -49,7 +55,7 @@ namespace chess.engine
                 if (transpositionTable[index].hash != result.hash) hashCollisions.Increment();
 
                 //the stored result has a greater depth than the new result, do not overrwide result
-                if (transpositionTable[index].searchedDepth < result.searchedDepth)
+                if (transpositionTable[index].searchedDepth > result.searchedDepth)
                 {
                     ttWriteTime.Increment(getCurrentTime() - startTime);
                     return;
@@ -70,11 +76,13 @@ namespace chess.engine
         /// <returns>The searchresult from the transposition table, if any</returns>
         protected SearchResult? getFromTranspositionTable(Board board)
         {
+            long startTime = getCurrentTime();
             ulong hash = Zobrist.hash(board);
             ulong index = hash % config.transpositionTableSize;
 
             if (transpositionTable[index] == null || transpositionTable[index].hash != hash) return null;
 
+            ttReadTime.Increment(getCurrentTime() - startTime);
             return transpositionTable[index];
         }
 
@@ -84,6 +92,38 @@ namespace chess.engine
         public void clearTranspositionTable()
         {
             transpositionTable = new SearchResult[config.transpositionTableSize];
+        }
+
+        /// <summary>
+        /// Gets the computed principal variation, i.e. the top line, does
+        /// not compute anything in itself
+        /// </summary>
+        /// <param name="board">The board to get the pv from</param>
+        /// <returns>A list of moves indicating the pv</returns>
+        public List<Move> getPV(Board board)
+        {
+            List<Move> pv = new List<Move>();
+
+            while (true)
+            {
+                SearchResult? result = getFromTranspositionTable(board);
+                if (result == null || result.move == null) break;
+
+                pv.Add(result.move);
+                board = board.makeMove(result.move);
+            }
+            return pv;
+        }
+
+        /// <summary>
+        /// Displays all stored results to the console
+        /// </summary>
+        public void displayTranspositionTable()
+        {
+            foreach (SearchResult result in transpositionTable)
+            {
+                if (result != null && result.searchedDepth != 0) Console.WriteLine(result);
+            }
         }
     }
 }

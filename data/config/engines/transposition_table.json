@@ -1,5 +1,5 @@
 {
-    "maxDepth": 6,
+    "maxDepth": 4,
     "hasTranspositionTable": true,
     "transpositionTableSize": 20000000
 }

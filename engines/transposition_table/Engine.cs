@@ -1,6 +1,5 @@
 using chess;
 using chess.engine;
-using counters;
 
 namespace transposition_table
 {

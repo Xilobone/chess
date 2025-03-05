@@ -1,35 +1,13 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace chess.engine
-{   
+{
     /// <summary>
     /// Represents the result of a engine search
     /// </summary>
     public class SearchResult
     {
-        /// <summary>
-        /// Indicates the type of node in the search tree, either exact, lower bound or upper bound
-        /// </summary>
-        public enum NodeType
-        {
-            /// <summary>
-            /// The nodes evaluation is exact
-            /// </summary>
-            Exact,
-            /// <summary>
-            /// The nodes evaluation is a lower bound
-            /// </summary>
-            LowerBound,
-            /// <summary>
-            /// The nodes evaluation is a upper bound
-            /// </summary>
-            UpperBound
-        }
-
-        /// <summary>
-        /// The type of node that is stored
-        /// </summary>
-        public NodeType type;
 
         /// <summary>
         /// The evaluation of the result
@@ -81,7 +59,13 @@ namespace chess.engine
         /// <returns>The string representation of the result</returns>
         public override string ToString()
         {
-            return JsonSerializer.Serialize(this);
+            return JsonSerializer.Serialize(new
+            {
+                evaluation,
+                searchedDepth,
+                hash,
+                move = move?.ToString() ?? "No move"
+            });
         }
     }
 }

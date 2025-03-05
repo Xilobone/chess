@@ -1,23 +1,43 @@
 using chess;
-using counters;
+using chess.engine;
 
 namespace improved_minimax_engine
 {
+    /// <summary>
+    /// Engine that uses an improved version of the minimax algorithm with alpha beta pruning
+    /// </summary>
     public class Engine : chess.engine.Engine
     {
 
         private float remainingTime;
 
+        /// <summary>
+        /// Creates a new engine
+        /// </summary>
         public Engine() : this(true) { }
 
-
+        /// <summary>
+        /// Creates a new engine
+        /// </summary>
+        /// <param name="isWhite">Whether the engine is optimizing for white or not</param>
         public Engine(bool isWhite) : base(isWhite, new Evaluator()) { }
 
+        /// <summary>
+        /// Computes the best move to make on the given board
+        /// </summary>
+        /// <param name="board">The board to make a move on</param>
+        /// <returns>The best move to make on the board</returns>
         public override Move makeMove(Board board)
         {
             return makeMove(board, float.MaxValue);
         }
 
+        /// <summary>
+        /// Computes the best move to make on the given board within the time limit
+        /// </summary>
+        /// <param name="board">The board to make a move on</param>
+        /// <param name="maxTime">The maximum allowed time to compute for</param>
+        /// <returns>The best move to make on the board</returns>
         public override Move makeMove(Board board, float maxTime)
         {
             remainingTime = maxTime;
