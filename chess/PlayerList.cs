@@ -1,29 +1,43 @@
 namespace chess
-{
+{   
+    /// <summary>
+    /// Class containing lists of all players that are configured
+    /// </summary>
     public static class PlayerList
     {
-        public static Player[] whitePlayers = {
-            new Player("player", new player.Player(), new player.Evaluator()),
-            new Player("minimax", new minimax_engine.Engine(), new minimax_engine.Evaluator()),
-            new Player("improved minimax", new improved_minimax_engine.Engine(), new improved_minimax_engine.Evaluator()),
-            new Player("improved eval minimax", new improved_minimax_eval_engine.Engine(), new improved_minimax_eval_engine.Evaluator()),
-            new Player("transposition table", new transposition_table.Engine(), new transposition_table.Evaluator()),
-            new Player("iterative deepening", new iterative_deepening.Engine(), new iterative_deepening.Evaluator())
-            
+        /// <summary>
+        /// List of all white players that are configured
+        /// </summary>
+        public static IPlayer[] whitePlayers = {
+            new Player<player.Player>(),
+            new Player<minimax_engine.Engine>(),
+            new Player<improved_minimax_engine.Engine>(),
+            new Player<improved_minimax_eval_engine.Engine>(),
+            new Player<transposition_table.Engine>(),
+            new Player<iterative_deepening.Engine>(),
+
         };
 
-        public static Player[] blackPlayers = {
-            new Player("player", new player.Player(), new player.Evaluator()),
-            new Player("minimax", new minimax_engine.Engine(), new minimax_engine.Evaluator()),
-            new Player("improved minimax", new improved_minimax_engine.Engine(), new improved_minimax_engine.Evaluator()),
-            new Player("improved eval minimax", new improved_minimax_eval_engine.Engine(), new improved_minimax_eval_engine.Evaluator()),
-            new Player("transposition table", new transposition_table.Engine(), new transposition_table.Evaluator()),
-            new Player("iterative deepening", new iterative_deepening.Engine(), new iterative_deepening.Evaluator())
+        /// <summary>
+        /// List of all black players that are configured
+        /// </summary>
+        public static IPlayer[] blackPlayers = {
+            new Player<player.Player>(),
+            new Player<minimax_engine.Engine>(),
+            new Player<improved_minimax_engine.Engine>(),
+            new Player<improved_minimax_eval_engine.Engine>(),
+            new Player<transposition_table.Engine>(),
+            new Player<iterative_deepening.Engine>(),
         };
 
-        public static Player selectPlayer(bool isWhite) 
+        /// <summary>
+        /// Asks the user to select a player from the corresponding list
+        /// </summary>
+        /// <param name="isWhite">The color of the player to select</param>
+        /// <returns>The selected player</returns>
+        public static IPlayer selectPlayer(bool isWhite)
         {
-            Player[] players = isWhite ? whitePlayers : blackPlayers;
+            IPlayer[] players = isWhite ? whitePlayers : blackPlayers;
             string color = isWhite ? "white" : "black";
             Console.WriteLine("Please select a " + color + " player:");
 
@@ -34,7 +48,7 @@ namespace chess
 
             int index = int.Parse(Console.ReadLine()!);
 
-            Player player = players[index];
+            IPlayer player = players[index];
 
             player.engine.isWhite = isWhite;
             return player;

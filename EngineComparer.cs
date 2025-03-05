@@ -16,8 +16,8 @@ namespace chessTesting
         public static void CompareFromUserInput()
         {
             //request players from user
-            Player white = PlayerList.selectPlayer(true);
-            Player black = PlayerList.selectPlayer(false);
+            IPlayer white = PlayerList.selectPlayer(true);
+            IPlayer black = PlayerList.selectPlayer(false);
 
             ChessPlayerSettings settings = ChessPlayerSettings.AskUserForSettings();
             //get list of boards to play

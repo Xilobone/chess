@@ -1,8 +1,12 @@
 namespace chess
 {
     using engine;
-    public class Player
-    {   
+
+    /// <summary>
+    /// Represents an agent that can play a game of chess
+    /// </summary>
+    public class Player<T> : IPlayer where T : Engine, new()
+    {
         /// <summary>
         /// The name of the player
         /// </summary>
@@ -14,15 +18,12 @@ namespace chess
         public Engine engine { get; private set; }
 
         /// <summary>
-        /// The evaluator the player uses
+        /// Creates a new player
         /// </summary>
-        public Evaluator evaluator { get; private set; }
-
-        public Player(string name, Engine engine, Evaluator evaluator)
+        public Player()
         {
-            this.name = name;
-            this.engine = engine;
-            this.evaluator = evaluator;
+            engine = new T();
+            name = engine.GetType().Namespace!;
         }
     }
 }

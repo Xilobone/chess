@@ -9,8 +9,8 @@ namespace chessPlayer
     /// </summary>
     public class ChessPlayer
     {
-        private Player? white;
-        private Player? black;
+        private IPlayer? white;
+        private IPlayer? black;
 
         /// <summary>
         /// The current board of the game that is being played
@@ -40,7 +40,7 @@ namespace chessPlayer
         /// </summary>
         /// <param name="white">The engine that will play for white</param>
         /// <param name="black">The engine that will play for black</param>
-        public ChessPlayer(Player white, Player black) : this(white, black, ChessPlayerSettings.DEFAULT_SETTINGS) { }
+        public ChessPlayer(IPlayer white, IPlayer black) : this(white, black, ChessPlayerSettings.DEFAULT_SETTINGS) { }
 
         /// <summary>
         /// Creates a new chess player, with custom settings
@@ -48,7 +48,7 @@ namespace chessPlayer
         /// <param name="white">The engine that will play for white</param>
         /// <param name="black">The engine that will play for black</param>
         /// <param name="settings">The settings to play the game with</param>
-        public ChessPlayer(Player white, Player black, ChessPlayerSettings settings)
+        public ChessPlayer(IPlayer white, IPlayer black, ChessPlayerSettings settings)
         {
             this.white = white;
             this.black = black;
@@ -98,8 +98,8 @@ namespace chessPlayer
                 if (settings.displayBoards)
                 {
                     board.display();
-                    Console.WriteLine("White's evaluation: " + white.evaluator.evaluate(board));
-                    Console.WriteLine("Black's evaluation: " + black.evaluator.evaluate(board));
+                    Console.WriteLine("White's evaluation: " + white.engine.evaluator.evaluate(board));
+                    Console.WriteLine("Black's evaluation: " + black.engine.evaluator.evaluate(board));
                 }
 
                 if (settings.requireInputAfterEachTurn)
@@ -130,8 +130,8 @@ namespace chessPlayer
 
             //game has finished
             board.display();
-            Console.WriteLine("White's evaluation: " + white.evaluator.evaluate(board));
-            Console.WriteLine("Black's evaluation: " + black.evaluator.evaluate(board));
+            Console.WriteLine("White's evaluation: " + white.engine.evaluator.evaluate(board));
+            Console.WriteLine("Black's evaluation: " + black.engine.evaluator.evaluate(board));
 
 
             long time = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startTime;

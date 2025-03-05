@@ -23,7 +23,7 @@ namespace chess
         /// <param name="result">The result of the game</param>
         /// <param name="playedMoves">The series of moves played in the game</param>
         /// <param name="settings">The chess player settings the game was played with</param>
-        public static void LogGame(Player white, Player black, string startFen, GameResult result, List<Move> playedMoves, ChessPlayerSettings settings)
+        public static void LogGame(IPlayer white, IPlayer black, string startFen, GameResult result, List<Move> playedMoves, ChessPlayerSettings settings)
         {
             string timestamp = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}]";
 

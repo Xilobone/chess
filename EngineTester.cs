@@ -2,19 +2,19 @@ using System.Text.RegularExpressions;
 using chess;
 using counters;
 
-namespace chessTesting 
-{   
+namespace chessTesting
+{
     /// <summary>
     /// Class used for testing the performance of a standalone engine
     /// </summary>
     public static class EngineTester
-    {   
+    {
         /// <summary>
         /// Tests the performance of a engine for one position, writes the engines counters to the console
         /// </summary>
         public static void testSinglePosition()
         {
-            Player player = PlayerList.selectPlayer(true);
+            IPlayer player = PlayerList.selectPlayer(true);
             int repetitions = getRepetitions();
 
             Console.Write("Enter the starting fen (or leave empty for the standard position):");
@@ -36,7 +36,7 @@ namespace chessTesting
                 if (player.engine is chess.engine.TTEngine)
                 {
                     chess.engine.TTEngine engine = (chess.engine.TTEngine)player.engine;
-                    engine.clearTranspositionTable();
+                    // engine.clearTranspositionTable();
                 }
             }
 
@@ -47,7 +47,21 @@ namespace chessTesting
             foreach (ICounter counter in player.engine.counters)
             {
                 // counter.write();
-                counter.DisplayOverview(true);
+                counter.DisplayOverview(false);
+            }
+
+            if (player.engine is chess.engine.TTEngine)
+            {
+                chess.engine.TTEngine engine = (chess.engine.TTEngine)player.engine;
+                // engine.displayTranspositionTable();
+                List<Move> pv = engine.getPV(board);
+                string pvString = "";
+                foreach (Move mv in pv)
+                {
+                    pvString += mv + " ";
+                }
+                Console.WriteLine($"pv: {pvString}");
+
             }
         }
 
