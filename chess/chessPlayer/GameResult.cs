@@ -6,11 +6,46 @@ namespace chessPlayer
     /// Stores the result of a game of chess
     /// </summary>
     public class GameResult
-    {      
+    {   
         /// <summary>
-        /// The result of the game, 1: white won, -1: black won, 0: draw
+        /// The possible game results
         /// </summary>
-        public float result { get; private set; }
+        public enum Result
+        {   
+            /// <summary>
+            /// The game is still ongoing
+            /// </summary>
+            Ongoing,
+
+            /// <summary>
+            /// White has won
+            /// </summary>
+            WinWhite,
+
+            /// <summary>
+            /// Black has won
+            /// </summary>
+            WinBlack,
+
+            /// <summary>
+            /// The game is a draw by repitition
+            /// </summary>
+            DrawRepitition,
+
+            /// <summary>
+            /// The game is a draw by stalemate
+            /// </summary>
+            DrawStalemate,
+
+            /// <summary>
+            /// The game is a draw by the 50 move rule
+            /// </summary>
+            DrawFiftyMove
+        }  
+        /// <summary>
+        /// The result of the game
+        /// </summary>
+        public Result result { get; private set; }
 
         /// <summary>
         /// Whites final evaluation of the board
@@ -33,7 +68,7 @@ namespace chessPlayer
         /// <param name="result">The result of the game</param>
         /// <param name="whiteEval">Whites final evaluation</param>
         /// <param name="blackEval">Blacks final evaluation</param>
-        public GameResult(float result, float whiteEval, float blackEval)
+        public GameResult(Result result, float whiteEval, float blackEval)
         {
             this.result = result;
             this.whiteEval = whiteEval;
@@ -51,10 +86,14 @@ namespace chessPlayer
         /// <returns></returns>
         public static GameResult GetResult(Board board, IPlayer white, IPlayer black)
         {
-            float result = 0;
+            Result result;
             if (board.isInMate())
             {
-                result = board.whiteToMove ? -1 : 1;
+                result = board.whiteToMove ? Result.WinBlack : Result.WinWhite;
+            }
+            else
+            {
+                result = board.isADraw();
             }
 
             return new GameResult(result, white.engine.evaluator.evaluate(board), black.engine.evaluator.evaluate(board));
@@ -66,14 +105,17 @@ namespace chessPlayer
         /// <returns></returns>
         public override string ToString()
         {
-            string winner = "";
+            string res = "";
             switch (result)
             {
-                case 0: winner = "draw"; break;
-                case 1: winner = "white won"; break;
-                case -1: winner = "black won"; break;
+                case Result.Ongoing: res = "game is ongoing"; break;
+                case Result.WinWhite: res = "white won"; break;
+                case Result.WinBlack: res = "black won"; break;
+                case Result.DrawStalemate: res = "draw (stalemate)"; break;
+                case Result.DrawRepitition: res = "raw (repitition)"; break;
+                case Result.DrawFiftyMove: res = "raw (50 move rule)"; break;
             }
-            return $"{winner}, eval: white:{whiteEval}, black:{blackEval}";
+            return $"{res}, eval: white:{whiteEval}, black:{blackEval}";
         }
     }
 }

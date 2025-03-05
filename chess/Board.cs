@@ -1,12 +1,13 @@
+using chessPlayer;
 using converter;
 
 namespace chess
-{   
+{
     /// <summary>
     /// Class that represents a state of the chess board, boards are immutable
     /// </summary>
     public class Board
-    {   
+    {
         /// <summary>
         /// The fen string of the regular start position of a game of chess
         /// </summary>
@@ -52,9 +53,24 @@ namespace chess
         //bitmaps should be read from the least significant bit to the most,
         //they represent board positions from the top left to the bottom right
 
+        /// <summary>
+        /// The bitboards for the white pieces
+        /// </summary>
         public ulong[] bitboardsWhite = new ulong[6];
+
+        /// <summary>
+        /// The bitboards for the squares white is attacking
+        /// </summary>
         public ulong[] bitboardsWhiteAttack = new ulong[6];
+
+        /// <summary>
+        /// Bitboards for the black pieces
+        /// </summary>
         public ulong[] bitboardsBlack = new ulong[6];
+
+        /// <summary>
+        /// Bitboards for the squares black is attacking
+        /// </summary>
         public ulong[] bitboardsBlackAttack = new ulong[6];
 
         /// <summary>
@@ -397,11 +413,24 @@ namespace chess
         }
 
         /// <summary>
-        /// Checks if a board is a draw by repetition
+        /// Checks if a board is a draw by repition, stalemate or 50 move rule
         /// </summary>
-        /// <returns>true if the board is a draw, false otherwise</returns>
+        /// <returns>The result of the game</returns>
         public bool isInDraw()
         {
+            return isADraw() != GameResult.Result.Ongoing;
+        }
+
+        /// <summary>
+        /// Checks if a board is a draw by repition, stalemate or 50 move rule
+        /// </summary>
+        /// <returns>The result of the game</returns>
+        public GameResult.Result isADraw()
+        {   
+            //check for 50 move rule
+            if (halfMoves >= 100) return GameResult.Result.DrawFiftyMove;
+
+            //check for the same board in the history
             int sameBoards = 0;
             ulong hash = Zobrist.hash(this);
             foreach (ulong h in previousBoards)
@@ -412,7 +441,21 @@ namespace chess
 
             //a draw occurs if it is the third time this position occurs,
             //the current board is not included in previousBoards but counts as 1
-            return sameBoards >= 2;
+            if (sameBoards >= 2) return GameResult.Result.DrawRepitition;
+
+            //check if it is not a check or mate
+            if (isInCheck() || isInMate()) return GameResult.Result.Ongoing;
+            //check for stalemate
+            //do not use generateAllMoves as finding just a single legal move is enough to
+            //determine it is not stalemate
+            for (int i = 0; i < 64; i++)
+            {
+                if (MoveGenerator.generateMoves(this, i).Count != 0) return GameResult.Result.Ongoing;
+            }
+
+            return GameResult.Result.DrawStalemate;
+
+
         }
 
         /// <summary>
@@ -426,7 +469,7 @@ namespace chess
                 Console.Write((y + 1) + " |");
                 for (int x = 0; x < 8; x++)
                 {
-                    int index = x + 8*y;
+                    int index = x + 8 * y;
                     Console.Write(" " + Piece.DISPLAY[pieces[index]] + " |");
                 }
                 Console.WriteLine();
