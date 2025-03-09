@@ -86,6 +86,9 @@ namespace chess
         {
             Board result = getCopy();
             result.previousBoards.Add(Zobrist.hash(this));
+            result.checkKnown = false;
+            result.mateKnown = false;
+            result.drawKnown = false;
 
             int piece = getPiece(move.fr);
             int frRank = Index.GetRank(move.fr);

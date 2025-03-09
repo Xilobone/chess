@@ -8,9 +8,16 @@ namespace chessPlayer
     /// Plats a game of chess between two engines, configuration depends on the settings object
     /// </summary>
     public class ChessPlayer
-    {
-        private IPlayer? white;
-        private IPlayer? black;
+    {   
+        /// <summary>
+        /// The white player
+        /// </summary>
+        public IPlayer white { get; private set; }
+
+        /// <summary>
+        /// The black player
+        /// </summary>
+        public IPlayer black { get; private set; }
 
         /// <summary>
         /// The current board of the game that is being played
@@ -29,11 +36,6 @@ namespace chessPlayer
         public EventHandler<ChessEventArgs>? onChange;
 
         private bool isRunning;
-
-        /// <summary>
-        /// Creates a new chess player
-        /// </summary>
-        public ChessPlayer() { }
 
         /// <summary>
         /// Creates a new chess player, with default settings
@@ -83,9 +85,13 @@ namespace chessPlayer
                 return new GameResult(0, 0, 0);
             }
 
+            //reset the engines
+            white.engine.clearState();
+            black.engine.clearState();
+
             isRunning = true;
             board = Board.fromFen(fen);
-            onChange?.Invoke(this, new ChessEventArgs(board));
+            onChange?.Invoke(this, new ChessEventArgs(board, null));
 
             turnsAtStart = board.fullMoves;
             whiteStarted = board.whiteToMove;
@@ -123,7 +129,7 @@ namespace chessPlayer
                 board = board.makeMove(move);
                 playedMoves.Add(move);
 
-                onChange?.Invoke(this, new ChessEventArgs(board));
+                onChange?.Invoke(this, new ChessEventArgs(board, move));
 
                 runningTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startTime;
             }
@@ -175,18 +181,19 @@ namespace chessPlayer
         /// <summary>
         /// Asks the user to select a black and white engine, then plays a game of chess with these engines
         /// </summary>
-        public void PlayFromUserInput()
+        public static void PlayFromUserInput()
         {
-            white = PlayerList.selectPlayer(true);
-            black = PlayerList.selectPlayer(false);
+            IPlayer white = PlayerList.selectPlayer(true);
+            IPlayer black = PlayerList.selectPlayer(false);
 
-            settings = ChessPlayerSettings.AskUserForSettings();
+            ChessPlayerSettings settings = ChessPlayerSettings.AskUserForSettings();
 
             Console.Write("Enter the starting fen (or leave empty for the standard position):");
             string? fen = Console.ReadLine();
 
-            if (string.IsNullOrEmpty(fen)) Play();
-            else Play(fen);
+            ChessPlayer player = new ChessPlayer(white, black, settings);
+            if (string.IsNullOrEmpty(fen)) player.Play();
+            else player.Play(fen);
 
         }
 
@@ -210,12 +217,19 @@ namespace chessPlayer
         public Board board { get; private set; }
 
         /// <summary>
+        /// The last move that was made
+        /// </summary>
+        public Move? lastMove { get; private set; }
+        /// <summary>
         /// Creates a new chess event arguments object
         /// </summary>
         /// <param name="board">The new board of the game</param>
-        public ChessEventArgs(Board board)
+        /// <param name="lastMove">The last move that was made</param>
+        public ChessEventArgs(Board board, Move? lastMove)
         {
             this.board = board;
+            this.lastMove = lastMove;
+
         }
     }
 }

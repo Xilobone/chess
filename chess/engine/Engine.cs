@@ -84,6 +84,10 @@ namespace chess.engine
         public abstract Move makeMove(Board board, float maxTime);
 
         /// <summary>
+        /// Resets the state of the engine
+        /// </summary>
+        public virtual void clearState() { }
+        /// <summary>
         /// Clears the value of all counters of the engine
         /// </summary>
         protected void clearCounters()

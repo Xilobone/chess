@@ -59,6 +59,8 @@ namespace iterative_deepening
                 if (getCurrentTime() < moveEndTime) result = newResult;
                 else break;
             }
+
+            Console.WriteLine($"searched depth: {result!.searchedDepth}");
             addToTranspositionTable(board, result!);
 
             computationTime.Set(getCurrentTime() - startTime);

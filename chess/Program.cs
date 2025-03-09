@@ -11,14 +11,12 @@ using parser;
 /// </summary>
 public class Program
 {
-    private ChessPlayer player;
-
     /// <summary>
     /// Creates a new program
     /// </summary>
     public Program()
     {
-        player = new ChessPlayer();
+        UnitTest.Run();
         selectSetup();
     }
 
@@ -60,7 +58,7 @@ public class Program
 
         switch (type)
         {
-            case 0: player.PlayFromUserInput(); break;
+            case 0: ChessPlayer.PlayFromUserInput(); break;
             case 1: EngineComparer.CompareFromUserInput(); break;
             case 2: EngineTester.testSinglePosition(); break;
             default: break;

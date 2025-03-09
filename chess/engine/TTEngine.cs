@@ -74,7 +74,7 @@ namespace chess.engine
         /// </summary>
         /// <param name="board">The board to get the result from</param>
         /// <returns>The searchresult from the transposition table, if any</returns>
-        protected SearchResult? getFromTranspositionTable(Board board)
+        public SearchResult? getFromTranspositionTable(Board board)
         {
             long startTime = getCurrentTime();
             ulong hash = Zobrist.hash(board);
@@ -84,6 +84,14 @@ namespace chess.engine
 
             ttReadTime.Increment(getCurrentTime() - startTime);
             return transpositionTable[index];
+        }
+
+        /// <summary>
+        /// Empties the transposition table
+        /// </summary>
+        public override void clearState()
+        {
+            clearTranspositionTable();
         }
 
         /// <summary>
