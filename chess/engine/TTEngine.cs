@@ -111,12 +111,16 @@ namespace chess.engine
         public List<Move> getPV(Board board)
         {
             List<Move> pv = new List<Move>();
-
+            List<ulong> hashes = new List<ulong>();
             while (true)
             {
                 SearchResult? result = getFromTranspositionTable(board);
                 if (result == null || result.move == null) break;
 
+                //break if encountered this board before, indicating we have ended up in a loop
+                if (hashes.Contains(result.hash)) break;
+                hashes.Add(result.hash);
+                
                 pv.Add(result.move);
                 board = board.makeMove(result.move);
             }
@@ -132,6 +136,21 @@ namespace chess.engine
             {
                 if (result != null && result.searchedDepth != 0) Console.WriteLine(result);
             }
+        }
+
+        /// <summary>
+        /// Gets the fraction of the transposition table that is used
+        /// </summary>
+        /// <returns>The fraction of the transposition table that is used</returns>
+        public float getTranspositionTableOccupancy()
+        {
+            int filled = 0;
+            foreach (SearchResult result in transpositionTable)
+            {
+                if (result != null) filled++;
+            }
+
+            return (float)filled / transpositionTable.Length;
         }
     }
 }
