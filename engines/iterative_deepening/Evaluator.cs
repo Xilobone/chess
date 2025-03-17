@@ -21,7 +21,7 @@ namespace iterative_deepening
 
             if (board.isInDraw()) return eval;
 
-            eval += 2 * getPieceValue(board);
+            eval += 5 * getPieceValue(board);
             eval += 0.2f * getPawnChain(board);
             eval += 0.5f * getCenterControl(board);
             eval += 0.5f * getCheck(board);

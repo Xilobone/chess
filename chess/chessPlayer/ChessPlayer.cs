@@ -116,6 +116,7 @@ namespace chessPlayer
                 Move move;
 
                 long moveStartTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
                 //select correct player to make a move
                 switch ((board.whiteToMove, settings.limitedTurnTime))
                 {
@@ -125,12 +126,13 @@ namespace chessPlayer
                     case (false, false): move = black.engine.makeMove(board); break;
                 }
 
+
                 if (settings.displayBoards) Console.WriteLine($"move: {move}");
                 board = board.makeMove(move);
                 playedMoves.Add(move);
 
-                onChange?.Invoke(this, new ChessEventArgs(board, move));
 
+                onChange?.Invoke(this, new ChessEventArgs(board, move));
                 runningTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startTime;
             }
 

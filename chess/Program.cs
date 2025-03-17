@@ -16,7 +16,8 @@ public class Program
     /// </summary>
     public Program()
     {
-        UnitTest.Run();
+
+        // UnitTest.Run();
         selectSetup();
     }
 

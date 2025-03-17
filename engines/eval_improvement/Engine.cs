@@ -2,7 +2,7 @@ using counters;
 using chess;
 using chess.engine;
 
-namespace iterative_deepening
+namespace eval_improvement
 {
     /// <summary>
     /// Engine that makes use of a minimax algorithm and a transposition table in order to find the best
@@ -78,14 +78,14 @@ namespace iterative_deepening
             }
 
             //return this board if reached end of search tree, or if out of time
-            if (depth == 0 || board.isInMate() || getCurrentTime() >= moveEndTime)
+            if (depth == 0 || board.isInMate() || board.isInDraw() || getCurrentTime() >= moveEndTime)
             {
                 evaluatedBoards.Increment();
 
                 long startTime = getCurrentTime();
                 float eval = evaluator.evaluate(board);
                 evaluationTime.Increment(getCurrentTime() - startTime);
-                
+
                 SearchResult result = new SearchResult(eval, 0);
                 addToTranspositionTable(board, result);
                 return result;
@@ -116,17 +116,19 @@ namespace iterative_deepening
             IEnumerable<SortedItem> sortedBoards = getSortedBoards(board, moves, true);
             sortTime.Increment(getCurrentTime() - startTime);
             Move? bestMove = null;
-
+            int bestDepth = int.MaxValue;
             foreach (SortedItem item in sortedBoards)
             {
-                // Console.WriteLine(item.move);
-
                 SearchResult result = Minimax(item.board, depth - 1, alpha, beta, false);
 
-                if (result.evaluation > maxEval)
+                //always prefer results with a better evaluation
+                //if the evaluation is the same, accept the result with the lowest depth
+                //(ensures the 'better' position is reached as quickly as possible)
+                if (result.evaluation > maxEval || (result.evaluation == maxEval && result.searchedDepth < bestDepth))
                 {
                     maxEval = result.evaluation;
                     bestMove = item.move;
+                    bestDepth = result.searchedDepth;
                 }
 
                 alpha = Math.Max(alpha, result.evaluation);
@@ -151,22 +153,25 @@ namespace iterative_deepening
 
             startTime = getCurrentTime();
             IEnumerable<SortedItem> sortedBoards = getSortedBoards(board, moves, false);
-            // IEnumerable<Move> sortedMoves = moves.OrderByDescending(move => getMovePriority(move, board, false));
             sortTime.Increment(getCurrentTime() - startTime);
 
             Move? bestMove = null;
+            int bestDepth = int.MaxValue;
 
             foreach (SortedItem item in sortedBoards)
             {
-                
-                // Console.WriteLine(item.move);
+
 
                 SearchResult result = Minimax(item.board, depth - 1, alpha, beta, true);
 
-                if (result.evaluation < minEval)
+                //always prefer results with a better evaluation
+                //if the evaluation is the same, accept the result with the lowest depth
+                //(ensures the 'better' position is reached as quickly as possible)
+                if (result.evaluation < minEval || (result.evaluation == minEval && result.searchedDepth < bestDepth))
                 {
                     minEval = result.evaluation;
                     bestMove = item.move;
+                    bestDepth = result.searchedDepth;
                 }
 
                 beta = Math.Min(beta, result.evaluation);

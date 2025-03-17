@@ -15,6 +15,7 @@ namespace chess
             new Player<improved_minimax_eval_engine.Engine>(),
             new Player<transposition_table.Engine>(),
             new Player<iterative_deepening.Engine>(),
+            new Player<eval_improvement.Engine>(),
 
         };
 
@@ -28,6 +29,7 @@ namespace chess
             new Player<improved_minimax_eval_engine.Engine>(),
             new Player<transposition_table.Engine>(),
             new Player<iterative_deepening.Engine>(),
+            new Player<eval_improvement.Engine>(),
         };
 
         /// <summary>

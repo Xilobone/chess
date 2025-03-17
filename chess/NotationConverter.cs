@@ -45,20 +45,13 @@ namespace converter
 
         private static Move toMovePromotion(string move, Board board)
         {
-            // Console.WriteLine($"{move} is a promition");
-
             string[] split = move.Split("=");
             string pos = split[0];
             string promotion = split[1].ToLower()[0].ToString();
 
-            // Console.WriteLine($"pos:{pos}");
-
             //get last two characters from pos
             string toString = pos.Substring(pos.Length - 2, 2);
-            // Console.WriteLine($"toString:{toString}");
             int to = toIndex(toString);
-            // Console.WriteLine($"to:{to}");
-
 
             int fr;
 
@@ -147,8 +140,6 @@ namespace converter
 
             foreach (Move mv in moves)
             {
-                if (move.Equals("Rxb8")) Console.WriteLine(mv);
-
                 if (mv.to != to)
                 {
                     continue;
