@@ -3,12 +3,12 @@ using System.Text.RegularExpressions;
 using converter;
 
 namespace chess
-{   
+{
     /// <summary>
     /// Represents a move in a game of chess
     /// </summary>
     public class Move
-    {   
+    {
         /// <summary>
         /// Index for castling kingside for white
         /// </summary>
@@ -73,6 +73,17 @@ namespace chess
         {"r", FLAG_PROMOTE_ROOK},
         {"b", FLAG_PROMOTE_BISHOP},
         {"n", FLAG_PROMOTE_KNIGHT }
+    };
+
+        /// <summary>
+        /// Maps promotion flags to characters
+        /// </summary>
+        public static Dictionary<int, string> PROMOTION_CHARS = new Dictionary<int, string>
+    {
+        {FLAG_PROMOTE_QUEEN, "q"},
+        {FLAG_PROMOTE_ROOK, "r"},
+        {FLAG_PROMOTE_BISHOP, "b"},
+        {FLAG_PROMOTE_KNIGHT, "n"}
     };
 
         /// <summary>

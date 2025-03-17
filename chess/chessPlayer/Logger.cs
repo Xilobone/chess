@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using chess.engine;
 using chessPlayer;
+using converter;
 
 namespace chess
 {
@@ -45,11 +46,25 @@ namespace chess
             writer.WriteLine($"{timestamp} starting position: {startFen}");
 
             //log each move
+            int turn = 1;
+            Board board = Board.fromFen(startFen);
             string moves = "";
-            foreach (Move move in playedMoves)
+
+            for (int i = 0; i < playedMoves.Count; i += 2)
             {
-                moves += $"{move} ";
+                moves += $"{turn}. {NotationConverter.toAlgebraic(playedMoves[i], board)}";
+                board = board.makeMove(playedMoves[i]);
+
+                if ((i + 1) < playedMoves.Count)
+                {
+                    moves += $" {NotationConverter.toAlgebraic(playedMoves[i + 1], board)} ";
+                    board = board.makeMove(playedMoves[i + 1]);
+                }
+
+                turn++;
+                 
             }
+
             writer.WriteLine($"{timestamp} moves: {moves}");
 
             //log the game result

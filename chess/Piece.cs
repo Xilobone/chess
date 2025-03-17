@@ -163,5 +163,15 @@ namespace chess
             return (isWhite(piece) && whiteToMove) || (isBlack(piece) && !whiteToMove);
         }
 
+        /// <summary>
+        /// Checks if a given piece is a pawn
+        /// </summary>
+        /// <param name="piece">The piece to check</param>
+        /// <returns>Wether the piece is a pawn</returns>
+        public static bool isPawn(int piece)
+        {
+            return piece == WHITE_PAWN || piece == BLACK_PAWN;
+        }
+
     }
 }

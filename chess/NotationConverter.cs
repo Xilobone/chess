@@ -6,7 +6,7 @@ namespace converter
     /// Class used to convert different types of thess notations
     /// </summary>
     public static class NotationConverter
-    {   
+    {
         /// <summary>
         /// Converts algebraic notation to a move object
         /// </summary>
@@ -166,8 +166,83 @@ namespace converter
                 return mv;
             }
 
-            // board.display();
             throw new Exception($"notation invalid! ({move})");
+        }
+
+        /// <summary>
+        /// Converts a move to the algebraic notation
+        /// </summary>
+        /// <param name="move">The move to convert</param>
+        /// <param name="board">The board on which the move is made</param>
+        /// <returns>The algebraic notation of the move</returns>
+        public static string toAlgebraic(Move move, Board board)
+        {
+            //castling
+            if (move.flag == Move.FLAG_CASTLING)
+            {
+                if (chess.Index.GetFile(move.to) == 2) return "O-O-O";
+                if (chess.Index.GetFile(move.to) == 6) return "O-O";
+            }
+
+            string algebraic = "";
+            int piece = board.getPiece(move.fr);
+
+            //add the moved piece, or blank if it was a pawn
+            if (!Piece.isPawn(piece))
+            {
+                algebraic += Piece.DISPLAY[piece].ToUpper();
+            }
+
+            //check if there is any ambiguity
+            List<Move> possibleMoves = MoveGenerator.generateAllMoves(board);
+            List<Move> disambiguous = new List<Move>();
+            foreach (Move possibleMove in possibleMoves)
+            {
+                //skip the same move as the move made
+                if (possibleMove.fr == move.fr) continue;
+
+                //if the same destination is possible with the same type of piece it is ambiguous
+                if (possibleMove.to == move.to && board.getPiece(possibleMove.fr) == piece) disambiguous.Add(possibleMove);
+            }
+
+            //add disambigous file and/or rank
+            if (disambiguous.Count != 0 && !Piece.isPawn(piece))
+            {
+                bool sameFile = disambiguous.Any(mv => chess.Index.GetFile(mv.fr) == chess.Index.GetFile(move.fr));
+                bool sameRank = disambiguous.Any(mv => chess.Index.GetRank(mv.fr) == chess.Index.GetRank(move.fr));
+
+                string coordinate = toCoordinates(move.fr);
+                if (!sameFile) algebraic += coordinate[0];
+                else if (!sameRank) algebraic += coordinate[1];
+                else algebraic += coordinate;
+            }
+
+            //add x to move if it was a capture
+            if (board.getPiece(move.to) != Piece.EMPTY || (Piece.isPawn(piece) && move.to == board.enpassantIndex))
+            {
+                if (Piece.isPawn(piece)) algebraic += toCoordinates(move.fr)[0];
+
+                algebraic += "x";
+            }
+
+            //add destination
+            algebraic += toCoordinates(move.to);
+
+            //add promotion
+            if ((piece == Piece.WHITE_PAWN && chess.Index.GetRank(move.to) == 7)
+                || (piece == Piece.WHITE_PAWN && chess.Index.GetRank(move.to) == 0))
+            {
+                algebraic += "=" + Move.PROMOTION_CHARS[move.flag];
+            }
+
+            //add check and mate
+            Board result = board.makeMove(move);
+            if (result.isInMate()) algebraic += "#";
+            else if (result.isInCheck()) algebraic += "+";
+
+
+
+            return algebraic;
         }
 
         /// <summary>
@@ -176,7 +251,7 @@ namespace converter
         /// <param name="coordinates">The coordinates to convert</param>
         /// <returns>The index of the coordinates</returns>
         public static int toIndex(string coordinates)
-        {   
+        {
             int rank = coordinates[0] - 'a';
             int file = int.Parse(coordinates[1].ToString()) - 1;
             return rank + 8 * file;

@@ -24,6 +24,10 @@ namespace chessPlayer
         /// </summary>
         public Board? board { get; private set; }
 
+        /// <summary>
+        /// A list of all moves that have been played since the most recent game has started
+        /// </summary>
+        public List<Move> playedMoves { get; private set; }
         private ChessPlayerSettings? settings;
         private long runningTime;
 
@@ -61,6 +65,8 @@ namespace chessPlayer
 
             isRunning = false;
 
+            playedMoves = new List<Move>();
+
         }
 
         /// <summary>
@@ -97,7 +103,7 @@ namespace chessPlayer
             whiteStarted = board.whiteToMove;
             runningTime = 0;
             long startTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            List<Move> playedMoves = new List<Move>();
+            playedMoves.Clear();
             //runs the game
             while (!stopConditionMet())
             {

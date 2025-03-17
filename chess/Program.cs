@@ -16,7 +16,7 @@ public class Program
     /// </summary>
     public Program()
     {
-
+        test();
         // UnitTest.Run();
         selectSetup();
     }
@@ -68,8 +68,24 @@ public class Program
 
     private static void test()
     {
-        SearchResult result = new SearchResult(111, 5, new Move(32, 30));
-        Console.WriteLine(result);
+        ChessPlayerSettings settings = new ChessPlayerSettings();
+        settings.displayBoards = true;
+        settings.limitedTurns = false;
+        settings.limitedTurnTime = true;
+        settings.maxTurnTime = 1000;
+        settings.limitedTime = false;
+        settings.requireInputAfterEachTurn = false;
+        ChessPlayer player = new ChessPlayer(PlayerList.whitePlayers[1], PlayerList.blackPlayers[4], settings);
+        player.Play();
+
+        List<Move> moves = player.playedMoves;
+
+        Board board = Board.startPosition();
+        foreach (Move move in moves)
+        {
+            Console.WriteLine($"{move} -> {NotationConverter.toAlgebraic(move, board)}");
+            board = board.makeMove(move);
+        }
     }
 
     private static HashSet<Board> GetBoards(Board board, int depth)
@@ -95,14 +111,5 @@ public class Program
         }
 
         return boards;
-    }
-
-    private static void test2()
-    {
-        Board board1 = Board.fromFen("rnbqkbnr/p1p1pppp/1p6/3p4/6P1/2N5/PPPPPP1P/R1BQKBNR w KQkq d6 0 3");
-        Board board2 = Board.fromFen("rnbqkbnr/pppp1ppp/8/4p3/7P/P7/1PPPPPP1/RNBQKBNR b KQkq - 0 3");
-
-        board1.display();
-        board2.display();
     }
 }
